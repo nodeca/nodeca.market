@@ -1,0 +1,5 @@
+menus:
+  common:
+    navbar:
+      market:
+        to: market.index

@@ -1,0 +1,35 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-index__head
+  display flex
+
+.market-index__title
+  flex 1 1 0%
+
+.market-index__switch-type
+  text-align center
+  font-size $font-size-sm
+  border-bottom 1px solid $decorator-color
+  padding 0.25rem
+
+.market-index__switch-type-link
+  color $body-color-secondary
+
+$category-spacing = 1rem
+
+.market-index__categories
+  display flex
+  flex-wrap wrap
+  margin 0 $category-spacing * -1
+
+.market-index__category
+  padding $category-spacing
+  width 33.33%
+  min-width 200px
+
+.market-index__category-title
+  font-size $h5-font-size
+  line-height 1.6em
+
+.market-index__sub-category
+  color $body-color-secondary

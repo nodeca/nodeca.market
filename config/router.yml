@@ -1,0 +1,4 @@
+router:
+  http.get:
+    market.index:
+      "/market": ~

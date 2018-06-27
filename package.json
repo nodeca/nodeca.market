@@ -1,0 +1,21 @@
+{
+  "name": "nodeca.market",
+  "description": "Nodeca market application",
+  "version": "0.0.1",
+  "keywords": [ "nodeca" ],
+  "homepage": "https://github.com/nodeca/nodeca.market",
+  "license": "MIT",
+  "repository": "nodeca/nodeca.market",
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ]
+        }
+      ]
+    ]
+  }
+}

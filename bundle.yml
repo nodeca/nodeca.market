@@ -1,0 +1,13 @@
+bundles:
+  frontend:
+    - market
+
+
+packages:
+  market:
+    depends:
+      - common
+
+    entries:
+      - client/market
+      - server/market
