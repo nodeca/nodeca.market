@@ -39,58 +39,11 @@ article#content.market-index
       a.market-index__switch-type-link(href="#")= self.t('buy_link')
 
     .market-index__categories
-      .market-index__category
-        .market-index__category-title='Самолеты'
-        .market-index__sub-category='Готовые самолеты и наборы'
-        .market-index__sub-category='Комплектующие'
+      each section in self.subsections
+        .market-index__section
+          .market-index__section-title
+            a.market-index__section-link(href='#')=section.title
 
-      .market-index__category
-        .market-index__category-title='Квадрокоптеры и другие'
-        .market-index__sub-category='Готовые'
-        .market-index__sub-category='Рамы, наборы для сборки'
-        .market-index__sub-category='Контроллеры'
-        .market-index__sub-category='Комплектующие для квадрокоптеров'
-        .market-index__sub-category='FPV-оборудование'
-        .market-index__sub-category='Комплектующие'
-
-      .market-index__category
-        .market-index__category-title='Самолеты'
-        .market-index__sub-category='Готовые самолеты и наборы'
-        .market-index__sub-category='Комплектующие'
-
-      .market-index__category
-        .market-index__category-title='Квадрокоптеры и другие'
-        .market-index__sub-category='Готовые'
-        .market-index__sub-category='Рамы, наборы для сборки'
-        .market-index__sub-category='Контроллеры'
-        .market-index__sub-category='Комплектующие для квадрокоптеров'
-        .market-index__sub-category='FPV-оборудование'
-        .market-index__sub-category='Комплектующие'
-
-      .market-index__category
-        .market-index__category-title='Самолеты'
-        .market-index__sub-category='Готовые самолеты и наборы'
-        .market-index__sub-category='Комплектующие'
-
-      .market-index__category
-        .market-index__category-title='Квадрокоптеры и другие'
-        .market-index__sub-category='Готовые'
-        .market-index__sub-category='Рамы, наборы для сборки'
-        .market-index__sub-category='Контроллеры'
-        .market-index__sub-category='Комплектующие для квадрокоптеров'
-        .market-index__sub-category='FPV-оборудование'
-        .market-index__sub-category='Комплектующие'
-
-      .market-index__category
-        .market-index__category-title='Самолеты'
-        .market-index__sub-category='Готовые самолеты и наборы'
-        .market-index__sub-category='Комплектующие'
-
-      .market-index__category
-        .market-index__category-title='Квадрокоптеры и другие'
-        .market-index__sub-category='Готовые'
-        .market-index__sub-category='Рамы, наборы для сборки'
-        .market-index__sub-category='Контроллеры'
-        .market-index__sub-category='Комплектующие для квадрокоптеров'
-        .market-index__sub-category='FPV-оборудование'
-        .market-index__sub-category='Комплектующие'
+          each subsection in section.child_list
+            .market-index__subsection
+              a.market-index__subsection-link(href='#')=subsection.title

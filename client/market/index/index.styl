@@ -15,21 +15,24 @@
 .market-index__switch-type-link
   color $body-color-secondary
 
-$category-spacing = 1rem
+$section-spacing = 1rem
 
 .market-index__categories
   display flex
   flex-wrap wrap
-  margin 0 $category-spacing * -1
+  margin 0 $section-spacing * -1
 
-.market-index__category
-  padding $category-spacing
+.market-index__section
+  padding $section-spacing
   width 33.33%
   min-width 200px
 
-.market-index__category-title
+.market-index__section-title
   font-size $h5-font-size
   line-height 1.6em
 
-.market-index__sub-category
+.market-index__section-link
+  color $body-color
+
+.market-index__subsection-link
   color $body-color-secondary

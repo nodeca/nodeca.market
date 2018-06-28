@@ -4,15 +4,90 @@
 'use strict';
 
 
+const _                = require('lodash');
+const sanitize_section = require('nodeca.market/lib/sanitizers/section');
+
+
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {});
 
+  /*
+   *  to_tree(source[, root = null]) -> array
+   *  - source (array): array of sections
+   *  - root (mongodb.BSONPure.ObjectID|String): root section _id or null
+   *
+   *  Build sections tree (nested) from flat sorted array.
+   */
+  function to_tree(source, root) {
+    let result = [];
+    let nodes = {};
 
-  // Fetch categories
+    source.forEach(node => {
+      node.child_list = [];
+      nodes[node._id] = node;
+    });
+
+    root = root ? root.toString() : null;
+
+    // set children links for all nodes
+    // and collect root children to result array
+    source.forEach(node => {
+      node.parent = node.parent ? node.parent.toString() : null;
+
+      if (node.parent === root) {
+        result.push(node);
+
+      } else if (node.parent !== null) {
+        // Parent can be missed, if invisible. Check it, prior to add childs.
+        if (nodes[node.parent]) {
+          nodes[node.parent].child_list.push(node);
+        }
+      }
+    });
+
+    return result;
+  }
+
+
+  // Fetch section tree
   //
-  N.wire.on(apiPath, function market_categories_fetch(env) {
-    // TODO
+  N.wire.before(apiPath, async function market_sections_fetch(env) {
+    let subsections = await N.models.market.Section.getChildren(null, 2);
+
+    env.data.subsections_info = subsections;
+  });
+
+
+  // Fetch sections data and add `level` property
+  //
+  N.wire.on(apiPath, async function subsections_fetch_visible(env) {
+    let _ids = env.data.subsections_info.map(s => s._id);
+    env.data.subsections = [];
+
+    let sections = await N.models.market.Section.find()
+                             .where('_id').in(_ids)
+                             .lean(true);
+
+    // sort result in the same order as ids
+    env.data.subsections_info.forEach(subsectionInfo => {
+      let foundSection = _.find(sections, s => s._id.equals(subsectionInfo._id));
+
+      if (!foundSection) return; // continue
+
+      foundSection.level = subsectionInfo.level;
+      env.data.subsections.push(foundSection);
+    });
+  });
+
+
+  // Fill response data
+  //
+  N.wire.after(apiPath, async function subsections_fill_response(env) {
+    let subsections = await sanitize_section(N, env.data.subsections, env.user_info);
+
+    // build response tree
+    env.res.subsections = to_tree(subsections, null);
   });
 
 
