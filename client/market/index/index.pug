@@ -46,4 +46,7 @@ article#content.market-index
 
           each subsection in section.child_list
             .market-index__subsection
-              a.market-index__subsection-link(href='#')=subsection.title
+              a.market-index__subsection-link(
+                class=subsection.is_linked ? 'market-index__linked-section' : ''
+                href='#'
+              )=subsection.title

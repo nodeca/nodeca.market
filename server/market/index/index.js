@@ -33,6 +33,8 @@ module.exports = function (N, apiPath) {
     // set children links for all nodes
     // and collect root children to result array
     source.forEach(node => {
+      if (node.is_linked) return;
+
       node.parent = node.parent ? node.parent.toString() : null;
 
       if (node.parent === root) {
@@ -43,6 +45,21 @@ module.exports = function (N, apiPath) {
         if (nodes[node.parent]) {
           nodes[node.parent].child_list.push(node);
         }
+      }
+    });
+
+    // add linked sections for all nodes
+    source.forEach(node => {
+      if (!node.links) return;
+
+      for (let link of node.links) {
+        let linked_node = nodes[link];
+        if (!linked_node) continue;
+
+        linked_node = Object.assign({}, linked_node);
+        linked_node.child_list = [];
+        linked_node.is_linked = true;
+        node.child_list.push(linked_node);
       }
     });
 
@@ -66,14 +83,22 @@ module.exports = function (N, apiPath) {
     env.data.subsections = [];
 
     let sections = await N.models.market.Section.find()
-                             .where('_id').in(_ids)
+                             .where('_id').in(_.uniq(_ids.map(String)))
                              .lean(true);
+
+    sections = await sanitize_section(N, sections, env.user_info);
 
     // sort result in the same order as ids
     env.data.subsections_info.forEach(subsectionInfo => {
       let foundSection = _.find(sections, s => s._id.equals(subsectionInfo._id));
 
       if (!foundSection) return; // continue
+
+      foundSection = Object.assign({}, foundSection);
+
+      if (subsectionInfo.is_linked) {
+        foundSection.is_linked = true;
+      }
 
       foundSection.level = subsectionInfo.level;
       env.data.subsections.push(foundSection);
@@ -84,10 +109,8 @@ module.exports = function (N, apiPath) {
   // Fill response data
   //
   N.wire.after(apiPath, async function subsections_fill_response(env) {
-    let subsections = await sanitize_section(N, env.data.subsections, env.user_info);
-
     // build response tree
-    env.res.subsections = to_tree(subsections, null);
+    env.res.subsections = to_tree(env.data.subsections, null);
   });
 
 

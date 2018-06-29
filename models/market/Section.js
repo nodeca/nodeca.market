@@ -96,28 +96,33 @@ module.exports = function (N, collectionName) {
   //   - _id - section `_id`
   //   - parent - link to parent section object
   //   - children[ { _id, parent, children[...] } ]
+  //   - linked[ { _id, parent, children[...] } ]
   //
   let getSectionsTree = memoize(() =>
     N.models.market.Section
         .find()
         .sort('display_order')
-        .select('_id parent')
+        .select('_id parent links')
         .lean(true)
         .exec()
         .then(sections => {
 
           // create hash of trees for each section
           let result = sections.reduce((acc, s) => {
-            acc[s._id] = _.assign({ children: [] }, s);
+            acc[s._id] = Object.assign({ children: [], linked: [] }, s);
             return acc;
           }, {});
 
           // root is a special fake `section` that contains array of the root-level sections
-          let root = { children: [] };
+          let root = { children: [], linked: [] };
 
-          _.forEach(result, s => {
+          Object.values(result).forEach(s => {
             s.parent = s.parent ? result[s.parent] : root;
             s.parent.children.push(s);
+          });
+
+          Object.values(result).forEach(s => {
+            s.linked = s.links.map(ss => result[ss]).filter(Boolean);
           });
 
           result.root = root;
@@ -172,8 +177,13 @@ module.exports = function (N, collectionName) {
       }
 
       section.children.forEach(childSection => {
-        children.push(_.assign({ level: curDeepness }, childSection));
+        children.push(Object.assign({ level: curDeepness }, childSection));
         fillChildren(childSection, curDeepness + 1, maxDeepness);
+      });
+
+      // add linked sections, but don't resolve their children to prevent loops
+      section.linked.forEach(linkedSection => {
+        children.push(Object.assign({ level: curDeepness }, linkedSection, { is_linked: true }));
       });
     }
 
