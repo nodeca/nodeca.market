@@ -3,3 +3,11 @@ menus:
     navbar:
       market:
         to: market.index
+
+  admin:
+    navbar:
+      market:
+        to: admin.market.section.index
+        submenu:
+          section:
+            to: admin.market.section.index

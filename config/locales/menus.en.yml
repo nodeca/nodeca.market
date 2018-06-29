@@ -1,0 +1,11 @@
+i18n:
+  en-US:
+    admin:
+      menus:
+        navbar:
+          market: Market
+          market.section: Sections
+    common:
+      menus:
+        navbar:
+          market: Market

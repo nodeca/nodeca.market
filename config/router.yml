@@ -2,3 +2,6 @@ router:
   http.get:
     market.index:
       "/market": ~
+
+    admin.market.section.index:
+      "/market/section": ~

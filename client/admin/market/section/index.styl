@@ -1,0 +1,49 @@
+@import "nodeca.core/client/admin/core/_variables"
+
+.amarket-index__scontent
+  ul
+    list-style: none
+
+  .jqtree-tree
+    border-left 1px solid $gray-200
+    padding-left 5px
+    margin-left 0
+
+  // highlight moving item
+  .jqtree-moving
+    outline 1px dashed #4183C4
+    opacity .2
+
+  // empty div to highlight place where item will be inserted
+  .jqtree-ghost
+    background: #4183C4;
+    height 1px;
+
+  .jqtree-element
+    position relative
+
+  // empty span to highlight item which will become parent
+  .jqtree-border
+    position absolute
+    top 0
+    left 0
+    border-bottom 1px solid #4183C4
+
+//
+// Section line
+//
+
+.amarket-index__section
+  padding: 5px 15px 5px 5px
+  margin-bottom 3px
+  background-color $gray-200
+  border-radius 3px
+
+.amarket-index__sorter
+  opacity .2
+  user-select none
+  cursor move
+  margin-right 7px
+
+.amarket-index__section-delete
+  margin-left 20px
