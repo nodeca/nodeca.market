@@ -1,8 +1,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
 require('jqtree');
 
 
