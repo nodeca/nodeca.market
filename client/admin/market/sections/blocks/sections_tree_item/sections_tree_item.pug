@@ -1,17 +1,20 @@
 - var moderators = [];
 //li.amarket-index__slist-item(data-id=self.section._id)
 //- Section's own control bar.
-.amarket-index__section
+.amarket-index__section(
+  class=self.section.is_linked ? 'amarket-index__linked-section' : ''
+)
   .float-right
     a.amarket-index__section-delete.btn.btn-link.btn-sm(
       href="#",
-      data-on-click="admin.market.section.destroy",
+      data-on-click=self.section.is_linked ? 'admin.market.sections.destroy_link' : 'admin.market.sections.destroy_section',
       data-id=self.section._id,
+      data-parent=self.section.parent._id,
       data-title=self.section.title
     ) #{self.t('delete_section')}
 
   .amarket-index__section-info
     i.amarket-index__sorter.icon.icon-sorter._sorter
 
-    a.amarket-index__section-title(href=self.link_to('admin.market.section.edit', { _id: self.section._id }))
+    a.amarket-index__section-title(href=self.link_to('admin.market.sections.edit', { _id: self.section._id }))
       = self.section.title

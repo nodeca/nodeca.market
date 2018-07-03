@@ -3,5 +3,15 @@ router:
     market.index:
       "/market": ~
 
-    admin.market.section.index:
-      "/market/section": ~
+    admin.market.sections.index:
+      "/market/sections": ~
+
+    admin.market.sections.new:
+      "/market/sections/new": ~
+
+    admin.market.sections.new_link:
+      "/market/sections/new_link": ~
+
+    admin.market.sections.edit:
+      "/market/sections/{_id}":
+        _id: /[0-9a-f]{24}/

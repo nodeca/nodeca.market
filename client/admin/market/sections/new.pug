@@ -1,0 +1,13 @@
+- self.add_raw_data('allowed_parents', self.allowed_parents)
+
+
+#content
+  != self.partial('@admin.core.blocks.sidebar_menu')
+
+  .main
+    != self.partial('@admin.core.blocks.breadcrumbs')
+
+    .page-head
+      h1.page-head__title= self.head.title
+
+    != self.partial('@admin.market.sections.form_section')

@@ -7,7 +7,7 @@ menus:
   admin:
     navbar:
       market:
-        to: admin.market.section.index
+        to: admin.market.sections.index
         submenu:
-          section:
-            to: admin.market.section.index
+          sections:
+            to: admin.market.sections.index

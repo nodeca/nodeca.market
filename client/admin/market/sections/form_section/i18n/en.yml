@@ -1,0 +1,15 @@
+en-US:
+  button_save: Save
+  message_created: Section is created
+  message_updated: Section is updated
+
+  value_yes: Yes
+  value_no: No
+  value_section_none: None
+
+  field_copy_settings_from: Copy settings from
+  legend_market_settings: Market settings
+
+  field_title: Title
+  field_parent: Parent section
+  field_is_category: Category

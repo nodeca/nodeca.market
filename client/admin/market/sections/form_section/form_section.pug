@@ -1,0 +1,30 @@
+form.form-horizontal(data-bind="submit: isNewSection ? create : update")
+  fieldset(data-bind="if: isNewSection")
+    .form-group
+      label.col-form-label.col-3 #{self.t('field_copy_settings_from')}
+      .col-4: select.form-control.custom-select(data-bind="value: copySettingsFrom, options: allowedParents, optionsText: 'title', optionsValue: '_id'")
+
+  fieldset
+    legend #{self.t('legend_market_settings')}
+
+    .form-group.row
+      label.col-form-label.col-3 #{self.t('field_title')}
+      .col-4: input.form-control(type="text", data-bind="value: currentSection.title")
+
+    .form-group.row
+      label.col-form-label.col-3 #{self.t('field_parent')}
+      .col-4: select.form-control.custom-select(data-bind="value: currentSection.parent, options: allowedParents, optionsText: 'title', optionsValue: '_id'")
+
+    mixin option_field(name)
+      .form-group.row
+        label.col-form-label.col-3(for='section_' + name) #{self.t('field_' + name)}
+        .col-4
+          .switch
+            input(id='section_' + name, type="checkbox", data-bind='checked: currentSection.' + name)
+            label(for='section_' + name, data-yes=self.t('value_yes'), data-no=self.t('value_no')): i
+
+    +option_field('is_category')
+
+  .form-group.row
+    .col-9.ml-auto
+      button.btn.btn-primary(type="submit", data-bind="enable: isDirty") #{self.t('button_save')}

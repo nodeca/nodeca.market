@@ -1,0 +1,20 @@
+en-US:
+  index:
+    title: Edit market sections
+
+  new:
+    title: New market section
+
+  new_link:
+    title: New market section link
+
+  create:
+    error_parent_not_exists: Given parent section does not exist anymore.
+
+  edit:
+    title: 'Edit market section: #{name}'
+
+  destroy:
+    error_section_has_children: Can't delete this section because it has child sections.
+    error_section_is_linked: Can't delete this section because it is linked elsewhere.
+    error_section_contains_posts: Can't delete this section because it contains user posts.
