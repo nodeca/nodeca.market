@@ -13,27 +13,7 @@ article#content.market-index
 
       != self.partial('@market.index.blocks.toolbar_controls')
 
-    form.search-form
-      .search-form__input-container
-        .input-group
-          input.search-form__query.form-control(
-            type='text'
-            name='query'
-            placeholder=self.t('query_placeholder')
-            value=self.query
-          )
-
-          span.input-group-append
-            button.search-form__submit.btn.btn-outline-secondary.icon.icon-search(
-              type='submit'
-              title=self.t('search')
-            )
-
-        .search-form__meta
-          a.search-form__options-toggle(
-            href='#search_options'
-            data-on-click='search.general:search_options'
-          )= self.t('options')
+    != self.partial('@market.blocks.search_form')
 
     .market-index__switch-type
       a.market-index__switch-type-link(href="#")= self.t('buy_link')
@@ -42,11 +22,13 @@ article#content.market-index
       each section in self.subsections
         .market-index__section
           .market-index__section-title
-            a.market-index__section-link(href='#')=section.title
+            a.market-index__section-link(
+              href=self.link_to('market.section', { section_hid: section.hid })
+            )= section.title
 
           each subsection in section.child_list
             .market-index__subsection
               a.market-index__subsection-link(
                 class=subsection.is_linked ? 'market-index__linked-section' : ''
-                href='#'
+                href=self.link_to('market.section', { section_hid: subsection.hid })
               )=subsection.title

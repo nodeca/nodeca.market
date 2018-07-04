@@ -1,0 +1,60 @@
+form.market-search-form
+  .market-search-form__input-container
+    .input-group
+      input.market-search-form__query.form-control(
+        type='text'
+        name='query'
+        placeholder=self.t('query_placeholder')
+        value=self.query
+      )
+
+      span.input-group-append
+        button.market-search-form__submit.btn.btn-outline-secondary.icon.icon-search(
+          type='submit'
+          title=self.t('search')
+        )
+
+    .market-search-form__meta
+      a.market-search-form__options-toggle(
+        href='#market_search_options'
+        data-on-click='market.blocks.search_form:search_options'
+      )= self.t('options')
+
+      if self.section
+        .form-check.form-check-inline.market-search-form__search-all
+          input.form-check-input#market_search_all(type='checkbox')
+          label.form-check-label.market-search-form__search-all-label(for='market_search_all')= self.t('search_all')
+
+  #market_search_options.collapse
+    .market-search-form__options-inner
+      .row
+        .col-12
+          .form-check.form-check-inline
+            input.form-check-input#market_search_options_only_new(type='checkbox')
+            label.form-check-label(for='market_search_options_only_new')= self.t('only_new')
+
+          .form-check.form-check-inline
+            input.form-check-input#market_search_options_exchange(type='checkbox')
+            label.form-check-label(for='market_search_options_exchange')= self.t('exchange')
+
+          .form-check.form-check-inline
+            input.form-check-input#market_search_options_delivery(type='checkbox')
+            label.form-check-label(for='market_search_options_delivery')= self.t('delivery')
+        
+
+      .row
+        .col-lg-4.col-md-6.col-12.mb-2.mb-sm-0
+          .form-group.market-search-form__options-control
+            label.market-search-form__options-control-label= self.t('price')
+            input.form-control(type='text', placeholder=self.t('low_price_placeholder'))
+            span.market-search-form__options-price-dash= '-'
+            input.form-control(type='text', placeholder=self.t('high_price_placeholder'))
+
+        .col-lg-4.col-md-6.col-12.mb-2.mb-sm-0
+          .form-group.market-search-form__options-control
+            label.market-search-form__options-control-label(for='market_search_options_location')= self.t('location')
+            select.form-control.custom-select#market_search_options_location(
+              name='period'
+              onchange="$('.market-search-form__submit').click();"
+            )
+              option(selected)= self.t('near_me')

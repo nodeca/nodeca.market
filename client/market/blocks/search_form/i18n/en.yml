@@ -1,0 +1,13 @@
+en-US:
+  search: Search
+  options: Advanced options
+  search_all: Search in all categories
+  query_placeholder: What would you like to find?
+  only_new: Only new
+  exchange: Exchange
+  delivery: With delivery
+  price: Price
+  location: Location
+  low_price_placeholder: 0 ₽
+  high_price_placeholder: 999 999 ₽
+  near_me: Near me +100 km

@@ -3,6 +3,12 @@ router:
     market.index:
       "/market": ~
 
+    market.section:
+      "/market/c{section_hid}":
+        section_hid:
+          match: /\d+/
+          type: integer
+
     admin.market.sections.index:
       "/market/sections": ~
 
