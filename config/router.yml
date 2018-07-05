@@ -3,6 +3,9 @@ router:
     market.index:
       "/market": ~
 
+    market.new:
+      "/market/new": ~
+
     market.section:
       "/market/c{section_hid}":
         section_hid:

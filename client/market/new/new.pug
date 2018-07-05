@@ -1,0 +1,91 @@
+article#content.market-new
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+
+    header.page-head
+      h1.page-head__title(itemprop='name')= self.t('title')
+
+    form#market-new-form(data-bind='submit: submit')
+      fieldset
+        .row
+          .form-group.col-lg-3.col-md-4.col-sm-6
+            select.form-control.custom-select(data-bind="value: offer.type, options: offerTypes, optionsText: 'title', optionsValue: 'value'")
+
+        .row
+          .form-group.col
+            label(for='market-new-title')= self.t('field_title')
+            input.form-control#market-new-title(type='text', data-bind="value: offer.title")
+
+        .row
+          .form-group.col-lg-3.col-md-4.col-sm-6
+            label(for='market-new-price')= self.t('field_price')
+            .input-group
+              input.form-control#market-new-price(type='text', data-bind="value: offer.price_value")
+              select.form-control.market-new__currency.custom-select.input-group-append(data-bind="value: offer.price_currency, options: currencyTypes, optionsText: 'title', optionsValue: 'value'")
+
+        mixin render_section_tree(parent, level)
+          //- HTML5 doesn't support nested optgroups, so we emulate this
+          //- behavior with non-breaking space indent
+          each section in self.sections
+            if (section.parent || null) === parent
+              if section.is_category
+                optgroup(label=Array(level*4+1).join('\u00A0') + section.title)
+              else
+                option= Array(level*4+1).join('\u00A0') + section.title
+              +render_section_tree(section._id, level + 1)
+
+        .row
+          .form-group.col
+            label(for='market-new-section')= self.t('field_section')
+            select.form-control.custom-select#market-new-section(data-bind="value: offer.section")
+              option(value="", disabled, selected, hidden)= self.t('section_placeholder')
+              +render_section_tree(null, 0)
+
+        .row
+          .form-group.col
+            label= self.t('field_photos')
+            ul.user-albumlist.thumb-grid.thumb-grid__m-fluid
+              li.user-albumlist__item.thumb-grid__item
+                .thumb-grid__item-inner
+                  a.thumb(href='#')
+                    .thumb__content.icon.icon-plus
+
+        .row
+          .form-group.col
+            label(for='market-new-description')
+              = self.t('field_description')
+              = ' '
+              a(href='#', data-bind='click: preview, visible: !showPreview()')= self.t('mode_preview')
+              a(href='#', data-bind='click: preview, visible: showPreview()')= self.t('mode_edit')
+            textarea.form-control#market-new-description(rows=5, data-bind='value: offer.description, visible: !showPreview()')
+            .form-control(data-bind='html: previewHtml, visible: showPreview()')
+
+        .row
+          .form-group.col
+            label(for='market-new-barter')= self.t('field_barter')
+            input.form-control#market-new-barter(type='text', data-bind='value: offer.exchange')
+            small.form-text.text-muted= self.t('field_barter_help')
+
+        .row
+          .form-group.col
+            .form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input(type='checkbox', data-bind='checked: offer.delivery')
+                = self.t('field_delivery')
+
+        .row
+          .form-group.col
+            .form-check.form-check-inline
+              label.form-check-label
+                input.form-check-input(type='checkbox', data-bind='checked: offer.is_new')
+                = self.t('field_is_new')
+
+        .row
+          .form-actions.col
+            button.btn.btn-primary(type='submit', data-bind='enable: isDirty() && !isSubmitting()')= self.t('submit')
