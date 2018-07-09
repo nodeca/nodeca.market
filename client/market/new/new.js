@@ -7,11 +7,17 @@ let view = null;
 
 N.wire.on('navigate.preload:' + module.apiPath, function load_deps(preload) {
   preload.push('vendor.knockout');
+
+  // editor itself is not used, only markdown parser and mdedit cache
+  preload.push('mdedit');
 });
 
 
 N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
+  const RpcCache = require('nodeca.core/client/mdedit/_lib/rpc_cache')(N);
   const ko = require('knockout');
+
+  let rpc_cache = new RpcCache();
 
   view = {};
 
@@ -20,11 +26,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     { title: t('offer_buy'),  value: 'buy' }
   ];
 
-  view.currencyTypes = [
-    { title: t('currency_rub'), value: 'RUB' },
-    { title: t('currency_usd'), value: 'USD' },
-    { title: t('currency_eur'), value: 'EUR' }
-  ];
+  view.currencyTypes = N.runtime.page_data.currency_types;
 
   view.offer = {
     type:           ko.observable(view.offerTypes[0].value),
@@ -33,13 +35,16 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     price_currency: ko.observable(view.currencyTypes[0].value),
     section:        ko.observable(''),
     description:    ko.observable(''),
-    exchange:       ko.observable(''),
+    barter_info:    ko.observable(''),
     delivery:       ko.observable(false),
     is_new:         ko.observable(false)
   };
 
+  // force price to be numeric (better to do with extenders, but subscription is easier to do)
+  view.offer.price_value.subscribe(v => { view.offer.price_value(Number(v)); });
+
   view.showPreview  = ko.observable(false);
-  view.previewHtml  = '<em>TODO: render preview here</em>';
+  view.previewHtml  = ko.observable('');
   view.isSubmitting = ko.observable(false);
 
   let initialState = ko.observable({});
@@ -55,15 +60,35 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
   view.isDirty(false);
 
+  function updatePreview() {
+    N.parser.md2html({
+      text: view.offer.description(),
+      attachments: [],
+      options: N.runtime.page_data.parse_options,
+      rpc_cache
+    })
+      .then(result => {
+        view.previewHtml(result.html);
+      })
+      // It should never happen
+      .catch(err => N.wire.emit('notify', err.message));
+  }
+
   view.preview = function preview() {
-    view.showPreview(!view.showPreview());
+    // true - switch to preview mode
+    // false - switch back to editing
+    let showPreview = !view.showPreview();
+
+    view.showPreview(showPreview);
+
+    if (showPreview) updatePreview();
   };
 
-  view.submit = function submit() {
-    let request = {};
+  rpc_cache.on('update', updatePreview);
 
+  view.submit = function submit() {
     Promise.resolve()
-      .then(() => N.io.rpc('admin.new.create', request))
+      .then(() => N.io.rpc('market.new.create', ko.toJS(view.offer)))
       .then(() => N.wire.emit('market.index'))
       .catch(err => N.wire.emit('error', err));
   };

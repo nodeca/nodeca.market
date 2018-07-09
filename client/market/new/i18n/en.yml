@@ -2,9 +2,6 @@ en-US:
   title: Add an offer
   offer_sell: Sell
   offer_buy: Buy
-  currency_rub: ₽
-  currency_usd: $
-  currency_eur: €
   section_placeholder: ''
   field_title: Title
   field_price: Price

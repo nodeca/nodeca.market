@@ -1,0 +1,5 @@
+setting_groups:
+  market: ~
+
+  market_editor:
+    parent: market

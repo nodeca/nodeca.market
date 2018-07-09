@@ -35,6 +35,28 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill parse options for description editor
+  //
+  N.wire.after(apiPath, async function fill_parse_options(env) {
+    env.res.parse_options = await N.settings.getByCategory(
+      'market_items_markup',
+      { usergroup_ids: env.user_info.usergroups },
+      { alias: true }
+    );
+  });
+
+
+  // Fill available currencies
+  //
+  N.wire.after(apiPath, async function fill_options(env) {
+    // TODO: move to config
+    env.res.currency_types = [ 'RUB', 'USD', 'EUR' ].map(id => ({
+      title: env.t('currency_' + id.toLowerCase()),
+      value: id
+    }));
+  });
+
+
   // Fill head meta
   //
   N.wire.after(apiPath, function fill_head(env) {

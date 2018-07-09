@@ -1,0 +1,10 @@
+i18n:
+  en-US:
+    admin:
+      core:
+        group_names:
+          market: Market
+          market_editor: Editor
+
+        category_names:
+          market_items_markup: Market items markup
