@@ -52,12 +52,28 @@ article#content.market-new
 
         .row
           .form-group.col
+            //- Hidden
+            input#market-new-upload(
+              name='files[]'
+              type='file'
+              style='position: absolute; left: -2000px'
+              multiple
+            )
+
             label= self.t('field_photos')
             ul.user-albumlist.thumb-grid.thumb-grid__m-fluid
               li.user-albumlist__item.thumb-grid__item
                 .thumb-grid__item-inner
-                  a.thumb(href='#')
+                  //- Should 'click' file input in context of current action
+                  a.thumb(href='#', onClick='document.getElementById("market-new-upload").click()')
                     .thumb__content.icon.icon-plus
+
+              <!-- ko foreach: attachmentLinks -->
+                li.user-albumlist__item.thumb-grid__item
+                  .thumb-grid__item-inner
+                    a.thumb(href='#')
+                      img.thumb__image(data-bind="attr: { src: $data }")
+              <!-- /ko -->
 
         .row
           .form-group.col

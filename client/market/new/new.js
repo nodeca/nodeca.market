@@ -35,10 +35,15 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     price_currency: ko.observable(view.currencyTypes[0].value),
     section:        ko.observable(''),
     description:    ko.observable(''),
+    attachments:    ko.observableArray(),
     barter_info:    ko.observable(''),
     delivery:       ko.observable(false),
     is_new:         ko.observable(false)
   };
+
+  view.attachmentLinks = ko.computed(function () {
+    return this.offer.attachments().map(id => N.router.linkTo('core.gridfs_tmp', { bucket: id + '_sm' }));
+  }, view);
 
   // force price to be numeric (better to do with extenders, but subscription is easier to do)
   view.offer.price_value.subscribe(v => { view.offer.price_value(Number(v)); });
@@ -94,6 +99,28 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   };
 
   ko.applyBindings(view, $('#market-new-form').get(0));
+
+  //
+  // Set up file upload
+  //
+  $('#market-new-upload').on('change', function () {
+    let files = $(this).get(0).files;
+
+    if (files.length > 0) {
+      let params = {
+        files,
+        rpc: [ 'market.new.upload', {} ],
+        config: 'users.uploader_config',
+        uploaded: null
+      };
+
+      N.wire.emit('users.uploader:add', params)
+        .then(() => {
+          params.uploaded.reverse().forEach(m => view.offer.attachments.unshift(m.media_id));
+        })
+        .catch(err => N.wire.emit('error', err));
+    }
+  });
 });
 
 
