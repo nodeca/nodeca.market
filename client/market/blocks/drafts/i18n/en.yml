@@ -1,0 +1,2 @@
+en-US:
+  text: 'You have a <a href="#{link}">draft</a> from #{date}'

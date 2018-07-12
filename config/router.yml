@@ -4,7 +4,13 @@ router:
       "/market": ~
 
     market.new:
-      "/market/new": ~
+      "/market/new(/{draft_id})":
+        draft_id: /[0-9a-f]{24}/
+
+      "/market/c{section_hid}/new":
+        section_hid:
+          match: /\d+/
+          type: integer
 
     market.section:
       "/market/c{section_hid}":

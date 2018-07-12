@@ -1,0 +1,9 @@
+each draft in self.drafts || []
+  .market-draft.alert.alert-info.alert-dismissible.fade.show
+    button.close.icon.icon-x(
+      data-dismiss='alert'
+      aria-label='close'
+      data-on-click='market.blocks.drafts:remove'
+      data-draft-id=draft._id
+    )
+    != self.t('text', { link: self.link_to('market.new', { draft_id: draft._id }), date: self.date(draft.ts, 'relative_full') })

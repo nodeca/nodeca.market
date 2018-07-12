@@ -1,4 +1,4 @@
-// Create new market offer
+// Create new draft
 //
 
 'use strict';
@@ -18,6 +18,7 @@ module.exports = function (N, apiPath) {
       uniqueItems: true,
       items: { format: 'mongo' }
     },
+    barter_info:    { type: 'string' },
     delivery:       { type: 'boolean' },
     is_new:         { type: 'boolean' }
   });
@@ -30,8 +31,12 @@ module.exports = function (N, apiPath) {
   });
 
 
-  N.wire.on(apiPath, async function create_offer() {
-    // TODO
-    throw { code: N.io.CLIENT_ERROR, message: 'Creating market offers is not yet implemented' };
+  N.wire.on(apiPath, async function create_draft(env) {
+    let draft = await N.models.market.Draft.create({
+      user: env.user_info.user_id,
+      data: env.params
+    });
+
+    env.res.draft_id = draft._id;
   });
 };

@@ -10,7 +10,22 @@ const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 
 module.exports = function (N, apiPath) {
 
-  N.validate(apiPath, {});
+  N.validate(apiPath, {
+    section_hid: { type: 'integer' },
+    draft_id:    { format: 'mongo' }
+  });
+
+
+  // Load draft if user previously created one
+  //
+  N.wire.before(apiPath, async function load_draft(env) {
+    let draft = await N.models.market.Draft.findById(env.params.draft_id)
+                          .lean(true);
+
+    if (draft && String(draft.user) === String(env.user_info.user_id)) {
+      env.res.draft = draft.data;
+    }
+  });
 
 
   // Fetch section tree
@@ -32,6 +47,12 @@ module.exports = function (N, apiPath) {
     );
 
     env.res.sections = await sanitize_section(N, env.data.sections, env.user_info);
+
+    let selected_section = env.res.sections.filter(s => s.hid === env.params.section_hid)[0];
+
+    if (selected_section && !selected_section.is_category) {
+      env.res.selected_section_id = selected_section._id;
+    }
   });
 
 

@@ -1,12 +1,15 @@
-// Create new market offer
+// Update draft
 //
 
 'use strict';
+
+const _ = require('lodash');
 
 
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
+    draft_id:       { format: 'mongo', required: true },
     type:           { type: 'string', 'enum': [ 'sell', 'buy' ] },
     title:          { type: 'string' },
     price_value:    { type: 'number' },
@@ -18,6 +21,7 @@ module.exports = function (N, apiPath) {
       uniqueItems: true,
       items: { format: 'mongo' }
     },
+    barter_info:    { type: 'string' },
     delivery:       { type: 'boolean' },
     is_new:         { type: 'boolean' }
   });
@@ -30,8 +34,10 @@ module.exports = function (N, apiPath) {
   });
 
 
-  N.wire.on(apiPath, async function create_offer() {
-    // TODO
-    throw { code: N.io.CLIENT_ERROR, message: 'Creating market offers is not yet implemented' };
+  N.wire.on(apiPath, async function update_draft(env) {
+    await N.models.market.Draft.update(
+      { _id: env.params.draft_id, user: env.user_info.user_id },
+      { $set: { data: _.omit(env.params, 'draft_id'), ts: new Date() } }
+    );
   });
 };

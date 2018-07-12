@@ -106,6 +106,16 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch user drafts
+  //
+  N.wire.before(apiPath, async function fetch_drafts(env) {
+    env.res.drafts = await N.models.market.Draft.find()
+                               .where('user').equals(env.user_info.user_id)
+                               .sort('-ts')
+                               .lean(true);
+  });
+
+
   // Fill response data
   //
   N.wire.after(apiPath, async function subsections_fill_response(env) {

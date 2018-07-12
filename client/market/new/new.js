@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = require('lodash');
+
 
 // Knockout bindings root object.
 let view = null;
@@ -17,6 +19,8 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   const RpcCache = require('nodeca.core/client/mdedit/_lib/rpc_cache')(N);
   const ko = require('knockout');
 
+  let draft_id;
+
   let rpc_cache = new RpcCache();
 
   view = {};
@@ -27,6 +31,8 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   ];
 
   view.currencyTypes = N.runtime.page_data.currency_types;
+
+  view.router = N.router;
 
   view.offer = {
     type:           ko.observable(view.offerTypes[0].value),
@@ -41,29 +47,55 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     is_new:         ko.observable(false)
   };
 
-  view.attachmentLinks = ko.computed(function () {
-    return this.offer.attachments().map(id => N.router.linkTo('core.gridfs_tmp', { bucket: id + '_sm' }));
-  }, view);
+  if (N.runtime.page_data.selected_section_id) {
+    view.offer.section(N.runtime.page_data.selected_section_id);
+  }
+
+  let savedDraft = _.pickBy(ko.toJS(view.offer), v => v !== '');
+
+  if (N.runtime.page_data.draft) {
+    draft_id = N.runtime.page_data.draft._id;
+
+    for (let k of Object.keys(N.runtime.page_data.draft)) {
+      if (N.runtime.page_data.draft[k] && view.offer[k]) {
+        view.offer[k](N.runtime.page_data.draft[k]);
+      }
+    }
+  }
 
   // force price to be numeric (better to do with extenders, but subscription is easier to do)
-  view.offer.price_value.subscribe(v => { view.offer.price_value(Number(v)); });
+  view.offer.price_value.subscribe(v => {
+    if (v) view.offer.price_value(Number(v));
+  });
 
   view.showPreview  = ko.observable(false);
   view.previewHtml  = ko.observable('');
   view.isSubmitting = ko.observable(false);
+  view.showErrors   = ko.observable(false);
 
-  let initialState = ko.observable({});
+  let saveDraft = _.debounce(() => {
+    let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
-  view.isDirty = ko.computed({
-    read() {
-      return initialState() !== ko.toJSON(view.offer);
-    },
-    write(value) {
-      initialState(value ? null : ko.toJSON(view.offer));
+    if (JSON.stringify(savedDraft) === JSON.stringify(object)) return;
+
+    if (draft_id) {
+      N.io.rpc('market.new.draft.update', Object.assign({ draft_id }, object))
+        .catch(() => { /* ignore */ });
+    } else {
+      N.io.rpc('market.new.draft.create', object)
+        .then(res => {
+          draft_id = res.draft_id;
+          savedDraft = JSON.stringify(object);
+
+          return N.wire.emit('navigate.replace', { href: N.router.linkTo('market.new', { draft_id }) });
+        })
+        .catch(() => { /* ignore */ });
     }
-  });
+  }, 2000, { leading: false, trailing: true, maxWait: 10000 });
 
-  view.isDirty(false);
+  for (let k of Object.keys(view.offer)) {
+    view.offer[k].subscribe(saveDraft);
+  }
 
   function updatePreview() {
     N.parser.md2html({
@@ -91,9 +123,18 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
   rpc_cache.on('update', updatePreview);
 
-  view.submit = function submit() {
+  view.submit = function submit(form) {
+    if (form.checkValidity() === false) {
+      view.showErrors(true);
+      return;
+    }
+
+    view.showErrors(false);
+
+    let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
+
     Promise.resolve()
-      .then(() => N.io.rpc('market.new.create', ko.toJS(view.offer)))
+      .then(() => N.io.rpc('market.new.create', object))
       .then(() => N.wire.emit('market.index'))
       .catch(err => N.wire.emit('error', err));
   };

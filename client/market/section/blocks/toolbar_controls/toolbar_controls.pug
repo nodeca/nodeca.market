@@ -2,7 +2,7 @@
 
 .page-actions.market-section__toolbar-controls
   a.btn.btn-secondary.btn-square.icon.icon-plus(
-    href=self.link_to('market.new')
+    href=self.link_to('market.new', { section_hid: self.section.hid })
     title=self.t('item_add')
   )
 

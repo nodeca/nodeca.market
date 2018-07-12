@@ -7,6 +7,7 @@ article#content.market-section
 
   .layout__container.container-fluid
     != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
 
     header.page-head.market-section__head
       h1.market-section__title.page-head__title(itemprop='name')= self.section.title
