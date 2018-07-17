@@ -19,8 +19,8 @@ module.exports = function (N, apiPath) {
 
 
   N.wire.on(apiPath, async function remove_draft(env) {
-    await N.models.market.Draft.remove(
-      { _id: env.params.draft_id, user: env.user_info.user_id }
-    );
+    let draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
+
+    if (draft) await draft.remove();
   });
 };

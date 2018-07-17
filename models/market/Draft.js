@@ -4,14 +4,12 @@
 const Mongoose       = require('mongoose');
 const Schema         = Mongoose.Schema;
 
-const DRAFT_EXPIRE_TIMEOUT = 7 * 24 * 60 * 60; // 7 days in seconds.
-
 
 module.exports = function (N, collectionName) {
 
   let Draft = new Schema({
     user:           Schema.ObjectId,
-    ts:             { type: Date, 'default': Date.now, expires: DRAFT_EXPIRE_TIMEOUT },
+    ts:             { type: Date, 'default': Date.now },
     data:           new Schema({
       type:           String,
       title:          String,
@@ -23,7 +21,8 @@ module.exports = function (N, collectionName) {
       barter_info:    String,
       delivery:       Boolean,
       is_new:         Boolean
-    }, { _id: false })
+    }, { _id: false }),
+    files:          [ Schema.ObjectId ]
   }, {
     versionKey : false
   });
@@ -32,6 +31,12 @@ module.exports = function (N, collectionName) {
   /////////////////////////////////////////////////////////////////////////////
 
   Draft.index({ user: 1 });
+
+  // Remove attached files when draft is removed
+  //
+  Draft.pre('remove', function () {
+    return Promise.all(this.files.map(id => N.models.core.FileTmp.remove(id, true)));
+  });
 
 
   N.wire.on('init:models', function emit_init_Draft() {

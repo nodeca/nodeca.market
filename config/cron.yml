@@ -1,0 +1,2 @@
+cron:
+  drafts_cleanup: 0 25 4 * * * # everyday at 4:25

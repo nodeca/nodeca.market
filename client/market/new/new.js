@@ -54,7 +54,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   let savedDraft = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
   if (N.runtime.page_data.draft) {
-    draft_id = N.runtime.page_data.draft._id;
+    draft_id = N.runtime.page_data.draft_id;
 
     for (let k of Object.keys(N.runtime.page_data.draft)) {
       if (N.runtime.page_data.draft[k] && view.offer[k]) {
@@ -73,28 +73,30 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   view.isSubmitting = ko.observable(false);
   view.showErrors   = ko.observable(false);
 
-  let saveDraft = _.debounce(() => {
+  function saveDraft(force) {
     let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
-    if (JSON.stringify(savedDraft) === JSON.stringify(object)) return;
+    if (JSON.stringify(savedDraft) === JSON.stringify(object) && !force) return;
 
     if (draft_id) {
-      N.io.rpc('market.new.draft.update', Object.assign({ draft_id }, object))
-        .catch(() => { /* ignore */ });
-    } else {
-      N.io.rpc('market.new.draft.create', object)
+      return N.io.rpc('market.new.draft.update', Object.assign({ draft_id }, object));
+    }
+
+    return N.io.rpc('market.new.draft.create', object)
         .then(res => {
           draft_id = res.draft_id;
           savedDraft = JSON.stringify(object);
 
           return N.wire.emit('navigate.replace', { href: N.router.linkTo('market.new', { draft_id }) });
-        })
-        .catch(() => { /* ignore */ });
-    }
+        });
+  }
+
+  let saveDraftDebounced = _.debounce(() => {
+    saveDraft().catch(() => { /* ignore */ });
   }, 2000, { leading: false, trailing: true, maxWait: 10000 });
 
   for (let k of Object.keys(view.offer)) {
-    view.offer[k].subscribe(saveDraft);
+    view.offer[k].subscribe(saveDraftDebounced);
   }
 
   function updatePreview() {
@@ -148,18 +150,27 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     let files = $(this).get(0).files;
 
     if (files.length > 0) {
-      let params = {
-        files,
-        rpc: [ 'market.new.upload', {} ],
-        config: 'users.uploader_config',
-        uploaded: null
-      };
+      let promise = Promise.resolve();
 
-      N.wire.emit('users.uploader:add', params)
-        .then(() => {
-          params.uploaded.reverse().forEach(m => view.offer.attachments.unshift(m.media_id));
-        })
-        .catch(err => N.wire.emit('error', err));
+      if (!draft_id) {
+        promise = promise.then(() => saveDraft(true));
+      }
+
+      promise = promise.then(() => {
+        let params = {
+          files,
+          rpc: [ 'market.new.upload', { draft_id } ],
+          config: 'users.uploader_config',
+          uploaded: null
+        };
+
+        return N.wire.emit('users.uploader:add', params)
+          .then(() => {
+            params.uploaded.reverse().forEach(m => view.offer.attachments.unshift(m.media_id));
+          });
+      });
+
+      promise.catch(err => N.wire.emit('error', err));
     }
   });
 });

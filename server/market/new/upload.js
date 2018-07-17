@@ -19,7 +19,8 @@ module.exports = function (N, apiPath) {
 
 
   N.validate(apiPath, {
-    file: { type: 'string',  required: true }
+    draft_id: { format: 'mongo', required: true },
+    file:     { type: 'string',  required: true }
   });
 
 
@@ -27,6 +28,17 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function check_permissions() {
     // TODO
+  });
+
+
+  // Find current draft
+  //
+  N.wire.before(apiPath, async function find_draft(env) {
+    env.data.draft = await N.models.market.Draft.findOne()
+                               .where('_id').equals(env.params.draft_id)
+                               .where('user').equals(env.user_info.user_id);
+
+    if (!env.data.draft) throw N.io.NOT_FOUND;
   });
 
 
@@ -111,6 +123,15 @@ module.exports = function (N, apiPath) {
       media_id: data.id,
       file_size: data.size
     };
+  });
+
+
+  // Attach this file to draft
+  //
+  N.wire.after(apiPath, async function update_draft(env) {
+    env.data.draft.ts = new Date();
+    env.data.draft.files.push(env.res.media.media_id);
+    await env.data.draft.save();
   });
 
 

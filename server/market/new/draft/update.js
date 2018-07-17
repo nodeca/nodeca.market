@@ -34,10 +34,29 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Find current draft
+  //
+  N.wire.before(apiPath, async function find_draft(env) {
+    env.data.draft = await N.models.market.Draft.findOne()
+                               .where('_id').equals(env.params.draft_id)
+                               .where('user').equals(env.user_info.user_id);
+
+    if (!env.data.draft) throw N.io.NOT_FOUND;
+  });
+
+
+  // Update draft
+  //
   N.wire.on(apiPath, async function update_draft(env) {
-    await N.models.market.Draft.update(
-      { _id: env.params.draft_id, user: env.user_info.user_id },
-      { $set: { data: _.omit(env.params, 'draft_id'), ts: new Date() } }
-    );
+    let data = _.omit(env.params, 'draft_id');
+    let files = _.keyBy(env.data.draft.files);
+
+    // restrict attachments to only files that were uploaded for this draft
+    data.attachments = data.attachments.filter(id => files.hasOwnProperty(id));
+
+    env.data.draft.data = data;
+    env.data.draft.ts = new Date();
+
+    await env.data.draft.save();
   });
 };

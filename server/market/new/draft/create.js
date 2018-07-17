@@ -32,9 +32,13 @@ module.exports = function (N, apiPath) {
 
 
   N.wire.on(apiPath, async function create_draft(env) {
+    // can't have any attachments when draft is created
+    let data = env.params;
+    data.attachments = [];
+
     let draft = await N.models.market.Draft.create({
       user: env.user_info.user_id,
-      data: env.params
+      data
     });
 
     env.res.draft_id = draft._id;

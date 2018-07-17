@@ -1,4 +1,5 @@
 - self.add_raw_data('draft', self.draft)
+- self.add_raw_data('draft_id', self.draft_id)
 - self.add_raw_data('selected_section_id', self.selected_section_id)
 - self.add_raw_data('parse_options', self.parse_options)
 - self.add_raw_data('currency_types', self.currency_types)
@@ -63,18 +64,34 @@ article#content.market-new
             )
 
             label= self.t('field_photos')
-            ul.user-albumlist.thumb-grid.thumb-grid__m-fluid
-              li.user-albumlist__item.thumb-grid__item
+            ul.market-new__attach-list.thumb-grid.thumb-grid__m-fluid
+              li.market-new__attach-item.thumb-grid__item
                 .thumb-grid__item-inner
                   //- Should 'click' file input in context of current action
                   a.thumb(href='#', onClick='document.getElementById("market-new-upload").click()')
                     .thumb__content.icon.icon-plus
 
               <!-- ko foreach: offer.attachments -->
-                li.user-albumlist__item.thumb-grid__item(style='display: none', data-bind='visible: true')
+                li.market-new__attach-item.thumb-grid__item(style='display: none', data-bind='visible: true')
                   .thumb-grid__item-inner
                     a.thumb(href='#')
                       img.thumb__image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
+
+                      .market-new__attach-controls
+                        .market-new__attach-control-item.dropdown.dropup
+                          - var menu_rnd_id = 'rnd' + String(Math.random()).slice(2, 10)
+
+                          button.btn.btn-link.btn-square.icon.icon-dropdown-local.dropdown-toggle(
+                            type='button'
+                            id=menu_rnd_id
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            data-toggle='dropdown'
+                          )
+
+                          .dropdown-menu.dropdown-menu-right(aria-labelledby=menu_rnd_id)
+                            button.dropdown-item()= self.t('attach_make_primary')
+                            button.dropdown-item()= self.t('attach_delete')
               <!-- /ko -->
 
         .row

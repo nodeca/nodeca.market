@@ -24,6 +24,7 @@ module.exports = function (N, apiPath) {
 
     if (draft && String(draft.user) === String(env.user_info.user_id)) {
       env.res.draft = draft.data;
+      env.res.draft_id = draft._id;
     }
   });
 
