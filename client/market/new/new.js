@@ -47,6 +47,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     is_new:         ko.observable(false)
   };
 
+
   if (N.runtime.page_data.selected_section_id) {
     view.offer.section(N.runtime.page_data.selected_section_id);
   }
@@ -113,6 +114,32 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
       .catch(err => N.wire.emit('notify', err.message));
   }
 
+  function uploadFiles(files) {
+    if (files.length === 0) return;
+
+    let promise = Promise.resolve();
+
+    if (!draft_id) {
+      promise = promise.then(() => saveDraft(true));
+    }
+
+    promise = promise.then(() => {
+      let params = {
+        files,
+        rpc: [ 'market.new.upload', { draft_id } ],
+        config: 'users.uploader_config',
+        uploaded: null
+      };
+
+      return N.wire.emit('users.uploader:add', params)
+        .then(() => {
+          params.uploaded.reverse().forEach(m => view.offer.attachments.push(m.media_id));
+        });
+    });
+
+    promise.catch(err => N.wire.emit('error', err));
+  }
+
   view.preview = function preview() {
     // true - switch to preview mode
     // false - switch back to editing
@@ -125,6 +152,74 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
   rpc_cache.on('update', updatePreview);
 
+  view.attachSetMain = function attach_set_main(a) {
+    view.offer.attachments.remove(a);
+    view.offer.attachments.unshift(a);
+  };
+
+  view.attachDelete = function attach_delete(a) {
+    view.offer.attachments.remove(a);
+  };
+
+  //
+  // Support for re-ordering attachments using drag and drop,
+  // and uploading files when dropping them on attachment div
+  //
+  let dd_attach_id = null;
+
+  view.attachDragStart = function attach_drag_start(attach) {
+    dd_attach_id = attach;
+    return true;
+  };
+
+  view.attachDragOver = function attach_drag_over(attach, jqEvent) {
+    if (jqEvent.originalEvent.dataTransfer.types && jqEvent.originalEvent.dataTransfer.types[0] === 'Files') {
+      jqEvent.originalEvent.dataTransfer.dropEffect = 'copy';
+      return;
+    }
+
+    if (dd_attach_id) {
+      jqEvent.originalEvent.dataTransfer.dropEffect = 'move';
+
+      if (attach === dd_attach_id) return;
+
+      let index_active = view.offer.attachments.indexOf(dd_attach_id);
+      let index_target = view.offer.attachments.indexOf(attach);
+
+      if (index_active === -1 || index_target === -1) return;
+
+      if (index_active > index_target) {
+        view.offer.attachments.remove(dd_attach_id);
+        view.offer.attachments.splice(view.offer.attachments.indexOf(attach), 0, dd_attach_id);
+      } else {
+        view.offer.attachments.remove(dd_attach_id);
+        view.offer.attachments.splice(view.offer.attachments.indexOf(attach) + 1, 0, dd_attach_id);
+      }
+
+      return;
+    }
+  };
+
+  view.attachDrop = function attach_drop(__, jqEvent) {
+    dd_attach_id = null;
+
+    if (jqEvent.originalEvent.dataTransfer.files) {
+      uploadFiles(jqEvent.originalEvent.dataTransfer.files);
+    }
+  };
+
+  view.plusDragOver = function file_drag_over(__, jqEvent) {
+    if (jqEvent.originalEvent.dataTransfer.types && jqEvent.originalEvent.dataTransfer.types[0] === 'Files') {
+      jqEvent.originalEvent.dataTransfer.dropEffect = 'copy';
+    }
+  };
+
+  view.plusDrop = function file_drop(attach, jqEvent) {
+    if (jqEvent.originalEvent.dataTransfer.files) {
+      uploadFiles(jqEvent.originalEvent.dataTransfer.files);
+    }
+  };
+
   view.submit = function submit(form) {
     if (form.checkValidity() === false) {
       view.showErrors(true);
@@ -132,13 +227,19 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     }
 
     view.showErrors(false);
+    view.isSubmitting(true);
 
     let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
     Promise.resolve()
       .then(() => N.io.rpc('market.new.create', object))
       .then(() => N.wire.emit('market.index'))
-      .catch(err => N.wire.emit('error', err));
+      .then(() => {
+        view.isSubmitting(false);
+      }, err => {
+        view.isSubmitting(false);
+        N.wire.emit('error', err);
+      });
   };
 
   ko.applyBindings(view, $('#market-new-form').get(0));
@@ -147,31 +248,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   // Set up file upload
   //
   $('#market-new-upload').on('change', function () {
-    let files = $(this).get(0).files;
-
-    if (files.length > 0) {
-      let promise = Promise.resolve();
-
-      if (!draft_id) {
-        promise = promise.then(() => saveDraft(true));
-      }
-
-      promise = promise.then(() => {
-        let params = {
-          files,
-          rpc: [ 'market.new.upload', { draft_id } ],
-          config: 'users.uploader_config',
-          uploaded: null
-        };
-
-        return N.wire.emit('users.uploader:add', params)
-          .then(() => {
-            params.uploaded.reverse().forEach(m => view.offer.attachments.unshift(m.media_id));
-          });
-      });
-
-      promise.catch(err => N.wire.emit('error', err));
-    }
+    uploadFiles($(this).get(0).files);
   });
 });
 

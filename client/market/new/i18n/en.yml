@@ -14,6 +14,7 @@ en-US:
   field_is_new: New item (not used) 
   mode_preview: (preview)
   mode_edit: (edit)
-  attach_make_primary: Make primary
+  attach_main: Main photo
+  attach_set_main: Set as main
   attach_delete: Delete
   submit: Publish
