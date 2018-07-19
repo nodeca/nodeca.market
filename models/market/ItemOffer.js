@@ -19,7 +19,7 @@ module.exports = function (N, collectionName) {
     _.set(N, 'shared.content_type.' + name, value);
   }
 
-  set_content_type('MARKET_ITEM', 13);
+  set_content_type('MARKET_ITEM_OFFER', 13);
 
   let statuses = {
     VISIBLE:      1,
@@ -29,26 +29,19 @@ module.exports = function (N, collectionName) {
     DELETED_HARD: 5
   };
 
-  let offer_types = {
-    SELL: 1,
-    BUY:  2
-  };
-
 
   statuses.LIST_DELETABLE = [ statuses.VISIBLE, statuses.HB, statuses.PENDING ];
 
-  let Item = new Schema({
-    category:     Schema.ObjectId,
+  let ItemOffer = new Schema({
+    section:      Schema.ObjectId,
     hid:          Number,
     user:         Schema.ObjectId,
     ts:           { type: Date, 'default': Date.now }, // timestamp
     ip:           String, // ip address
     title:        String,
 
-    offer_type:   Number, // sell or buy
-
     price: {
-      value: Number,
+      value:    Number,
       currency: String // RUB, USD or EUR
     },
 
@@ -107,21 +100,33 @@ module.exports = function (N, collectionName) {
   // Indexes
   /////////////////////////////////////////////////////////////////////////////
 
-  // TODO: indexes
+  // lookup _id by hid (for routing)
+  ItemOffer.index({ hid: 1 });
 
-  // TODO: hooks
+
+  // Set 'hid' for the new item.
+  // This hook should always be the last one to avoid counter increment on error
+  ItemOffer.pre('save', async function () {
+    if (!this.isNew) return;
+
+    // hid is already defined when this item was created
+    // it's caller responsibility to increase Increment accordingly
+    if (this.hid) return;
+
+    this.hid = await N.models.core.Increment.next('market_item');
+  });
+
 
   // Export statuses
   //
-  Item.statics.statuses    = statuses;
-  Item.statics.offer_types = offer_types;
+  ItemOffer.statics.statuses    = statuses;
 
 
-  N.wire.on('init:models', function emit_init_Item() {
-    return N.wire.emit('init:models.' + collectionName, Item);
+  N.wire.on('init:models', function emit_init_ItemOffer() {
+    return N.wire.emit('init:models.' + collectionName, ItemOffer);
   });
 
-  N.wire.on('init:models.' + collectionName, function init_model_Item(schema) {
+  N.wire.on('init:models.' + collectionName, function init_model_ItemOffer(schema) {
     N.models[collectionName] = Mongoose.model(collectionName, schema);
   });
 };

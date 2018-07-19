@@ -71,9 +71,8 @@ module.exports = function (N, apiPath) {
   // Fill available currencies
   //
   N.wire.after(apiPath, async function fill_options(env) {
-    // TODO: move to config
-    env.res.currency_types = [ 'RUB', 'USD', 'EUR' ].map(id => ({
-      title: env.t('currency_' + id.toLowerCase()),
+    env.res.currency_types = Object.keys(N.config.market.currencies).map(id => ({
+      title: env.t('@market.currencies.' + id),
       value: id
     }));
   });

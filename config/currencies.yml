@@ -1,0 +1,7 @@
+market:
+  currencies:
+    RUB: ~
+    USD: ~
+    EUR: ~
+
+  base_currency: USD

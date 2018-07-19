@@ -229,14 +229,14 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.showErrors(false);
     view.isSubmitting(true);
 
-    let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
+    let params = _.pickBy(ko.toJS(view.offer));
+
+    params.draft_id = draft_id;
 
     Promise.resolve()
-      .then(() => N.io.rpc('market.new.create', object))
-      .then(() => N.wire.emit('market.index'))
-      .then(() => {
-        view.isSubmitting(false);
-      }, err => {
+      .then(() => N.io.rpc('market.new.create', params))
+      .then(res => N.wire.emit('navigate.to', { apiPath: 'market.section', params: { section_hid: res.section_hid } }))
+      .catch(err => {
         view.isSubmitting(false);
         N.wire.emit('error', err);
       });

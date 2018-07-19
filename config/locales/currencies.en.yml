@@ -1,0 +1,7 @@
+i18n:
+  en-US:
+    market:
+      currencies:
+        RUB: ₽
+        USD: $
+        EUR: €
