@@ -27,13 +27,28 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill sections via subcall
+  //
+  N.wire.on(apiPath, function subsections_fill_subcall(env) {
+    return N.wire.emit('internal:market.subsections_fill', env);
+  });
+
+
   // Fetch user drafts
   //
-  N.wire.before(apiPath, async function fetch_drafts(env) {
+  N.wire.after(apiPath, async function fetch_drafts(env) {
     env.res.drafts = await N.models.market.Draft.find()
                                .where('user').equals(env.user_info.user_id)
                                .sort('-ts')
                                .lean(true);
+  });
+
+
+  // Fill head meta
+  //
+  N.wire.after(apiPath, function fill_head(env) {
+    env.res.head = env.res.head || {};
+    env.res.head.title = env.data.section.title;
   });
 
 
@@ -48,14 +63,6 @@ module.exports = function (N, apiPath) {
     });
 
     env.res.breadcrumbs = env.data.breadcrumbs;
-  });
-
-
-  // Fill head meta
-  //
-  N.wire.after(apiPath, function fill_head(env) {
-    env.res.head = env.res.head || {};
-    env.res.head.title = env.data.section.title;
   });
 
 

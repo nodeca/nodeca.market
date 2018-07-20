@@ -5,3 +5,62 @@
 
 .market-section__title
   flex 1 1 0%
+
+.market-section__subsections
+  margin-top 1rem
+
+.market-section__subsection:before
+  content '/ '
+  font-family monospace
+
+.market-section__subsection.market-section__linked:before
+  content '→ '
+  font-family monospace
+
+.market-section__subsection-title
+  color $body-color
+
+.market-section__subsection-count
+  color $body-color-secondary
+  vertical-align sub
+  font-size $font-size-xs
+
+  &:before
+    content ' '
+
+.market-section__select-order
+  float right
+  width auto
+  margin-top 1rem
+
+.market-section__item-list
+  margin 0
+  padding 0
+  list-style none
+
+.market-section-item
+  display flex
+  margin-top 1rem
+
+.market-section-item__info
+  margin-left 1rem
+
+.market-section-item__title
+.market-section-item__price
+  font-size $font-size-lg
+
+.market-section-item__location
+  color $body-color-secondary
+
+.market-section-item__details
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-section-item__details-item
+  display inline
+
+.market-section-item__details-item + .market-section-item__details-item
+  &:before
+    content ' | '

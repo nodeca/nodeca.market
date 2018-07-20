@@ -103,6 +103,14 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // TODO: creating object in the database doesn't quite work and wasn't tested,
+  //       so better to disable it for now
+  //
+  N.wire.on(apiPath, async function create_offer() {
+    throw { code: N.io.CLIENT_ERROR, message: 'Creating market offers is not yet implemented' };
+  });
+
+
   N.wire.on(apiPath, async function create_buy_offer(env) {
     if (env.params.type !== 'buy') return;
 

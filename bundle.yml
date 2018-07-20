@@ -15,4 +15,5 @@ packages:
 
     entries:
       - client/market
+      - internal/market
       - server/market

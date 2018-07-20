@@ -15,3 +15,54 @@ article#content.market-section
       != self.partial('@market.section.blocks.toolbar_controls')
 
     != self.partial('@market.blocks.search_form')
+
+    select.market-section__select-order.form-control.custom-select
+      option(selected)= self.t('order_by_date')
+    
+    .market-section__subsections
+      each section in self.subsections
+        .market-section__subsection(
+          class=section.is_linked ? 'market-section__linked' : ''
+        )
+          a.market-section__subsection-title(
+            href=self.link_to('market.section', { section_hid: section.hid })
+          )= section.title
+
+          span.market-section__subsection-count= '0'
+
+    ul.market-section__item-list
+      li.market-section-item
+        .market-section-item__photo.thumb
+          img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+        .market-section-item__info
+          a.market-section-item__title(href='#')= 'Самолёт для FPV 1800 мм'
+          .market-section-item__price= '1 800 ₽'
+          .market-section-item__location= 'Новосибирск'
+          .market-section-item__details
+            .market-section-item__details-item= '10 Aug'
+            .market-section-item__details-item= 'username'
+            .market-section-item__details-item= 'Готовые самолёты и наборы'
+
+      li.market-section-item
+        .market-section-item__photo.thumb
+          img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+        .market-section-item__info
+          a.market-section-item__title(href='#')= 'Самолёт для FPV 1800 мм'
+          .market-section-item__price= '1 800 ₽'
+          .market-section-item__location= 'Новосибирск'
+          .market-section-item__details
+            .market-section-item__details-item= '10 Aug'
+            .market-section-item__details-item= 'username'
+            .market-section-item__details-item= 'Готовые самолёты и наборы'
+
+      li.market-section-item
+        .market-section-item__photo.thumb
+          img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+        .market-section-item__info
+          a.market-section-item__title(href='#')= 'Самолёт для FPV 1800 мм'
+          .market-section-item__price= '1 800 ₽'
+          .market-section-item__location= 'Новосибирск'
+          .market-section-item__details
+            .market-section-item__details-item= '10 Aug'
+            .market-section-item__details-item= 'username'
+            .market-section-item__details-item= 'Готовые самолёты и наборы'
