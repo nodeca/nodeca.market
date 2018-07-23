@@ -1,0 +1,86 @@
+article#content.market-item
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-item__head
+      h1.market-item__title.page-head__title(itemprop='name')= '3-х метровый Sbach 342 от Pilot-RC'
+
+      .market-item__price= '11 600 ₽'
+
+      .market-item__info
+        .market-item__info-item= '10 Aug'
+        .market-item__info-item= 'username'
+
+    ul.market-item__attach-list.thumb-grid.thumb-grid__m-fluid
+      li.market-item__attach-item.thumb-grid__item
+        .thumb-grid__item-inner
+          .thumb
+            img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+
+      li.market-item__attach-item.thumb-grid__item
+        .thumb-grid__item-inner
+          .thumb
+            img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+
+    .market-item__description.markup
+      p= 'Qui dicta aut velit qui et sunt cupiditate. Et esse veritatis impedit excepturi ut eum. Ducimus omnis eaque assumenda et ipsa. Rerum aliquid quam accusantium sit ab sit. Libero accusamus sunt esse.'
+
+      p= 'In quas quaerat explicabo quos quae voluptas ut temporibus. Quo eum sunt eos quos dolores est modi. Aut aliquid asperiores alias eius ut. Sunt maiores et qui possimus doloribus. Aut tempora nisi omnis perspiciatis omnis.'
+
+      p= 'Quos aut totam eveniet sed. Minus natus ipsam fugit eligendi sit. Neque voluptatem iusto nesciunt maiores aut ipsam.'
+
+    .market-item__details
+      .market-item__details-item
+        .market-item__details-key= 'Город:'
+        .market-item__details-value= 'Омск'
+
+      .market-item__details-item
+        .market-item__details-key= 'Пересылка:'
+        .market-item__details-value= 'есть'
+
+      .market-item__details-item
+        .market-item__details-key= 'Обмен:'
+        .market-item__details-value= 'на автомодели'
+
+      .market-item__details-item
+        .market-item__details-key= 'Состояние:'
+        .market-item__details-value= 'б/у'
+
+    footer.market-item__controls
+      ul.market-item__controls-blk
+
+      li.market-item__control-item.market-item__ts
+        != self.timetag(new Date(), 'relative')
+
+        li.market-item__control-item
+          button.btn.market-item__action.market-item__report(
+            title=self.t('report')
+          )
+            span.icon.icon-report
+
+      if self.runtime.is_member
+        li.market-item__control-item.market-item__bookmark
+          button.btn.market-item__action.market-item__bookmark-add(
+            title=self.t('bookmark_add')
+          )
+            span.icon.icon-bookmark
+            span.market-item__bookmarks-count(data-bm-count=0)
+
+          button.btn.market-item__action.market-item__bookmark-remove(
+            title=self.t('bookmark_remove')
+          )
+            span.icon.icon-bookmark
+            span.market-item__bookmarks-count(data-bm-count=0)
+
+      li.market-item__control-item.market-item__views
+        span.icon.icon-views.icon-space-after(
+          title=self.t('views')
+        )
+          = 784

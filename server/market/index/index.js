@@ -4,10 +4,6 @@
 'use strict';
 
 
-const _                = require('lodash');
-const sanitize_section = require('nodeca.market/lib/sanitizers/section');
-
-
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {});
@@ -38,16 +34,9 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fill breadcrumbs
+  // Fill breadcrumbs info
   //
-  N.wire.after(apiPath, function fill_breadcrumbs(env) {
-    env.data.breadcrumbs = [];
-
-    env.data.breadcrumbs.push({
-      text: env.t('@common.menus.navbar.market'),
-      route: 'market.index'
-    });
-
-    env.res.breadcrumbs = env.data.breadcrumbs;
+  N.wire.after(apiPath, async function fill_breadcrumbs(env) {
+    await N.wire.emit('internal:market.breadcrumbs_fill', { env });
   });
 };

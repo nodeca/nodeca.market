@@ -4,7 +4,6 @@
 
 
 const _                = require('lodash');
-const memoize          = require('promise-memoize');
 const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 
 

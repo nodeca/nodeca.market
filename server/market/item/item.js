@@ -1,22 +1,20 @@
-// Market section
+// Show a single market offer
 //
 
 'use strict';
 
 
-const sanitize_section = require('nodeca.market/lib/sanitizers/section');
-
-
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    section_hid: { type: 'integer', required: true }
+    section_hid: { type: 'integer', required: true },
+    item_hid:    { type: 'integer', required: true }
   });
 
 
   // Fetch section
   //
-  N.wire.on(apiPath, async function fetch_section(env) {
+  N.wire.before(apiPath, async function fetch_section(env) {
     let section = await N.models.market.Section.findOne()
                             .where('hid').equals(env.params.section_hid)
                             .lean(true);
@@ -27,10 +25,7 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fill sections via subcall
-  //
-  N.wire.on(apiPath, function subsections_fill_subcall(env) {
-    return N.wire.emit('internal:market.subsections_fill', env);
+  N.wire.on(apiPath, function todo() {
   });
 
 
@@ -48,7 +43,8 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, function fill_head(env) {
     env.res.head = env.res.head || {};
-    env.res.head.title = env.data.section.title;
+    // TODO
+    //env.res.head.title = '...';
   });
 
 
@@ -57,13 +53,8 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
     let parents = await N.models.market.Section.getParentList(env.data.section._id);
 
+    // add current section
+    parents.push(env.data.section._id);
     await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents });
-  });
-
-
-  // Sanitize section
-  //
-  N.wire.after(apiPath, async function section_sanitize(env) {
-    env.res.section = await sanitize_section(N, env.data.section, env.user_info);
   });
 };
