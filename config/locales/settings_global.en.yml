@@ -7,4 +7,11 @@ i18n:
           market_editor: Editor
 
         category_names:
+          market: Market
+          market_item: Item
           market_items_markup: Market items markup
+
+        setting_names:
+          market_title_min_length: Min title length
+          market_desc_min_length: Min description length
+          market_items_per_page: Market items per page

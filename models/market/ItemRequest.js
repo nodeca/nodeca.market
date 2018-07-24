@@ -3,7 +3,6 @@
 
 const _              = require('lodash');
 const Mongoose       = require('mongoose');
-const AttachmentInfo = require('./_AttachmentInfo');
 const Schema         = Mongoose.Schema;
 
 
@@ -59,7 +58,7 @@ module.exports = function (N, collectionName) {
 
     bookmarks:    { type: Number, 'default': 0 },
 
-    views_count:    { type: Number, 'default': 0 },
+    views:        { type: Number, 'default': 0 },
 
     del_reason:   String,
     del_by:       Schema.ObjectId,
@@ -77,10 +76,7 @@ module.exports = function (N, collectionName) {
     imports:      [ String ],
 
     // List of users to fetch in order to properly display the post
-    import_users: [ Schema.ObjectId ],
-
-    // Info to display post tail
-    tail:         [ AttachmentInfo ]
+    import_users: [ Schema.ObjectId ]
   }, {
     versionKey : false
   });

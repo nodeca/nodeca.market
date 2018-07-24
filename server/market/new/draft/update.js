@@ -12,11 +12,11 @@ module.exports = function (N, apiPath) {
     draft_id:       { format: 'mongo', required: true },
     type:           { type: 'string', 'enum': [ 'sell', 'buy' ] },
     title:          { type: 'string' },
-    price_value:    { type: 'number' },
+    price_value:    { type: 'number', minimum: 0 },
     price_currency: { type: 'string' },
     section:        { format: 'mongo' },
     description:    { type: 'string' },
-    attachments:    {
+    files:          {
       type: 'array',
       uniqueItems: true,
       items: { format: 'mongo' }
@@ -49,10 +49,10 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function update_draft(env) {
     let data = _.omit(env.params, 'draft_id');
-    let files = _.keyBy(env.data.draft.files);
+    let uploaded = _.keyBy(env.data.draft.files);
 
-    // restrict attachments to only files that were uploaded for this draft
-    data.attachments = data.attachments.filter(id => files.hasOwnProperty(id));
+    // restrict files to only files that were uploaded for this draft
+    data.files = data.files.filter(id => uploaded.hasOwnProperty(id));
 
     env.data.draft.data = data;
     env.data.draft.ts = new Date();

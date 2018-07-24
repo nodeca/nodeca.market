@@ -32,7 +32,7 @@ article#content.market-new
           .form-group.col-lg-3.col-md-4.col-sm-6
             label(for='market-new-price')= self.t('field_price')
             .input-group
-              input.form-control#market-new-price(type='number', step='0.01', data-bind="value: offer.price_value, attr: { required: offer.type() === 'sell' }")
+              input.form-control#market-new-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value, attr: { required: offer.type() === 'sell' }")
               select.form-control.market-new__currency.custom-select.input-group-append(data-bind="value: offer.price_currency, options: currencyTypes, optionsText: 'title', optionsValue: 'value', attr: { required: offer.type() === 'sell' }")
 
         mixin render_section_tree(parent, level)
@@ -71,7 +71,7 @@ article#content.market-new
                   a.thumb(href='#', onClick='document.getElementById("market-new-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
                     .thumb__content.icon.icon-plus
 
-              <!-- ko foreach: offer.attachments -->
+              <!-- ko foreach: offer.files -->
                 li.market-new__attach-item.thumb-grid__item(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }')
                   .thumb-grid__item-inner
                     .thumb

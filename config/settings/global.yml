@@ -3,3 +3,23 @@ setting_groups:
 
   market_editor:
     parent: market
+
+setting_schemas:
+  global:
+    market_title_min_length:
+      type: number
+      group_key: market_editor
+      category_key: market_item
+      default: 10
+
+    market_desc_min_length:
+      type: number
+      group_key: market_editor
+      category_key: market_item
+      default: 10
+
+    market_items_per_page:
+      type: number
+      group_key: core_display
+      category_key: market
+      default: 25

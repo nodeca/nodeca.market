@@ -15,7 +15,7 @@ const resizeParse = require('nodeca.users/server/_lib/resize_parse');
 
 module.exports = function (N, apiPath) {
 
-  const mediaConfig = resizeParse(N.config.users.uploads);
+  const mediaConfig = resizeParse(N.config.market.uploads);
 
 
   N.validate(apiPath, {
@@ -86,17 +86,10 @@ module.exports = function (N, apiPath) {
 
     // Check if config for this type exists
     if (!mediaConfig.types[format]) {
-      throw new Error(`Can't save file: '${format}' not supported`);
+      throw new Error(`Can't save file: ${format} is not supported`);
     }
 
     let typeConfig = mediaConfig.types[format];
-    let supportedImageFormats = [ 'bmp', 'gif', 'jpg', 'jpeg', 'png' ];
-
-    // Only allow images in market
-    if (supportedImageFormats.indexOf(format) === -1) {
-      throw new Error("Can't save file: format is not supported");
-    }
-
     let comment;
     let user = await N.models.users.User.findById(env.user_info.user_id);
     let date = new Date().toISOString().slice(0, 10);

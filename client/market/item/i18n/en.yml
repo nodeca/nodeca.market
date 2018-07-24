@@ -3,3 +3,11 @@ en-US:
   bookmark_add: Add to bookmarks
   bookmark_remove: Remove from bookmarks
   views: Views
+  location: 'Location:'
+  delivery: 'Delivery:'
+  delivery_available: yes
+  delivery_not_available: n/a
+  barter_info: 'In exchange for:'
+  condition: 'Condition:'
+  condition_new: 'new'
+  condition_used: 'used'

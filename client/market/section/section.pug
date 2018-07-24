@@ -33,31 +33,58 @@ article#content.market-section
             = '0'
 
     ul.market-section__item-list
-      each item in [ 1, 2, 3 ]
-        li.market-section-item
+      each item in self.items
+        li.market-section-item(id='item' + item.hid)
           .market-section-item__photo.thumb
-            img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+            //-img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+            .thumb__content= self.t('no_photo')
           .market-section-item__info
             .market-section-item__title
-              a(href=self.link_to('market.item', { section_hid: self.section.hid, item_hid: 123 }))
-                = 'Самолёт для FPV 1800 мм'
-              sub.market-section-item__icon
-                = ' '
-                = 'б/у'
+              a.market-section-item__title-text(href=self.link_to('market.item', { section_hid: self.section.hid, item_hid: item.hid }))
+                = item.title
+              if !item.is_new
+                sub.market-section-item__icon
+                  = ' '
+                  = self.t('used')
 
             .market-section-item__price
-              = '1 800 ₽'
+              //- 12300 -> "12 300"
+              //- 12300.1 -> "12 300.10"
+              - let price = (item.price || {}).value || 0;
+              = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
               = ' '
-              //- TODO: icon-exchange
-              span.market-section-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+              = self.t.exists('@market.currencies.' + item.price.currency) ? self.t('@market.currencies.' + item.price.currency) : item.price.currency
+              if item.exchange
+                = ' '
+                //- TODO: icon-exchange
+                span.market-section-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
 
             .market-section-item__location
-              = 'Новосибирск'
-              = ' '
-              //- TODO: icon-delivery
-              span.market-section-item__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
+              if item.location
+                a.market-section-item__location-link(
+                  href= '#'
+                  data-on-click= 'common.blocks.location_show_dlg'
+                  data-latitude= item.location && item.location[1]
+                  data-longitude= item.location && item.location[0]
+                )
+                  span.icon.icon-location.icon-space-after
+
+                  if self.location_names[item.location[0] + ':' + item.location[1]]
+                    = self.location_names[item.location[0] + ':' + item.location[1]]
+
+              if item.delivery
+                = ' '
+                //- TODO: icon-delivery
+                span.market-section-item__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
 
             .market-section-item__details
-              .market-section-item__details-item= '10 Aug'
-              .market-section-item__details-item= 'username'
-              .market-section-item__details-item= 'Готовые самолёты и наборы'
+              .market-section-item__details-item!= self.timetag(item.ts, 'relative')
+              .market-section-item__details-item
+                - var user = self.users[item.user];
+                if user
+                  a.market-item__user-link._ucard-popover(
+                    href=self.link_to('users.member', { user_hid: user.hid })
+                    data-user-id=user._id
+                    data-user-ref='market_section_item:'+self.section.hid+':'+item.hid
+                  )
+                    = user.name

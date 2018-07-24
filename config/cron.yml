@@ -1,2 +1,3 @@
 cron:
   drafts_cleanup: 0 25 4 * * * # everyday at 4:25
+  market_item_views_update: 0 */10 * * * * # every 10 minutes

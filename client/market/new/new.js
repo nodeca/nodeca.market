@@ -30,7 +30,10 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     { title: t('offer_buy'),  value: 'buy' }
   ];
 
-  view.currencyTypes = N.runtime.page_data.currency_types;
+  view.currencyTypes = N.runtime.page_data.currency_types.map(id => ({
+    title: t.exists('@market.currencies.' + id) ? t('@market.currencies.' + id) : id,
+    value: id
+  }));
 
   view.router = N.router;
 
@@ -41,7 +44,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     price_currency: ko.observable(view.currencyTypes[0].value),
     section:        ko.observable(''),
     description:    ko.observable(''),
-    attachments:    ko.observableArray(),
+    files:          ko.observableArray(),
     barter_info:    ko.observable(''),
     delivery:       ko.observable(false),
     is_new:         ko.observable(false)
@@ -77,7 +80,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   function saveDraft(force) {
     let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
-    if (JSON.stringify(savedDraft) === JSON.stringify(object) && !force) return;
+    if (JSON.stringify(savedDraft) === JSON.stringify(object) && !force) return Promise.resolve();
 
     if (draft_id) {
       return N.io.rpc('market.new.draft.update', Object.assign({ draft_id }, object));
@@ -133,7 +136,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
       return N.wire.emit('users.uploader:add', params)
         .then(() => {
-          params.uploaded.reverse().forEach(m => view.offer.attachments.push(m.media_id));
+          params.uploaded.reverse().forEach(m => view.offer.files.push(m.media_id));
         });
     });
 
@@ -153,16 +156,16 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   rpc_cache.on('update', updatePreview);
 
   view.attachSetMain = function attach_set_main(a) {
-    view.offer.attachments.remove(a);
-    view.offer.attachments.unshift(a);
+    view.offer.files.remove(a);
+    view.offer.files.unshift(a);
   };
 
   view.attachDelete = function attach_delete(a) {
-    view.offer.attachments.remove(a);
+    view.offer.files.remove(a);
   };
 
   //
-  // Support for re-ordering attachments using drag and drop,
+  // Support for re-ordering files using drag and drop,
   // and uploading files when dropping them on attachment div
   //
   let dd_attach_id = null;
@@ -183,17 +186,17 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
       if (attach === dd_attach_id) return;
 
-      let index_active = view.offer.attachments.indexOf(dd_attach_id);
-      let index_target = view.offer.attachments.indexOf(attach);
+      let index_active = view.offer.files.indexOf(dd_attach_id);
+      let index_target = view.offer.files.indexOf(attach);
 
       if (index_active === -1 || index_target === -1) return;
 
       if (index_active > index_target) {
-        view.offer.attachments.remove(dd_attach_id);
-        view.offer.attachments.splice(view.offer.attachments.indexOf(attach), 0, dd_attach_id);
+        view.offer.files.remove(dd_attach_id);
+        view.offer.files.splice(view.offer.files.indexOf(attach), 0, dd_attach_id);
       } else {
-        view.offer.attachments.remove(dd_attach_id);
-        view.offer.attachments.splice(view.offer.attachments.indexOf(attach) + 1, 0, dd_attach_id);
+        view.offer.files.remove(dd_attach_id);
+        view.offer.files.splice(view.offer.files.indexOf(attach) + 1, 0, dd_attach_id);
       }
 
       return;
@@ -229,13 +232,16 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.showErrors(false);
     view.isSubmitting(true);
 
-    let params = _.pickBy(ko.toJS(view.offer));
+    let params = ko.toJS(view.offer);
 
     params.draft_id = draft_id;
 
     Promise.resolve()
       .then(() => N.io.rpc('market.new.create', params))
-      .then(res => N.wire.emit('navigate.to', { apiPath: 'market.section', params: { section_hid: res.section_hid } }))
+      .then(res => N.wire.emit('navigate.to', {
+        apiPath: 'market.item',
+        params: { section_hid: res.section_hid, item_hid: res.item_hid }
+      }))
       .catch(err => {
         view.isSubmitting(false);
         N.wire.emit('error', err);

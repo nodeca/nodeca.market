@@ -9,11 +9,11 @@ module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     type:           { type: 'string', 'enum': [ 'sell', 'buy' ] },
     title:          { type: 'string' },
-    price_value:    { type: 'number' },
+    price_value:    { type: 'number', minimum: 0 },
     price_currency: { type: 'string' },
     section:        { format: 'mongo' },
     description:    { type: 'string' },
-    attachments:    {
+    files:          {
       type: 'array',
       uniqueItems: true,
       items: { format: 'mongo' }
@@ -32,9 +32,9 @@ module.exports = function (N, apiPath) {
 
 
   N.wire.on(apiPath, async function create_draft(env) {
-    // can't have any attachments when draft is created
+    // can't have any files when draft is created
     let data = env.params;
-    data.attachments = [];
+    data.files = [];
 
     let draft = await N.models.market.Draft.create({
       user: env.user_info.user_id,

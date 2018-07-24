@@ -71,10 +71,7 @@ module.exports = function (N, apiPath) {
   // Fill available currencies
   //
   N.wire.after(apiPath, async function fill_options(env) {
-    env.res.currency_types = Object.keys(N.config.market.currencies).map(id => ({
-      title: env.t('@market.currencies.' + id),
-      value: id
-    }));
+    env.res.currency_types = Object.keys(N.config.market.currencies);
   });
 
 

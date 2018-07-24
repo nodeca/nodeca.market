@@ -17,11 +17,15 @@ module.exports = function (N, collectionName) {
       price_currency: String,
       section:        Schema.ObjectId,
       description:    String,
-      attachments:    [ Schema.ObjectId ],
+      files:          [ Schema.ObjectId ],
       barter_info:    String,
       delivery:       Boolean,
       is_new:         Boolean
     }, { _id: false }),
+
+    // all uploaded files for this draft in the time order;
+    // (`data.files` is a subset of `files` which user can reorder and remove
+    // items from)
     files:          [ Schema.ObjectId ]
   }, {
     versionKey : false

@@ -10,54 +10,76 @@ article#content.market-item
     != self.partial('@market.blocks.drafts')
 
     header.page-head.market-item__head
-      h1.market-item__title.page-head__title(itemprop='name')= '3-х метровый Sbach 342 от Pilot-RC'
+      h1.market-item__title.page-head__title(itemprop='name')= self.item.title
 
-      .market-item__price= '11 600 ₽'
+      .market-item__price
+        //- 12300 -> "12 300"
+        //- 12300.1 -> "12 300.10"
+        - let price = (self.item.price || {}).value || 0;
+        = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
+        = ' '
+        = self.t.exists('@market.currencies.' + self.item.price.currency) ? self.t('@market.currencies.' + self.item.price.currency) : self.item.price.currency
 
       .market-item__info
-        .market-item__info-item= '10 Aug'
-        .market-item__info-item= 'username'
+        .market-item__info-item!= self.timetag(self.item.ts, 'relative')
+        .market-item__info-item
+          - var user = self.users[self.item.user];
+          if user
+            a.market-item__user-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=user._id
+              data-user-ref='market_item:'+self.section.hid+':'+self.item.hid
+            )
+              = user.name
 
-    ul.market-item__attach-list.thumb-grid.thumb-grid__m-fluid
-      li.market-item__attach-item.thumb-grid__item
-        .thumb-grid__item-inner
-          .thumb
-            img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+    //-
+      ul.market-item__attach-list.thumb-grid.thumb-grid__m-fluid
+        li.market-item__attach-item.thumb-grid__item
+          .thumb-grid__item-inner
+            .thumb
+              img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
 
-      li.market-item__attach-item.thumb-grid__item
-        .thumb-grid__item-inner
-          .thumb
-            img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+        li.market-item__attach-item.thumb-grid__item
+          .thumb-grid__item-inner
+            .thumb
+              img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
 
-    .market-item__description.markup
-      p= 'Qui dicta aut velit qui et sunt cupiditate. Et esse veritatis impedit excepturi ut eum. Ducimus omnis eaque assumenda et ipsa. Rerum aliquid quam accusantium sit ab sit. Libero accusamus sunt esse.'
-
-      p= 'In quas quaerat explicabo quos quae voluptas ut temporibus. Quo eum sunt eos quos dolores est modi. Aut aliquid asperiores alias eius ut. Sunt maiores et qui possimus doloribus. Aut tempora nisi omnis perspiciatis omnis.'
-
-      p= 'Quos aut totam eveniet sed. Minus natus ipsam fugit eligendi sit. Neque voluptatem iusto nesciunt maiores aut ipsam.'
+    .market-item__description.markup!= self.item.html
 
     .market-item__details
-      .market-item__details-item
-        .market-item__details-key= 'Город:'
-        .market-item__details-value= 'Омск'
+      if self.item.location
+        .market-item__details-item
+          .market-item__details-key= self.t('location')
+          .market-item__details-value
+            a.market-item__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= self.item.location && self.item.location[1]
+              data-longitude= self.item.location && self.item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_name
+                = self.location_name
 
       .market-item__details-item
-        .market-item__details-key= 'Пересылка:'
-        .market-item__details-value= 'есть'
+        .market-item__details-key= self.t('delivery')
+        .market-item__details-value= self.item.delivery ? self.t('delivery_available') : self.t('delivery_not_available')
+
+      if self.item.barter_info
+        .market-item__details-item
+          .market-item__details-key= self.t('barter_info')
+          .market-item__details-value= self.item.barter_info
 
       .market-item__details-item
-        .market-item__details-key= 'Обмен:'
-        .market-item__details-value= 'на автомодели'
-
-      .market-item__details-item
-        .market-item__details-key= 'Состояние:'
-        .market-item__details-value= 'б/у'
+        .market-item__details-key= self.t('condition')
+        .market-item__details-value= self.item.is_new ? self.t('condition_new') : self.t('condition_used')
 
     footer.market-item__controls
       ul.market-item__controls-blk
 
       li.market-item__control-item.market-item__ts
-        != self.timetag(new Date(), 'relative')
+        != self.timetag(self.item.ts, 'relative')
 
         li.market-item__control-item
           button.btn.market-item__action.market-item__report(
@@ -83,4 +105,4 @@ article#content.market-item
         span.icon.icon-views.icon-space-after(
           title=self.t('views')
         )
-          = 784
+          = self.item.views
