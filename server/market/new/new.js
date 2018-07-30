@@ -11,8 +11,15 @@ const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    section_hid: { type: 'integer' },
-    draft_id:    { format: 'mongo' }
+    draft_id:    { format: 'mongo' },
+    $query:      {
+      type: 'object',
+      properties: {
+        buy:     { 'const': '' },
+        section: { format: 'mongo' }
+      },
+      additionalProperties: false
+    }
   });
 
 
@@ -49,10 +56,16 @@ module.exports = function (N, apiPath) {
 
     env.res.sections = await sanitize_section(N, env.data.sections, env.user_info);
 
-    let selected_section = env.res.sections.filter(s => s.hid === env.params.section_hid)[0];
+    env.res.defaults = {
+      buy: Object.prototype.hasOwnProperty.call(env.params.$query || {}, 'buy')
+    };
 
-    if (selected_section && !selected_section.is_category) {
-      env.res.selected_section_id = selected_section._id;
+    if (env.params.$query && env.params.$query.section) {
+      let selected_section = env.res.sections.filter(s => String(s._id) === env.params.$query.section)[0];
+
+      if (selected_section && !selected_section.is_category) {
+        env.res.defaults.section = selected_section._id;
+      }
     }
   });
 

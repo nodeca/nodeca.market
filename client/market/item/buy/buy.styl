@@ -1,0 +1,89 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-item-buy__info
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-item-buy__info-item
+  display inline
+
+.market-item-buy__user-link
+  color $body-color-secondary
+
+.market-item-buy__info-item + .market-item-buy__info-item
+  &:before
+    content ' | '
+
+.market-item-buy__details
+  display table
+
+.market-item-buy__details-item
+  display table-row
+
+.market-item-buy__details-key
+  display table-cell
+  color $body-color-secondary
+  text-align right
+  padding-right 0.5rem
+
+.market-item-buy__details-value
+  display table-cell
+
+.market-item-buy__controls-blk
+  margin 0 0 .5rem 0
+  padding 0
+  list-style none
+
+.market-item-buy__control-item
+  color $body-color-secondary
+  display inline-block
+
+.market-item-buy__action
+  background-color transparent
+  color $body-color-secondary
+
+  &:hover
+  &:focus
+  &:active
+    color $body-color-secondary - 20%
+    background-color $body-bg-secondary
+
+.market-item-buy__infraction .icon
+  color $brand-danger
+.market-item-buy__infraction-m-warning .icon
+  color $brand-warning
+
+// override .btn+.btn margin
+.market-item-buy__bookmark-remove.market-item-buy__bookmark-remove
+  margin 0
+
+.market-item-buy__bookmark-remove
+  display none
+
+.market-item-buy__m-bookmarked
+  .market-item-buy__bookmark-remove
+    display inline-block
+    opacity 1
+    .icon
+      color $brand-success
+  .market-item-buy__bookmark-add
+    display none
+
+.market-item-buy__bookmarks-count
+  font-size $font-size-xs
+  color $body-color-secondary
+
+.market-item-buy__bookmarks-count:after
+  content attr(data-bm-count)
+  margin-left .3em
+
+.market-item-buy__bookmarks-count[data-bm-count="0"]:after
+  display none
+
+.market-item-buy__ts
+  margin-right .75rem
+
+.market-item-buy__views
+  margin-left .75rem

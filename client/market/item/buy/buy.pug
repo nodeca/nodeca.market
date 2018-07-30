@@ -1,0 +1,75 @@
+article#content.market-item-buy
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-item-buy__head
+      h1.market-item-buy__title.page-head__title(itemprop='name')= self.item.title
+
+      .market-item-buy__info
+        .market-item-buy__info-item!= self.timetag(self.item.ts, 'relative')
+        .market-item-buy__info-item
+          - var user = self.users[self.item.user];
+          if user
+            a.market-item-buy__user-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=user._id
+              data-user-ref='market_item_buy:'+self.section.hid+':'+self.item.hid
+            )
+              = user.name
+
+    .market-item-buy__description.markup!= self.item.html
+
+    .market-item-buy__details
+      if self.item.location
+        .market-item-buy__details-item
+          .market-item-buy__details-key= self.t('location')
+          .market-item-buy__details-value
+            a.market-item-buy__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= self.item.location && self.item.location[1]
+              data-longitude= self.item.location && self.item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_name
+                = self.location_name
+
+    footer.market-item-buy__controls
+      ul.market-item-buy__controls-blk
+
+      li.market-item-buy__control-item.market-item-buy__ts
+        != self.timetag(self.item.ts, 'relative')
+
+        li.market-item-buy__control-item
+          button.btn.market-item-buy__action.market-item-buy__report(
+            title=self.t('report')
+          )
+            span.icon.icon-report
+
+      if self.runtime.is_member
+        li.market-item-buy__control-item.market-item-buy__bookmark
+          button.btn.market-item-buy__action.market-item-buy__bookmark-add(
+            title=self.t('bookmark_add')
+          )
+            span.icon.icon-bookmark
+            span.market-item-buy__bookmarks-count(data-bm-count=0)
+
+          button.btn.market-item-buy__action.market-item-buy__bookmark-remove(
+            title=self.t('bookmark_remove')
+          )
+            span.icon.icon-bookmark
+            span.market-item-buy__bookmarks-count(data-bm-count=0)
+
+      li.market-item-buy__control-item.market-item-buy__views
+        span.icon.icon-views.icon-space-after(
+          title=self.t('views')
+        )
+          = self.item.views

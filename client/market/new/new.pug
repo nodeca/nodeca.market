@@ -1,6 +1,6 @@
 - self.add_raw_data('draft', self.draft)
 - self.add_raw_data('draft_id', self.draft_id)
-- self.add_raw_data('selected_section_id', self.selected_section_id)
+- self.add_raw_data('defaults', self.defaults)
 - self.add_raw_data('parse_options', self.parse_options)
 - self.add_raw_data('currency_types', self.currency_types)
 
@@ -17,7 +17,7 @@ article#content.market-new
     header.page-head
       h1.page-head__title(itemprop='name')= self.t('title')
 
-    form#market-new-form(novalidate, data-bind='submit: submit, css: { "was-validated": showErrors }')
+    form#market-new-form(novalidate, data-bind='submit: offer.type() === "buy" ? submitBuy : submitSell, css: { "was-validated": showErrors }')
       fieldset
         .row
           .form-group.col-lg-3.col-md-4.col-sm-6

@@ -1,25 +1,38 @@
 router:
   http.get:
-    market.index:
+    market.index.sell:
       "/market": ~
+
+    market.index.buy:
+      "/market/buy": ~
 
     market.new:
       "/market/new(/{draft_id})":
         draft_id: /[0-9a-f]{24}/
 
-      "/market/c{section_hid}/new":
-        section_hid:
-          match: /\d+/
-          type: integer
-
-    market.section:
+    market.section.sell:
       "/market/c{section_hid}":
         section_hid:
           match: /\d+/
           type: integer
 
-    market.item:
+    market.section.buy:
+      "/market/buy/c{section_hid}":
+        section_hid:
+          match: /\d+/
+          type: integer
+
+    market.item.sell:
       "/market/c{section_hid}/{item_hid}":
+        section_hid:
+          match: /\d+/
+          type: integer
+        item_hid:
+          match: /\d+/
+          type: integer
+
+    market.item.buy:
+      "/market/buy/c{section_hid}/{item_hid}":
         section_hid:
           match: /\d+/
           type: integer

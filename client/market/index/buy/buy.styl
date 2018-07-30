@@ -1,0 +1,41 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-index-buy__head
+  display flex
+
+.market-index-buy__title
+  flex 1 1 0%
+
+.market-index-buy__switch-type
+  text-align center
+  font-size $font-size-sm
+  border-bottom 1px solid $decorator-color
+  padding 0.25rem
+
+.market-index-buy__switch-type-link
+  color $body-color-secondary
+
+$section-spacing = 1rem
+
+.market-index-buy__categories
+  display flex
+  flex-wrap wrap
+  margin 0 $section-spacing * -1
+
+.market-index-buy__section
+  padding $section-spacing
+  width 33.33%
+  min-width 200px
+
+.market-index-buy__section-title
+  font-size $h5-font-size
+  line-height 1.6em
+
+.market-index-buy__linked-section:before
+  content '@ '
+
+.market-index-buy__section-link
+  color $body-color
+
+.market-index-buy__subsection-link
+  color $body-color-secondary

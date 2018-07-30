@@ -1,0 +1,92 @@
+article#content.market-section-sell
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-section-sell__head
+      h1.market-section-sell__title.page-head__title(itemprop='name')= self.section.title
+
+      != self.partial('@market.section.sell.blocks.toolbar_controls')
+
+    != self.partial('@market.blocks.search_form')
+
+    select.market-section-sell__select-order.form-control.custom-select
+      option(selected)= self.t('order_by_date')
+    
+    .market-section-sell__subsections
+      each section in self.subsections
+        .market-section-sell__subsection(
+          class=section.is_linked ? 'market-section-sell__linked' : ''
+        )
+          a.market-section-sell__subsection-title(
+            href=self.link_to('market.section.sell', { section_hid: section.hid })
+          )= section.title
+
+          span.market-section-sell__subsection-count
+            = ' '
+            = '0'
+
+    ul.market-section-sell__item-list
+      each item in self.items
+        li.market-section-sell-item(id='item' + item.hid)
+          .market-section-sell-item__photo.thumb
+            if item.files && item.files.length > 0
+              img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+            else
+              .thumb__content= self.t('no_photo')
+          .market-section-sell-item__info
+            .market-section-sell-item__title
+              a.market-section-sell-item__title-text(href=self.link_to('market.item.sell', { section_hid: self.section.hid, item_hid: item.hid }))
+                = item.title
+              if !item.is_new
+                sub.market-section-sell-item__icon
+                  = ' '
+                  = self.t('used')
+
+            .market-section-sell-item__price
+              //- 12300 -> "12 300"
+              //- 12300.1 -> "12 300.10"
+              - let price = (item.price || {}).value || 0;
+              = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
+              = ' '
+              = self.t.exists('@market.currencies.' + item.price.currency) ? self.t('@market.currencies.' + item.price.currency) : item.price.currency
+              if item.exchange
+                = ' '
+                //- TODO: icon-exchange
+                span.market-section-sell-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+
+            .market-section-sell-item__location
+              if item.location
+                a.market-section-sell-item__location-link(
+                  href= '#'
+                  data-on-click= 'common.blocks.location_show_dlg'
+                  data-latitude= item.location && item.location[1]
+                  data-longitude= item.location && item.location[0]
+                )
+                  span.icon.icon-location.icon-space-after
+
+                  if self.location_names[item.location[0] + ':' + item.location[1]]
+                    = self.location_names[item.location[0] + ':' + item.location[1]]
+
+              if item.delivery
+                = ' '
+                //- TODO: icon-delivery
+                span.market-section-sell-item__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
+
+            .market-section-sell-item__details
+              .market-section-sell-item__details-item!= self.timetag(item.ts, 'relative')
+              .market-section-sell-item__details-item
+                - var user = self.users[item.user];
+                if user
+                  a.market-section-sell-item__user-link._ucard-popover(
+                    href=self.link_to('users.member', { user_hid: user.hid })
+                    data-user-id=user._id
+                    data-user-ref='market_section_sell_item:'+self.section.hid+':'+item.hid
+                  )
+                    = user.name

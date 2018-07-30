@@ -51,8 +51,12 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   };
 
 
-  if (N.runtime.page_data.selected_section_id) {
-    view.offer.section(N.runtime.page_data.selected_section_id);
+  if (N.runtime.page_data.defaults.section) {
+    view.offer.section(N.runtime.page_data.defaults.section);
+  }
+
+  if (N.runtime.page_data.defaults.buy) {
+    view.offer.type('buy');
   }
 
   let savedDraft = _.pickBy(ko.toJS(view.offer), v => v !== '');
@@ -223,7 +227,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     }
   };
 
-  view.submit = function submit(form) {
+  view.submitBuy = function submit(form) {
     if (form.checkValidity() === false) {
       view.showErrors(true);
       return;
@@ -232,14 +236,51 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.showErrors(false);
     view.isSubmitting(true);
 
-    let params = ko.toJS(view.offer);
-
-    params.draft_id = draft_id;
+    let params = {
+      draft_id,
+      title:          view.offer.title(),
+      section:        view.offer.section(),
+      description:    view.offer.description()
+    };
 
     Promise.resolve()
-      .then(() => N.io.rpc('market.new.create', params))
+      .then(() => N.io.rpc('market.new.create_request', params))
       .then(res => N.wire.emit('navigate.to', {
-        apiPath: 'market.item',
+        apiPath: 'market.item.buy',
+        params: { section_hid: res.section_hid, item_hid: res.item_hid }
+      }))
+      .catch(err => {
+        view.isSubmitting(false);
+        N.wire.emit('error', err);
+      });
+  };
+
+  view.submitSell = function submit(form) {
+    if (form.checkValidity() === false) {
+      view.showErrors(true);
+      return;
+    }
+
+    view.showErrors(false);
+    view.isSubmitting(true);
+
+    let params = {
+      draft_id,
+      title:          view.offer.title(),
+      price_value:    view.offer.price_value(),
+      price_currency: view.offer.price_currency(),
+      section:        view.offer.section(),
+      description:    view.offer.description(),
+      files:          view.offer.files(),
+      barter_info:    view.offer.barter_info(),
+      delivery:       view.offer.delivery(),
+      is_new:         view.offer.is_new()
+    };
+
+    Promise.resolve()
+      .then(() => N.io.rpc('market.new.create_offer', params))
+      .then(res => N.wire.emit('navigate.to', {
+        apiPath: 'market.item.sell',
         params: { section_hid: res.section_hid, item_hid: res.item_hid }
       }))
       .catch(err => {

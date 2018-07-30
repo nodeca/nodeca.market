@@ -1,0 +1,104 @@
+article#content.market-item-sell
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-item-sell__head
+      h1.market-item-sell__title.page-head__title(itemprop='name')= self.item.title
+
+      .market-item-sell__price
+        //- 12300 -> "12 300"
+        //- 12300.1 -> "12 300.10"
+        - let price = (self.item.price || {}).value || 0;
+        = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
+        = ' '
+        = self.t.exists('@market.currencies.' + self.item.price.currency) ? self.t('@market.currencies.' + self.item.price.currency) : self.item.price.currency
+
+      .market-item-sell__info
+        .market-item-sell__info-item!= self.timetag(self.item.ts, 'relative')
+        .market-item-sell__info-item
+          - var user = self.users[self.item.user];
+          if user
+            a.market-item-sell__user-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=user._id
+              data-user-ref='market_item_sell:'+self.section.hid+':'+self.item.hid
+            )
+              = user.name
+
+    if self.item.files && self.item.files.length > 0
+      ul.market-item-sell__attach-list.thumb-grid.thumb-grid__m-fluid
+        each file in self.item.files
+          li.market-item-sell__attach-item.thumb-grid__item
+            .thumb-grid__item-inner
+              .thumb
+                img.thumb__image(src=self.link_to('core.gridfs', { bucket: file + '_sm' }))
+
+    .market-item-sell__description.markup!= self.item.html
+
+    .market-item-sell__details
+      if self.item.location
+        .market-item-sell__details-item
+          .market-item-sell__details-key= self.t('location')
+          .market-item-sell__details-value
+            a.market-item-sell__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= self.item.location && self.item.location[1]
+              data-longitude= self.item.location && self.item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_name
+                = self.location_name
+
+      .market-item-sell__details-item
+        .market-item-sell__details-key= self.t('delivery')
+        .market-item-sell__details-value= self.item.delivery ? self.t('delivery_available') : self.t('delivery_not_available')
+
+      if self.item.barter_info
+        .market-item-sell__details-item
+          .market-item-sell__details-key= self.t('barter_info')
+          .market-item-sell__details-value= self.item.barter_info
+
+      .market-item-sell__details-item
+        .market-item-sell__details-key= self.t('condition')
+        .market-item-sell__details-value= self.item.is_new ? self.t('condition_new') : self.t('condition_used')
+
+    footer.market-item-sell__controls
+      ul.market-item-sell__controls-blk
+
+      li.market-item-sell__control-item.market-item-sell__ts
+        != self.timetag(self.item.ts, 'relative')
+
+        li.market-item-sell__control-item
+          button.btn.market-item-sell__action.market-item-sell__report(
+            title=self.t('report')
+          )
+            span.icon.icon-report
+
+      if self.runtime.is_member
+        li.market-item-sell__control-item.market-item-sell__bookmark
+          button.btn.market-item-sell__action.market-item-sell__bookmark-add(
+            title=self.t('bookmark_add')
+          )
+            span.icon.icon-bookmark
+            span.market-item-sell__bookmarks-count(data-bm-count=0)
+
+          button.btn.market-item-sell__action.market-item-sell__bookmark-remove(
+            title=self.t('bookmark_remove')
+          )
+            span.icon.icon-bookmark
+            span.market-item-sell__bookmarks-count(data-bm-count=0)
+
+      li.market-item-sell__control-item.market-item-sell__views
+        span.icon.icon-views.icon-space-after(
+          title=self.t('views')
+        )
+          = self.item.views

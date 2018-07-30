@@ -1,0 +1,35 @@
+article#content.market-index-buy
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-index-buy__head
+      h1.market-index-buy__title.page-head__title(itemprop='name')= self.t('buy')
+
+      != self.partial('@market.index.buy.blocks.toolbar_controls')
+
+    != self.partial('@market.blocks.search_form')
+
+    .market-index-buy__switch-type
+      a.market-index-buy__switch-type-link(href=self.link_to('market.index.sell'))= self.t('sell_link')
+
+    .market-index-buy__categories
+      each section in self.subsections
+        .market-index-buy__section
+          .market-index-buy__section-title
+            a.market-index-buy__section-link(
+              href=self.link_to('market.section.buy', { section_hid: section.hid })
+            )= section.title
+
+          each subsection in section.child_list
+            .market-index-buy__subsection
+              a.market-index-buy__subsection-link(
+                class=subsection.is_linked ? 'market-index-buy__linked-section' : ''
+                href=self.link_to('market.section.buy', { section_hid: subsection.hid })
+              )= subsection.title
