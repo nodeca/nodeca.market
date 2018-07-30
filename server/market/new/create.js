@@ -4,10 +4,17 @@
 'use strict';
 
 
-const charcount = require('charcount');
+const _           = require('lodash');
+const charcount   = require('charcount');
+const mongoose    = require('mongoose');
+const pump        = require('util').promisify(require('pump'));
+const resizeParse = require('nodeca.users/server/_lib/resize_parse');
 
 
 module.exports = function (N, apiPath) {
+
+  const uploadSizes = Object.keys(resizeParse(N.config.market.uploads).resize);
+
 
   N.validate(apiPath, {
     draft_id:       { format: 'mongo' },
@@ -17,7 +24,7 @@ module.exports = function (N, apiPath) {
     price_currency: { type: 'string' },
     section:        { format: 'mongo' },
     description:    { type: 'string' },
-    attachments:    {
+    files:          {
       type: 'array',
       uniqueItems: true,
       items: { format: 'mongo' }
@@ -60,6 +67,18 @@ module.exports = function (N, apiPath) {
 
     // Should never happen, restricted on client
     if (section.is_category) throw N.io.BAD_REQUEST;
+  });
+
+
+  // Fetch draft
+  //
+  N.wire.before(apiPath, async function fetch_draft(env) {
+    env.data.draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
+
+    let uploaded = _.keyBy(env.data.draft.files);
+
+    // restrict files to only files that were uploaded for this draft
+    env.params.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
   });
 
 
@@ -120,19 +139,71 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Create buy offer if offer type is "buy"
+  //
   N.wire.on(apiPath, async function create_buy_offer(env) {
     if (env.params.type !== 'buy') return;
 
-    // TODO
-    throw {
-      code: N.io.CLIENT_ERROR,
-      message: 'Not implemented'
-    };
+    let statuses = N.models.market.ItemRequest.statuses;
+    let item = new N.models.market.ItemRequest();
+
+    item.imports = env.data.parse_result.imports;
+    item.import_users = env.data.parse_result.import_users;
+    item.title = env.params.title;
+    item.html = env.data.parse_result.html;
+    item.md = env.params.description;
+    item.ip = env.req.ip;
+    item.params = env.data.parse_options;
+
+    if (env.user_info.hb) {
+      item.st  = statuses.HB;
+      item.ste = statuses.VISIBLE;
+    } else {
+      item.st  = statuses.VISIBLE;
+    }
+
+    item.section = env.data.section._id;
+    item.user    = env.user_info.user_id;
+
+    item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
+
+    await item.save();
+
+    env.data.new_item = item;
   });
 
 
+  // Create sell offer if offer type is "sell"
+  //
   N.wire.on(apiPath, async function create_sell_offer(env) {
     if (env.params.type !== 'sell') return;
+
+    let files = [];
+
+    for (let file of env.params.files) {
+      let new_id = new mongoose.Types.ObjectId();
+
+      files.push(new_id);
+
+      for (let size of uploadSizes) {
+        let info = await N.models.core.FileTmp.getInfo(file + (size === 'orig' ? '' : '_' + size));
+
+        if (!info) continue;
+
+        let params = { contentType: info.contentType };
+
+        if (size === 'orig') {
+          params._id = new_id;
+        } else {
+          params.filename = new_id + '_' + size;
+        }
+
+        await pump(
+          N.models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
+          N.models.core.File.createWriteStream(params)
+        );
+      }
+    }
 
     let statuses = N.models.market.ItemOffer.statuses;
     let item = new N.models.market.ItemOffer();
@@ -152,6 +223,7 @@ module.exports = function (N, apiPath) {
     item.barter_info = env.params.barter_info;
     item.delivery = env.params.delivery;
     item.is_new = env.params.is_new;
+    item.files = files;
 
     if (env.user_info.hb) {
       item.st  = statuses.HB;
@@ -181,9 +253,7 @@ module.exports = function (N, apiPath) {
   // Remove draft
   //
   N.wire.after(apiPath, async function remove_draft(env) {
-    let draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
-
-    if (draft) await draft.remove();
+    if (env.data.draft) await env.data.draft.remove();
   });
 
 

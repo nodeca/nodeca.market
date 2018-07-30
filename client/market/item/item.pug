@@ -32,17 +32,13 @@ article#content.market-item
             )
               = user.name
 
-    //-
+    if self.item.files && self.item.files.length > 0
       ul.market-item__attach-list.thumb-grid.thumb-grid__m-fluid
-        li.market-item__attach-item.thumb-grid__item
-          .thumb-grid__item-inner
-            .thumb
-              img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
-
-        li.market-item__attach-item.thumb-grid__item
-          .thumb-grid__item-inner
-            .thumb
-              img.thumb__image(src=self.link_to('core.gridfs', { bucket: '5b51f0e9ad5e67256238bed8_sm' }))
+        each file in self.item.files
+          li.market-item__attach-item.thumb-grid__item
+            .thumb-grid__item-inner
+              .thumb
+                img.thumb__image(src=self.link_to('core.gridfs', { bucket: file + '_sm' }))
 
     .market-item__description.markup!= self.item.html
 
