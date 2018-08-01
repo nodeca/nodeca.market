@@ -1,4 +1,8 @@
-article#content.market-item-buy
+- self.own_bookmarks = self.own_bookmarks || [];
+
+article#content.market-item-buy(
+  class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-buy__m-bookmarked' : ''
+)
   != self.partial('@common.blocks.navbar.logo_apps')
 
   nav.breadcrumbs-container
@@ -57,16 +61,21 @@ article#content.market-item-buy
       if self.runtime.is_member
         li.market-item-buy__control-item.market-item-buy__bookmark
           button.btn.market-item-buy__action.market-item-buy__bookmark-add(
+            data-on-click='market.item.buy:item_bookmark'
+            data-item-id=self.item._id
             title=self.t('bookmark_add')
           )
             span.icon.icon-bookmark
-            span.market-item-buy__bookmarks-count(data-bm-count=0)
+            span.market-item-buy__bookmarks-count(data-bm-count=self.item.bookmarks)
 
           button.btn.market-item-buy__action.market-item-buy__bookmark-remove(
+            data-on-click='market.item.buy:item_bookmark'
+            data-item-id=self.item._id
+            data-remove='true'
             title=self.t('bookmark_remove')
           )
             span.icon.icon-bookmark
-            span.market-item-buy__bookmarks-count(data-bm-count=0)
+            span.market-item-buy__bookmarks-count(data-bm-count=self.item.bookmarks)
 
       li.market-item-buy__control-item.market-item-buy__views
         span.icon.icon-views.icon-space-after(

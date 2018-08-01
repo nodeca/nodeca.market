@@ -4,6 +4,7 @@
 'use strict';
 
 
+const _                     = require('lodash');
 const sanitize_section      = require('nodeca.market/lib/sanitizers/section');
 const sanitize_item_request = require('nodeca.market/lib/sanitizers/item_request');
 
@@ -23,7 +24,33 @@ module.exports = function (N, apiPath) {
                          .where('hid').equals(env.params.item_hid)
                          .lean(true);
 
-    if (!item) throw N.io.NOT_FOUND;
+    if (!item) {
+      // maybe offer type is wrong, redirect in that case
+      item = await N.models.market.ItemOffer.findOne()
+                       .where('hid').equals(env.params.item_hid)
+                       .lean(true);
+
+      if (!item) throw N.io.NOT_FOUND;
+
+      let access_env = { params: {
+        items: item,
+        user_info: env.user_info
+      } };
+
+      await N.wire.emit('internal:market.access.item_offer', access_env);
+
+      if (!access_env.data.access_read) throw N.io.NOT_FOUND;
+
+      throw {
+        code: N.io.REDIRECT,
+        head: {
+          Location: N.router.linkTo('market.item.sell', {
+            section_hid: env.params.section_hid,
+            item_hid:    env.params.item_hid
+          })
+        }
+      };
+    }
 
     let access_env = { params: {
       items: item,
@@ -141,5 +168,19 @@ module.exports = function (N, apiPath) {
         });
       });
     });
+  });
+
+
+  // Fetch and fill bookmarks
+  //
+  N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
+    let bookmarks = await N.models.market.ItemRequestBookmark.find()
+                              .where('user').equals(env.user_info.user_id)
+                              .where('item').equals(env.data.item._id)
+                              .lean(true);
+
+    if (!bookmarks.length) return;
+
+    env.res.own_bookmarks = _.map(bookmarks, 'item');
   });
 };
