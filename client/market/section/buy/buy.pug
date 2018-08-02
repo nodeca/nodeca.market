@@ -30,7 +30,7 @@ article#content.market-section-buy
 
           span.market-section-buy__subsection-count
             = ' '
-            = '0'
+            = (section.cache || {}).request_count || 0
 
     ul.market-section-buy__item-list
       each item in self.items

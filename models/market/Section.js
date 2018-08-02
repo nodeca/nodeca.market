@@ -21,9 +21,10 @@ module.exports = function (N, collectionName) {
 
   set_content_type('MARKET_SECTION', 12);
 
-  //let cache = {
-  //  item_count: { type: Number, 'default': 0 }
-  //};
+  let cache = {
+    offer_count:   { type: Number, 'default': 0 },
+    request_count: { type: Number, 'default': 0 }
+  };
 
   let Section = new Schema({
     title:            String,
@@ -39,11 +40,11 @@ module.exports = function (N, collectionName) {
     links:            [ Schema.ObjectId ],
 
     // Options
-    is_category:      { type: Boolean, 'default': false }
+    is_category:      { type: Boolean, 'default': false },
 
     // Cache
-    //cache,
-    //cache_hb:         cache
+    cache,
+    cache_hb:         cache
   }, {
     versionKey : false
   });
@@ -198,4 +199,10 @@ module.exports = function (N, collectionName) {
   // Provide a possibility to clear section tree cache (used in seeds)
   //
   Section.statics.getChildren.clear = () => getSectionsTree.clear();
+
+  // Recalculate section cache
+  //
+  Section.statics.updateCache = (sectionID) => {
+    N.queue.market_section_item_count_update(sectionID).postpone();
+  };
 };

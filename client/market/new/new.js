@@ -245,10 +245,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
     Promise.resolve()
       .then(() => N.io.rpc('market.new.create_request', params))
-      .then(res => N.wire.emit('navigate.to', {
-        apiPath: 'market.item.buy',
-        params: { section_hid: res.section_hid, item_hid: res.item_hid }
-      }))
+      .then(res => N.wire.emit('navigate.to', res.redirect_url))
       .catch(err => {
         view.isSubmitting(false);
         N.wire.emit('error', err);
@@ -279,10 +276,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
     Promise.resolve()
       .then(() => N.io.rpc('market.new.create_offer', params))
-      .then(res => N.wire.emit('navigate.to', {
-        apiPath: 'market.item.sell',
-        params: { section_hid: res.section_hid, item_hid: res.item_hid }
-      }))
+      .then(res => N.wire.emit('navigate.to', res.redirect_url))
       .catch(err => {
         view.isSubmitting(false);
         N.wire.emit('error', err);

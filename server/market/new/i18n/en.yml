@@ -1,4 +1,8 @@
 en-US:
-  create:
+  create_offer:
+    err_title_too_short: "Title should have at least #{count} ((character|characters))"
+    err_desc_too_short: "Description should have at least #{count} ((character|characters))"
+
+  create_request:
     err_title_too_short: "Title should have at least #{count} ((character|characters))"
     err_desc_too_short: "Description should have at least #{count} ((character|characters))"

@@ -205,13 +205,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Mark user as active
-  //
-  N.wire.after(apiPath, async function set_active_flag(env) {
-    await N.wire.emit('internal:users.mark_user_active', env);
-  });
-
-
   // Remove draft
   //
   N.wire.after(apiPath, async function remove_draft(env) {
@@ -219,10 +212,26 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Update section counters
+  //
+  N.wire.after(apiPath, async function update_section(env) {
+    await N.models.market.Section.updateCache(env.data.section._id);
+  });
+
+
   // Add redirect info
   //
-  N.wire.after(apiPath, async function redirect_info(env) {
-    env.res.section_hid = env.data.section.hid;
-    env.res.item_hid    = env.data.new_item.hid;
+  N.wire.after(apiPath, function redirect_info(env) {
+    env.res.redirect_url = N.router.linkTo('market.item.sell', {
+      section_hid: env.data.section.hid,
+      item_hid:    env.data.new_item.hid
+    });
+  });
+
+
+  // Mark user as active
+  //
+  N.wire.after(apiPath, async function set_active_flag(env) {
+    await N.wire.emit('internal:users.mark_user_active', env);
   });
 };
