@@ -3,6 +3,19 @@
 
 N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
+  // Click report button
+  //
+  N.wire.on(module.apiPath + ':report', function item_report(data) {
+    let params = { messages: t('@market.abuse_report.messages') };
+    let id = data.$this.data('item-id');
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('common.blocks.abuse_report_dlg', params))
+      .then(() => N.io.rpc('market.item.buy.abuse_report', { item_id: id, message: params.message }))
+      .then(() => N.wire.emit('notify.info', t('abuse_reported')));
+  });
+
+
   // Add/remove bookmark
   //
   N.wire.on(module.apiPath + ':item_bookmark', function item_bookmark(data) {

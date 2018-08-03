@@ -1,18 +1,6 @@
-- var menu_rnd_id = 'rnd' + String(Math.random()).slice(2, 10)
-
 .page-actions.market-section-buy__toolbar-controls
-  a.btn.btn-secondary.btn-square.icon.icon-plus(
-    href=self.link_to('market.new', { $query: { buy: '', section: self.section._id } })
-    title=self.t('item_add')
-  )
-
-  .page-actions__dropdown
-    button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
-      type='button'
-      id=menu_rnd_id
-      aria-haspopup='true'
-      aria-expanded='false'
-      data-toggle='dropdown'
+  if self.settings.market_can_create_items
+    a.btn.btn-secondary.btn-square.icon.icon-plus(
+      href=self.link_to('market.new', { $query: { buy: '', section: self.section._id } })
+      title=self.t('item_add')
     )
-
-    .dropdown-menu.dropdown-menu-right(aria-labelledby=menu_rnd_id)

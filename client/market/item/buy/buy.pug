@@ -1,3 +1,5 @@
+- self.add_raw_data('settings', self.settings)
+
 - self.own_bookmarks = self.own_bookmarks || [];
 
 article#content.market-item-buy(
@@ -52,11 +54,14 @@ article#content.market-item-buy(
       li.market-item-buy__control-item.market-item-buy__ts
         != self.timetag(self.item.ts, 'relative')
 
-        li.market-item-buy__control-item
-          button.btn.market-item-buy__action.market-item-buy__report(
-            title=self.t('report')
-          )
-            span.icon.icon-report
+        if self.settings.can_report_abuse
+          li.market-item-buy__control-item
+            button.btn.market-item-buy__action.market-item-buy__report(
+              title=self.t('report')
+              data-item-id=self.item._id
+              data-on-click='market.item.buy:report'
+            )
+              span.icon.icon-report
 
       if self.runtime.is_member
         li.market-item-buy__control-item.market-item-buy__bookmark

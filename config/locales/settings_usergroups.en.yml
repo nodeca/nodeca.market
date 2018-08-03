@@ -1,0 +1,7 @@
+i18n:
+  en-US:
+    admin:
+      core:
+        setting_names:
+          market_can_create_items: Create market lots
+          market_mod_can_add_infractions: Can give infractions in market

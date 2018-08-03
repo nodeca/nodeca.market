@@ -1,0 +1,14 @@
+setting_schemas:
+  usergroup:
+
+    market_can_create_items:
+      priority: 10
+      category_key: market
+      type: boolean
+      default: false
+
+    market_mod_can_add_infractions:
+      priority: 2110
+      category_key: perm_infractions
+      type: boolean
+      default: false

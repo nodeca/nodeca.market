@@ -9,6 +9,10 @@ packages:
       - client/admin
       - server/admin
 
+  common:
+    entries:
+      - internal/common
+
   market:
     depends:
       - common

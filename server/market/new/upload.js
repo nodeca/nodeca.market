@@ -24,10 +24,19 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Check auth
+  //
+  N.wire.before(apiPath, function check_user_auth(env) {
+    if (!env.user_info.is_member) throw N.io.FORBIDDEN;
+  });
+
+
   // Check permissions
   //
-  N.wire.before(apiPath, async function check_permissions() {
-    // TODO
+  N.wire.before(apiPath, async function check_permissions(env) {
+    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+
+    if (!can_create_items) throw N.io.FORBIDDEN;
   });
 
 

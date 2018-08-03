@@ -18,6 +18,15 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Check permissions
+  //
+  N.wire.before(apiPath, async function check_permissions(env) {
+    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+
+    if (!can_create_items) throw N.io.FORBIDDEN;
+  });
+
+
   N.wire.on(apiPath, async function remove_draft(env) {
     let draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
 

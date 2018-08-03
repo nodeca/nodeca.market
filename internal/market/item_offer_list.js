@@ -24,6 +24,12 @@ const _                   = require('lodash');
 const sanitize_item_offer = require('nodeca.market/lib/sanitizers/item_offer');
 const sanitize_section    = require('nodeca.market/lib/sanitizers/section');
 
+let setting_names = [
+  'can_see_hellbanned',
+  'market_can_create_items',
+  'market_items_per_page'
+];
+
 
 module.exports = function (N, apiPath) {
 
@@ -41,10 +47,7 @@ module.exports = function (N, apiPath) {
   // Fetch and fill permissions
   //
   N.wire.before(apiPath, async function fetch_and_fill_permissions(env) {
-    env.res.settings = env.data.settings = await env.extras.settings.fetch([
-      'can_see_hellbanned',
-      'market_items_per_page'
-    ]);
+    env.res.settings = env.data.settings = await env.extras.settings.fetch(setting_names);
   });
 
 

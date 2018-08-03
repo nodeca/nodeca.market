@@ -19,10 +19,14 @@ module.exports = function (N, apiPath) {
   // Fetch user drafts
   //
   N.wire.after(apiPath, async function fetch_drafts(env) {
-    env.res.drafts = await N.models.market.Draft.find()
-                               .where('user').equals(env.user_info.user_id)
-                               .sort('-ts')
-                               .lean(true);
+    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+
+    if (can_create_items) {
+      env.res.drafts = await N.models.market.Draft.find()
+                                 .where('user').equals(env.user_info.user_id)
+                                 .sort('-ts')
+                                 .lean(true);
+    }
   });
 
 
@@ -38,5 +42,14 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
     await N.wire.emit('internal:market.breadcrumbs_fill', { env });
+  });
+
+
+  // Fetch settings needed on the client-side
+  //
+  N.wire.after(apiPath, async function fetch_settings(env) {
+    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+      'market_can_create_items'
+    ]));
   });
 };

@@ -91,10 +91,14 @@ module.exports = function (N, apiPath) {
   // Fetch user drafts
   //
   N.wire.after(apiPath, async function fetch_drafts(env) {
-    env.res.drafts = await N.models.market.Draft.find()
-                               .where('user').equals(env.user_info.user_id)
-                               .sort('-ts')
-                               .lean(true);
+    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+
+    if (can_create_items) {
+      env.res.drafts = await N.models.market.Draft.find()
+                                 .where('user').equals(env.user_info.user_id)
+                                 .sort('-ts')
+                                 .lean(true);
+    }
   });
 
 
