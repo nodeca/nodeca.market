@@ -16,6 +16,27 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Show IP
+  //
+  N.wire.on(module.apiPath + ':show_ip', function show_ip(data) {
+    return N.wire.emit('market.item.buy.ip_info_dlg', { item_id: data.$this.data('item-id') });
+  });
+
+
+  // Add infraction
+  //
+  N.wire.on(module.apiPath + ':add_infraction', function add_infraction(data) {
+    let item_id = data.$this.data('item-id');
+    let params = { item_id };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
+      .then(() => N.io.rpc('market.item.buy.add_infraction', params))
+      .then(() => N.wire.emit('navigate.reload'))
+      .then(() => N.wire.emit('notify.info', t('infraction_added')));
+  });
+
+
   // Add/remove bookmark
   //
   N.wire.on(module.apiPath + ':item_bookmark', function item_bookmark(data) {

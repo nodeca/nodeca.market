@@ -1,5 +1,6 @@
 - self.add_raw_data('settings', self.settings)
 
+- self.infractions = self.infractions || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
 article#content.market-item-sell(
@@ -83,6 +84,17 @@ article#content.market-item-sell(
       li.market-item-sell__control-item.market-item-sell__ts
         != self.timetag(self.item.ts, 'relative')
 
+        - var infraction = self.infractions[self.item._id];
+        if infraction
+          li.market-item-sell__control-item.market-item-sell__infraction(
+            class=infraction.points === 0 ? 'market-item-sell__infraction-m-warning' : ''
+          )
+            a.btn.market-item-sell__action(
+              title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+              href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+            )
+              span.icon.icon-infraction
+
         if self.settings.can_report_abuse
           li.market-item-sell__control-item
             button.btn.market-item-sell__action.market-item-sell__report(
@@ -116,3 +128,27 @@ article#content.market-item-sell(
           title=self.t('views')
         )
           = self.item.views
+
+      - var showDropdown = false
+      - showDropdown = showDropdown || self.settings.market_mod_can_add_infractions
+      - showDropdown = showDropdown || self.settings.can_see_ip
+
+      if showDropdown
+        //- no aria parts - visible to moderators only
+        .market-item-sell__control-item.market-item-sell__mod-menu.dropdown.dropup
+          button.btn.btn-square.market-item-sell__action.dropdown-toggle(
+            data-toggle='dropdown'
+            role='button'
+          )
+          .dropdown-menu.dropdown-menu-right(role='menu')
+            if self.settings.market_mod_can_add_infractions
+              button.dropdown-item(
+                data-on-click='market.item.sell:add_infraction'
+                data-item-id=self.item._id
+              )= self.t('add_infraction')
+
+            if self.settings.can_see_ip
+              button.dropdown-item(
+                data-item-id=self.item._id
+                data-on-click='market.item.sell:show_ip'
+              )= self.t('ip_info')

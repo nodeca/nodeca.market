@@ -202,7 +202,7 @@ module.exports = function (N, collectionName) {
 
   // Recalculate section cache
   //
-  Section.statics.updateCache = (sectionID) => {
+  Section.statics.updateCache = function (sectionID) {
     N.queue.market_section_item_count_update(sectionID).postpone();
   };
 };

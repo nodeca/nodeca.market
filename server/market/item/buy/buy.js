@@ -189,11 +189,36 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch infractions
+  //
+  N.wire.after(apiPath, async function fetch_infractions(env) {
+    let settings = await env.extras.settings.fetch([
+      'market_mod_can_add_infractions',
+      'can_see_infractions'
+    ]);
+
+    if (!settings.can_see_infractions && !settings.market_mod_can_add_infractions) return;
+
+    let infractions = await N.models.users.Infraction.find()
+                                .where('src').equals(env.data.item._id)
+                                .where('exists').equals(true)
+                                .select('src points ts')
+                                .lean(true);
+
+    env.res.infractions = infractions.reduce((acc, infraction) => {
+      acc[infraction.src] = infraction;
+      return acc;
+    }, {});
+  });
+
+
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
-      'can_report_abuse'
+      'can_report_abuse',
+      'can_see_ip',
+      'market_mod_can_add_infractions'
     ]));
   });
 };

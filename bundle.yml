@@ -21,3 +21,7 @@ packages:
       - client/market
       - internal/market
       - server/market
+
+  users:
+    entries:
+      - internal/users
