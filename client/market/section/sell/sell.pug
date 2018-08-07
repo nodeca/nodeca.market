@@ -1,5 +1,32 @@
-article#content.market-section-sell
-  != self.partial('@common.blocks.navbar.logo_apps')
+- self.add_raw_data('settings',   self.settings)
+- self.add_raw_data('pagination', self.pagination)
+
+article#content.market-section-sell(
+  data-keymap= {
+    'home': 'market.section.sell:nav_to_start',
+    'end':  'market.section.sell:nav_to_end'
+  }
+  data-last-item-hid= self.last_item_hid
+  data-top-marker=    self.items && self.items.length > 0 ? self.items[0]._id : null
+  data-bottom-marker= self.items && self.items.length > 0 ? self.items[self.items.length - 1]._id : null
+)
+  -
+    var navbar_args = {
+      title:    self.section.title,
+      level_up: self.parent_hid ?
+                self.link_to('market.section.sell', { section_hid: self.parent_hid }) :
+                self.link_to('market.index.sell'),
+      toolbar:  'market.section.sell.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('market.section.sell', { section_hid: self.section.hid }),
+        link_bottom: self.link_to('market.section.sell', { section_hid: self.section.hid, $query: { from: self.last_item_hid } }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -20,7 +47,7 @@ article#content.market-section-sell
       option(selected)= self.t('order_by_date')
     
     .market-section-sell__subsections
-      each section in self.subsections
+      each section in self.subsections || []
         .market-section-sell__subsection(
           class=section.is_linked ? 'market-section-sell__linked' : ''
         )
@@ -32,61 +59,37 @@ article#content.market-section-sell
             = ' '
             = (section.cache || {}).offer_count || 0
 
-    ul.market-section-sell__item-list
-      each item in self.items
-        li.market-section-sell-item(id='item' + item.hid)
-          .market-section-sell-item__photo.thumb
-            if item.files && item.files.length > 0
-              img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
-            else
-              .thumb__content= self.t('no_photo')
-          .market-section-sell-item__info
-            .market-section-sell-item__title
-              a.market-section-sell-item__title-text(href=self.link_to('market.item.sell', { section_hid: self.section.hid, item_hid: item.hid }))
-                = item.title
-              if !item.is_new
-                sub.market-section-sell-item__icon
-                  = ' '
-                  = self.t('used')
+    if self.section.is_category === false || (self.items && self.items.length)
+      if self.items && self.items.length
+        .market-section-sell__loading-prev.nojs-hide(
+          class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
 
-            .market-section-sell-item__price
-              //- 12300 -> "12 300"
-              //- 12300.1 -> "12 300.10"
-              - let price = (item.price || {}).value || 0;
-              = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
-              = ' '
-              = self.t.exists('@market.currencies.' + item.price.currency) ? self.t('@market.currencies.' + item.price.currency) : item.price.currency
-              if item.exchange
-                = ' '
-                //- TODO: icon-exchange
-                span.market-section-sell-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+        ul.market-section-sell__item-list._affix(
+          data-affix-top={
+            offset:     500,
+            wire_above: 'market.section.sell:load_prev',
+            throttle:   100
+          }
+          data-affix-bottom={
+            offset:     500,
+            wire_below: 'market.section.sell:load_next',
+            throttle:   100
+          }
+        )!= self.partial('@market.blocks.items_sell_list')
 
-            .market-section-sell-item__location
-              if item.location
-                a.market-section-sell-item__location-link(
-                  href= '#'
-                  data-on-click= 'common.blocks.location_show_dlg'
-                  data-latitude= item.location && item.location[1]
-                  data-longitude= item.location && item.location[0]
-                )
-                  span.icon.icon-location.icon-space-after
+        .market-section-sell__loading-next.nojs-hide(
+          class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
 
-                  if self.location_names[item.location[0] + ':' + item.location[1]]
-                    = self.location_names[item.location[0] + ':' + item.location[1]]
+        nav.pager.js-hide
+          if self.head.prev
+            a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
 
-              if item.delivery
-                = ' '
-                //- TODO: icon-delivery
-                span.market-section-sell-item__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
-
-            .market-section-sell-item__details
-              .market-section-sell-item__details-item!= self.timetag(item.ts, 'relative')
-              .market-section-sell-item__details-item
-                - var user = self.users[item.user];
-                if user
-                  a.market-section-sell-item__user-link._ucard-popover(
-                    href=self.link_to('users.member', { user_hid: user.hid })
-                    data-user-id=user._id
-                    data-user-ref='market_section_sell_item:'+self.section.hid+':'+item.hid
-                  )
-                    = user.name
+          if self.head.next
+            a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+      else
+        p.market-section-sell__no-items
+          != self.t('no_items')

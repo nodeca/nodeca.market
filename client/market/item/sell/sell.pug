@@ -6,7 +6,12 @@
 article#content.market-item-sell(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-sell__m-bookmarked' : ''
 )
-  != self.partial('@common.blocks.navbar.logo_apps')
+  -
+    var navbar_args = {
+      level_up: self.link_to('market.section.sell', { section_hid: self.section.hid, $query: { from: self.item.hid } })
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

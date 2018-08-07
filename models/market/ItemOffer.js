@@ -102,6 +102,9 @@ module.exports = function (N, collectionName) {
   // lookup _id by hid (for routing)
   ItemOffer.index({ hid: 1 });
 
+  // get a list of items in a section
+  ItemOffer.index({ user: 1, _id: -1, st: 1 });
+
 
   // Set 'hid' for the new item.
   // This hook should always be the last one to avoid counter increment on error
