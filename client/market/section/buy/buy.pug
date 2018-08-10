@@ -1,5 +1,32 @@
-article#content.market-section-buy
-  != self.partial('@common.blocks.navbar.logo_apps')
+- self.add_raw_data('settings',   self.settings)
+- self.add_raw_data('pagination', self.pagination)
+
+article#content.market-section-buy(
+  data-keymap= {
+    'home': 'market.section.buy:nav_to_start',
+    'end':  'market.section.buy:nav_to_end'
+  }
+  data-last-item-hid= self.last_item_hid
+  data-top-marker=    self.items && self.items.length > 0 ? self.items[0]._id : null
+  data-bottom-marker= self.items && self.items.length > 0 ? self.items[self.items.length - 1]._id : null
+)
+  -
+    var navbar_args = {
+      title:    self.section.title,
+      level_up: self.parent_hid ?
+                self.link_to('market.section.buy', { section_hid: self.parent_hid }) :
+                self.link_to('market.index.buy'),
+      toolbar:  'market.section.buy.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('market.section.buy', { section_hid: self.section.hid }),
+        link_bottom: self.link_to('market.section.buy', { section_hid: self.section.hid, $query: { from: self.last_item_hid } }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -20,7 +47,7 @@ article#content.market-section-buy
       option(selected)= self.t('order_by_date')
     
     .market-section-buy__subsections
-      each section in self.subsections
+      each section in self.subsections || []
         .market-section-buy__subsection(
           class=section.is_linked ? 'market-section-buy__linked' : ''
         )
@@ -32,34 +59,37 @@ article#content.market-section-buy
             = ' '
             = (section.cache || {}).request_count || 0
 
-    ul.market-section-buy__item-list
-      each item in self.items
-        li.market-section-buy-item(id='item' + item.hid)
-          .market-section-buy-item__title
-            a.market-section-buy-item__title-text(href=self.link_to('market.item.buy', { section_hid: self.section.hid, item_hid: item.hid }))
-              = item.title
+    if self.section.is_category === false || (self.items && self.items.length)
+      if self.items && self.items.length
+        .market-section-buy__loading-prev.nojs-hide(
+          class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
 
-          .market-section-buy-item__location
-            if item.location
-              a.market-section-buy-item__location-link(
-                href= '#'
-                data-on-click= 'common.blocks.location_show_dlg'
-                data-latitude= item.location && item.location[1]
-                data-longitude= item.location && item.location[0]
-              )
-                span.icon.icon-location.icon-space-after
+        ul.market-section-buy__item-list._affix(
+          data-affix-top={
+            offset:     500,
+            wire_above: 'market.section.buy:load_prev',
+            throttle:   100
+          }
+          data-affix-bottom={
+            offset:     500,
+            wire_below: 'market.section.buy:load_next',
+            throttle:   100
+          }
+        )!= self.partial('@market.blocks.items_buy_list')
 
-                if self.location_names[item.location[0] + ':' + item.location[1]]
-                  = self.location_names[item.location[0] + ':' + item.location[1]]
+        .market-section-buy__loading-next.nojs-hide(
+          class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
 
-          .market-section-buy-item__details
-            .market-section-buy-item__details-item!= self.timetag(item.ts, 'relative')
-            .market-section-buy-item__details-item
-              - var user = self.users[item.user];
-              if user
-                a.market-section-buy-item__user-link._ucard-popover(
-                  href=self.link_to('users.member', { user_hid: user.hid })
-                  data-user-id=user._id
-                  data-user-ref='market_section_buy_item:'+self.section.hid+':'+item.hid
-                )
-                  = user.name
+        nav.pager.js-hide
+          if self.head.prev
+            a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
+
+          if self.head.next
+            a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+      else
+        p.market-section-buy__no-items
+          != self.t('no_items')
