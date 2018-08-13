@@ -11,6 +11,7 @@ packages:
 
   common:
     entries:
+      - client/common
       - internal/common
 
   market:

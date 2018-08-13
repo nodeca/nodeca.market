@@ -23,6 +23,36 @@ const userInfo = require('nodeca.users/lib/user_info');
 
 module.exports = function (N, apiPath) {
 
+  //////////////////////////////////////////////////////////////////////////
+  // Hook for the "get permissions by url" feature, used in snippets
+  //
+  N.wire.on('internal:common.access', async function check_market_item_offer_access(access_env) {
+    let match = N.router.matchAll(access_env.params.url).reduce(
+      (acc, match) => (match.meta.methods.get === 'market.item.sell' ? match : acc),
+      null
+    );
+
+    if (!match) return;
+
+    let item = await N.models.market.ItemOffer.findOne()
+                         .where('hid').equals(match.params.item_hid)
+                         .lean(true);
+
+    if (!item) return;
+
+    let access_env_sub = {
+      params: {
+        items: item,
+        user_info: access_env.params.user_info
+      }
+    };
+
+    await N.wire.emit('internal:market.access.item_offer', access_env_sub);
+
+    access_env.data.access_read = access_env_sub.data.access_read;
+  });
+
+
   /////////////////////////////////////////////////////////////////////////////
   // Initialize return value for data.access_read
   //

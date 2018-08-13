@@ -10,6 +10,7 @@ module.exports.up = async function (N) {
 
   await usergroupStore.set({
     market_can_create_items:        { value: true },
+    market_show_ignored:            { value: true },
     market_mod_can_add_infractions: { value: true }
   }, { usergroup_id: adminGroupId });
 

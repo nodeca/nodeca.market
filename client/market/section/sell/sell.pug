@@ -42,9 +42,6 @@ article#content.market-section-sell(
       != self.partial('@market.section.sell.blocks.toolbar_controls')
 
     != self.partial('@market.blocks.search_form')
-
-    select.market-section-sell__select-order.form-control.custom-select
-      option(selected)= self.t('order_by_date')
     
     .market-section-sell__subsections
       each section in self.subsections || []

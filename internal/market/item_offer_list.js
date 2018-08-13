@@ -27,7 +27,8 @@ const sanitize_section    = require('nodeca.market/lib/sanitizers/section');
 let setting_names = [
   'can_see_hellbanned',
   'market_can_create_items',
-  'market_items_per_page'
+  'market_items_per_page',
+  'market_show_ignored'
 ];
 
 

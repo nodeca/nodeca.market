@@ -1,36 +1,42 @@
 - self.users = self.users || {};
 
 each item in self.items
-  li.market-section-buy-item(
-    id='item' + item.hid
-    data-item-id=item._id
-    data-item-hid=item.hid
-  )
-    .market-section-buy-item__title
-      a.market-section-buy-item__title-text(href=self.link_to('market.item.buy', { section_hid: self.section.hid, item_hid: item.hid }))
-        = item.title
+  if (self.ignored_users[item.user] && !self.settings.market_show_ignored)
+    //- skip entries created by ignored users
 
-    .market-section-buy-item__location
-      if item.location
-        a.market-section-buy-item__location-link(
-          href= '#'
-          data-on-click= 'common.blocks.location_show_dlg'
-          data-latitude= item.location && item.location[1]
-          data-longitude= item.location && item.location[0]
-        )
-          span.icon.icon-location.icon-space-after
+  else
+    li.market-section-buy-item(
+      id='item' + item.hid
+      class=(self.ignored_users[item.user]) ? 'market-section-buy-item__m-ignored' : ''
+      data-item-id=item._id
+      data-item-hid=item.hid
+    )
+      .market-section-buy-item__title
+        a.market-section-buy-item__title-text(href=self.link_to('market.item.buy', { section_hid: self.section.hid, item_hid: item.hid }))
+          = item.title
 
-          if self.location_names[item.location[0] + ':' + item.location[1]]
-            = self.location_names[item.location[0] + ':' + item.location[1]]
-
-    .market-section-buy-item__details
-      .market-section-buy-item__details-item!= self.timetag(item.ts, 'relative')
-      .market-section-buy-item__details-item
-        - var user = self.users[item.user];
-        if user
-          a.market-section-buy-item__user-link._ucard-popover(
-            href=self.link_to('users.member', { user_hid: user.hid })
-            data-user-id=user._id
-            data-user-ref='market_section_buy_item:'+self.section.hid+':'+item.hid
+      .market-section-buy-item__location
+        if item.location
+          a.market-section-buy-item__location-link(
+            href= '#'
+            data-on-click= 'common.blocks.location_show_dlg'
+            data-latitude= item.location && item.location[1]
+            data-longitude= item.location && item.location[0]
           )
-            = user.name
+            span.icon.icon-location.icon-space-after
+
+            if self.location_names[item.location[0] + ':' + item.location[1]]
+              = self.location_names[item.location[0] + ':' + item.location[1]]
+
+      .market-section-buy-item__details
+        .market-section-buy-item__details-item!= self.timetag(item.ts, 'relative')
+        .market-section-buy-item__details-item
+          - var user = self.users[item.user];
+          if user
+            a.market-section-buy-item__user-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=user._id
+              data-user-ref='market_section_buy_item:'+self.section.hid+':'+item.hid
+            )
+              span.market-section-buy-item__ignored-mark.icon.icon-ignore.icon-space-after
+              = user.name

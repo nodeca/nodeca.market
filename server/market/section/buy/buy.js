@@ -157,7 +157,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
     let parents = await N.models.market.Section.getParentList(env.data.section._id);
 
-    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents });
+    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents, buy: true });
   });
 
 
