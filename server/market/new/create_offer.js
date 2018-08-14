@@ -221,6 +221,13 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Schedule image size fetch
+  //
+  N.wire.after(apiPath, function fill_image_info(env) {
+    return N.queue.market_item_offer_images_fetch(env.data.new_item._id).postpone();
+  });
+
+
   // Update section counters
   //
   N.wire.after(apiPath, async function update_section(env) {

@@ -1,0 +1,25 @@
+- self.add_raw_data('market_items_task', self.task_info);
+
+#rebuild-market-items-task.rebuild-widget
+  .rebuild-widget__title
+    = self.t('title')
+    | 
+    small(data-bind='visible: started, text: (current() / total() * 100 || 0).toFixed(2) + "%"')
+
+  .rebuild-widget__progress.progress
+    .progress-bar(
+      data-bind='style: { width: (current() / total() * 100).toFixed(4) + "%" }, visible: current() !== total()'
+      style='display: none'
+    )
+
+  div
+    button.btn.btn-light(
+      data-on-click='admin.core.rebuild.blocks.market_items.start'
+      data-bind='visible: !started()'
+    )= self.t('start')
+
+    button.btn.btn-danger(
+      data-on-click='admin.core.rebuild.blocks.market_items.stop'
+      data-bind='visible: started'
+      style='display: none'
+    )= self.t('stop')

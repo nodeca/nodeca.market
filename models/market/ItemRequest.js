@@ -104,6 +104,34 @@ module.exports = function (N, collectionName) {
   });
 
 
+  // Remove empty "imports" and "import_users" fields
+  //
+  ItemRequest.pre('save', function () {
+    if (this.imports && this.imports.length === 0) {
+      /*eslint-disable no-undefined*/
+      this.imports = undefined;
+    }
+
+    if (this.import_users && this.import_users.length === 0) {
+      /*eslint-disable no-undefined*/
+      this.import_users = undefined;
+    }
+  });
+
+
+  // Store parser options separately and save reference to them
+  //
+  ItemRequest.pre('save', async function () {
+    if (!this.params) return;
+
+    let id = await N.models.core.MessageParams.setParams(this.params);
+
+    /*eslint-disable no-undefined*/
+    this.params = undefined;
+    this.params_ref = id;
+  });
+
+
   // Export statuses
   //
   ItemRequest.statics.statuses    = statuses;
