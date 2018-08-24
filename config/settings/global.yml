@@ -18,6 +18,18 @@ setting_schemas:
       category_key: market_item
       default: 10
 
+    market_items_min_images:
+      type: number
+      group_key: market_editor
+      category_key: market_item
+      default: 0
+
+    market_items_max_images:
+      type: number
+      group_key: market_editor
+      category_key: market_item
+      default: 10
+
     market_items_per_page:
       type: number
       group_key: core_display

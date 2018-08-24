@@ -7,7 +7,9 @@ en-US:
   field_price: Price
   field_section: Category
   field_description: Description
-  field_photos: Photos (at least 1, up to 10)
+  field_photos: 'Photos'
+  field_photos_limit_range: ' (#{min}-#{max})'
+  field_photos_limit_low: ' (>= #{min})'
   field_barter: Direct exchange
   field_barter_help: Leave field empty if you're not interested in bartering. Otherwise, specify what you would like to exchange your item for.
   field_delivery: Delivery is available

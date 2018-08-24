@@ -91,6 +91,37 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Check number of images
+  //
+  N.wire.before(apiPath, async function check_image_count(env) {
+    let min_images = await env.extras.settings.fetch('market_items_min_images');
+    let max_images = await env.extras.settings.fetch('market_items_max_images');
+
+    // treat invalid settings as "no limit"
+    if (min_images >= 0 && max_images >= 0 && min_images > max_images) {
+      min_images = max_images = -1;
+    }
+
+    if (min_images >= 0) {
+      if (env.params.files.length < min_images) {
+        throw {
+          code: N.io.CLIENT_ERROR,
+          message: env.t('err_too_few_images', min_images)
+        };
+      }
+    }
+
+    if (max_images >= 0) {
+      if (env.params.files.length > max_images) {
+        throw {
+          code: N.io.CLIENT_ERROR,
+          message: env.t('err_too_many_images', max_images)
+        };
+      }
+    }
+  });
+
+
   // Check and convert currency
   //
   N.wire.before(apiPath, function convert_currency(env) {

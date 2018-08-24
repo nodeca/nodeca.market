@@ -14,4 +14,6 @@ i18n:
         setting_names:
           market_title_min_length: Min title length
           market_desc_min_length: Min description length
+          market_items_min_images: Min number of images in a lot
+          market_items_max_images: Max number of images in a lot
           market_items_per_page: Market items per page

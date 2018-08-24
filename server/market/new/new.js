@@ -117,4 +117,14 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
     await N.wire.emit('internal:market.breadcrumbs_fill', { env });
   });
+
+
+  // Fetch settings needed on the client-side
+  //
+  N.wire.after(apiPath, async function fetch_settings(env) {
+    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+      'market_items_min_images',
+      'market_items_max_images'
+    ]));
+  });
 };

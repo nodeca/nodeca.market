@@ -53,56 +53,80 @@ article#content.market-new
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +render_section_tree(null, 0)
 
-        .row(data-bind="visible: offer.type() === 'sell'")
-          .form-group.col
-            //- Hidden
-            input#market-new-upload(
-              name='files[]'
-              type='file'
-              style='position: absolute; left: -2000px'
-              multiple
-            )
+        -
+          var min_images = null, max_images = null;
 
-            label= self.t('field_photos')
-            ul.market-new__attach-list.thumb-grid.thumb-grid__m-fluid
-              li.market-new__attach-item.thumb-grid__item
-                .thumb-grid__item-inner
-                  //- Should 'click' file input in context of current action
-                  a.thumb(href='#', onClick='document.getElementById("market-new-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
-                    .thumb__content.icon.icon-plus
+          if (self.settings.market_items_min_images >= 0) {
+            min_images = self.settings.market_items_min_images;
+          }
 
-              <!-- ko foreach: offer.files -->
-                li.market-new__attach-item.thumb-grid__item(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }')
+          if (self.settings.market_items_max_images >= 0) {
+            max_images = self.settings.market_items_max_images;
+          }
+
+          // check if settings are invalid
+          if (min_images !== null && max_images !== null && min_images > max_images) {
+            min_images = max_images = null;
+          }
+
+        if max_images === null || max_images > 0
+          .row(data-bind="visible: offer.type() === 'sell'")
+            .form-group.col
+              //- Hidden
+              input#market-new-upload(
+                name='files[]'
+                type='file'
+                style='position: absolute; left: -2000px'
+                multiple
+              )
+
+              label
+                = self.t('field_photos')
+                if min_images !== null && max_images !== null
+                  if max_images !== null
+                    = self.t('field_photos_limit_range', { min: min_images || 0, max: max_images })
+                  else
+                    = self.t('field_photos_limit_low', { min: min_images || 0 })
+
+              ul.market-new__attach-list.thumb-grid.thumb-grid__m-fluid
+                li.market-new__attach-item.thumb-grid__item
                   .thumb-grid__item-inner
-                    .thumb
-                      img.thumb__image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
+                    //- Should 'click' file input in context of current action
+                    a.thumb(href='#', onClick='document.getElementById("market-new-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
+                      .thumb__content.icon.icon-plus
 
-                      .market-new__attach-controls
-                        .market-new__attach-control-item.dropdown.dropup
-                          - var menu_rnd_id = 'rnd' + self.get_label_uid()
+                <!-- ko foreach: offer.files -->
+                  li.market-new__attach-item.thumb-grid__item(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }')
+                    .thumb-grid__item-inner
+                      .thumb
+                        img.thumb__image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
 
-                          button.btn.btn-link.btn-square.icon.icon-dropdown-local.dropdown-toggle(
-                            type='button'
-                            id=menu_rnd_id
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            data-toggle='dropdown'
-                          )
+                        .market-new__attach-controls
+                          .market-new__attach-control-item.dropdown.dropup
+                            - var menu_rnd_id = 'rnd' + self.get_label_uid()
 
-                          .dropdown-menu.dropdown-menu-right(aria-labelledby=menu_rnd_id)
-                            button.dropdown-item(
+                            button.btn.btn-link.btn-square.icon.icon-dropdown-local.dropdown-toggle(
                               type='button'
-                              data-bind='click: $root.attachSetMain, visible: $index() !== 0'
-                            )= self.t('attach_set_main')
+                              id=menu_rnd_id
+                              aria-haspopup='true'
+                              aria-expanded='false'
+                              data-toggle='dropdown'
+                            )
 
-                            button.dropdown-item(
-                              type='button'
-                              data-bind='click: $root.attachDelete'
-                            )= self.t('attach_delete')
+                            .dropdown-menu.dropdown-menu-right(aria-labelledby=menu_rnd_id)
+                              button.dropdown-item(
+                                type='button'
+                                data-bind='click: $root.attachSetMain, visible: $index() !== 0'
+                              )= self.t('attach_set_main')
 
-                      .market-new__attach-main(data-bind='visible: $index() === 0')
-                        small= self.t('attach_main')
-              <!-- /ko -->
+                              button.dropdown-item(
+                                type='button'
+                                data-bind='click: $root.attachDelete'
+                              )= self.t('attach_delete')
+
+                        .market-new__attach-main(data-bind='visible: $index() === 0')
+                          small= self.t('attach_main')
+                <!-- /ko -->
 
         .row
           .form-group.col
