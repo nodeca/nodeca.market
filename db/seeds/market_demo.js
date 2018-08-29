@@ -69,6 +69,7 @@ async function createItemOffer(section) {
       value:     price,
       currency:  charlatan.Helpers.sample(Object.keys(config.market.currencies))
     },
+    base_currency_price: 0, // TODO
 
     barter_info: charlatan.Helpers.rand(3) ? null : charlatan.Lorem.sentence().slice(0, -1),
     delivery:    charlatan.Helpers.sample([ true, false, false ]),
