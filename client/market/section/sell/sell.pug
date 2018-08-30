@@ -41,7 +41,7 @@ article#content.market-section-sell(
 
       != self.partial('@market.section.sell.blocks.toolbar_controls')
 
-    != self.partial('@market.blocks.search_form')
+    != self.partial('@market.blocks.search_form_sell')
     
     .market-section-sell__subsections
       each section in self.subsections || []

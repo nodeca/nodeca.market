@@ -6,6 +6,12 @@ router:
     market.index.buy:
       "/market/buy": ~
 
+    market.search.sell:
+      "/market/search": ~
+
+    market.search.buy:
+      "/market/buy/search": ~
+
     market.new:
       "/market/new(/{draft_id})":
         draft_id: /[0-9a-f]{24}/

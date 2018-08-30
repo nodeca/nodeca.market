@@ -30,6 +30,16 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill available currencies
+  //
+  N.wire.after(apiPath, async function fill_options(env) {
+    let c = N.config.market.currencies || {};
+
+    env.res.currency_types = Object.keys(c)
+                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
+  });
+
+
   // Fill head meta
   //
   N.wire.after(apiPath, function fill_head(env) {

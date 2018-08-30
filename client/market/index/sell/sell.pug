@@ -14,7 +14,7 @@ article#content.market-index-sell
 
       != self.partial('@market.index.sell.blocks.toolbar_controls')
 
-    != self.partial('@market.blocks.search_form')
+    != self.partial('@market.blocks.search_form_sell')
 
     .market-index-sell__switch-type
       a.market-index-sell__switch-type-link(href=self.link_to('market.index.buy'))= self.t('buy_link')

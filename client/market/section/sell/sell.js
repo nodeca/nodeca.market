@@ -80,6 +80,12 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
   }
 });
 
+// Init search form
+//
+N.wire.on('navigate.done:' + module.apiPath, function search_form_init() {
+  return N.wire.emit('market.blocks.search_form_sell:init');
+});
+
 
 /////////////////////////////////////////////////////////////////////
 // Change URL when user scrolls the page

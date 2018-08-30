@@ -1,0 +1,81 @@
+- self.search = self.search || {};
+
+form.market-search-form-sell(data-on-submit='market.blocks.search_form_sell:search')
+  if self.section
+    input(
+      type='hidden'
+      name='section'
+      value=self.section._id
+    )
+
+  .market-search-form-sell__input-container
+    .input-group
+      input.market-search-form-sell__query.form-control(
+        type='text'
+        name='query'
+        placeholder=self.t('query_placeholder')
+        value=self.search.query
+      )
+
+      span.input-group-append
+        button.market-search-form-sell__submit.btn.btn-outline-secondary.icon.icon-search(
+          type='submit'
+          title=self.t('search')
+        )
+
+    .market-search-form-sell__meta
+      a.market-search-form-sell__options-toggle(
+        href='#market_search_options'
+        data-on-click='market.blocks.search_form_sell:search_options'
+      )= self.t('options')
+
+      if self.section
+        .form-check.form-check-inline.market-search-form-sell__search-all
+          input.form-check-input#market_search_all(type='checkbox', name='search_all', checked=self.search.search_all)
+          label.form-check-label.market-search-form-sell__search-all-label(for='market_search_all')= self.t('search_all')
+
+  #market_search_options.collapse
+    .market-search-form-sell__options-inner
+      .row
+        .col
+          .form-check.form-check-inline
+            input.form-check-input#market_search_options_only_new(type='checkbox', name='is_new', checked=self.search.is_new)
+            label.form-check-label(for='market_search_options_only_new')= self.t('only_new')
+
+          .form-check.form-check-inline
+            input.form-check-input#market_search_options_barter(type='checkbox', name='barter', checked=self.search.barter)
+            label.form-check-label(for='market_search_options_barter')= self.t('barter')
+
+          .form-check.form-check-inline
+            input.form-check-input#market_search_options_delivery(type='checkbox', name='delivery', checked=self.search.delivery)
+            label.form-check-label(for='market_search_options_delivery')= self.t('delivery')
+
+      .row
+        .col
+          .form-group.market-search-form-sell__options-control
+            label.market-search-form-sell__options-control-label= self.t('price')
+
+            .input-group.market-search-form-sell__price
+              input.form-control.market-search-form-sell__price-value(type='number', step=0.01, min=0, name='price_min_value', value=self.search.price_min_value, placeholder=self.t('price_min_placeholder'))
+              select.form-control.custom-select.input-group-append.market-search-form-sell__price-currency(name='price_min_currency')
+                each currency in self.currency_types
+                  option(value=currency, selected=currency===self.search.price_max_currency)= self.t.exists('@market.currencies.' + currency) ? self.t('@market.currencies.' + currency) : currency
+
+            span.market-search-form-sell__options-price-dash= '-'
+
+            .input-group.market-search-form-sell__price
+              input.form-control.market-search-form-sell__price-value(type='number', step=0.01, min=0, name='price_max_value', value=self.search.price_max_value, placeholder=self.t('price_max_placeholder'))
+              select.form-control.custom-select.input-group-append.market-search-form-sell__price-currency(name='price_max_currency')
+                each currency in self.currency_types
+                  option(value=currency, selected=currency===self.search.price_min_currency)= self.t.exists('@market.currencies.' + currency) ? self.t('@market.currencies.' + currency) : currency
+
+        .col
+          .form-group.market-search-form-sell__options-control
+            label.market-search-form-sell__options-control-label(for='market_search_options_location')= self.t('location')
+            select.form-control.custom-select#market_search_options_location(
+              name='range'
+              onchange="$('.market-search-form-sell__submit').click();"
+            )
+              option(value='', selected=!self.search.range)= self.t('location_any')
+              option(value=100, selected=self.search.range===100)= self.t('location_100km')
+              option(value=200, selected=self.search.range===200)= self.t('location_200km')

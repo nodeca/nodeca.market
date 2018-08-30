@@ -1,0 +1,6 @@
+.page-actions.market-search-buy__toolbar-controls
+  if self.settings.market_can_create_items
+    a.btn.btn-secondary.btn-square.icon.icon-plus(
+      href=self.link_to('market.new', { $query: { section: (self.section || {})._id } })
+      title=self.t('item_add')
+    )

@@ -100,7 +100,10 @@ module.exports = function (N, apiPath) {
   // Fill available currencies
   //
   N.wire.after(apiPath, async function fill_options(env) {
-    env.res.currency_types = Object.keys(N.config.market.currencies);
+    let c = N.config.market.currencies || {};
+
+    env.res.currency_types = Object.keys(c)
+                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
   });
 
 
