@@ -58,7 +58,7 @@ module.exports = function (N, apiPath) {
   });
 
 
-  N.wire.on(apiPath, async function todo(env) {
+  N.wire.on(apiPath, async function todo() {
   });
 
 

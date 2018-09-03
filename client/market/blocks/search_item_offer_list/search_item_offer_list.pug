@@ -1,0 +1,76 @@
+- self.users = self.users || {};
+
+each item in self.items
+  if (self.ignored_users[item.user] && !self.settings.market_show_ignored)
+    //- skip entries created by ignored users
+
+  else
+    - var section = self.sections_by_id[item.section] || {};
+
+    li.market-search-sell-item(
+      id='item' + item.hid
+      class=(self.ignored_users[item.user]) ? 'market-search-sell-item__m-ignored' : ''
+      data-item-id=item._id
+      data-item-hid=item.hid
+    )
+      .market-search-sell-item__photo.thumb
+        if item.files && item.files.length > 0
+          img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+        else
+          .thumb__content= self.t('no_photo')
+      .market-search-sell-item__info
+        .market-search-sell-item__title
+          a.market-search-sell-item__title-text(href=self.link_to('market.item.sell', { section_hid: section.hid, item_hid: item.hid }))
+            = item.title
+          if !item.is_new
+            sub.market-search-sell-item__icon
+              = ' '
+              = self.t('used')
+
+        .market-search-sell-item__price
+          //- 12300 -> "12 300"
+          //- 12300.1 -> "12 300.10"
+          - let price = (item.price || {}).value || 0;
+          = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
+          = ' '
+          = self.t.exists('@market.currencies.' + item.price.currency) ? self.t('@market.currencies.' + item.price.currency) : item.price.currency
+          if item.barter_info
+            = ' '
+            //- TODO: icon-exchange
+            span.market-search-sell-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+
+        .market-search-sell-item__location
+          if item.location
+            a.market-search-sell-item__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= item.location && item.location[1]
+              data-longitude= item.location && item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_names[item.location[0] + ':' + item.location[1]]
+                = self.location_names[item.location[0] + ':' + item.location[1]]
+
+          if item.delivery
+            = ' '
+            //- TODO: icon-delivery
+            span.market-search-sell-item__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
+
+        .market-search-sell-item__details
+          .market-search-sell-item__details-item!= self.timetag(item.ts, 'relative')
+          .market-search-sell-item__details-item
+            - var user = self.users[item.user];
+            if user
+              a.market-search-sell-item__user-link._ucard-popover(
+                href=self.link_to('users.member', { user_hid: user.hid })
+                data-user-id=user._id
+                data-user-ref='market_search_sell_item:'+section.hid+':'+item.hid
+              )
+                span.market-search-sell-item__ignored-mark.icon.icon-ignore.icon-space-after
+                = user.name
+          .market-search-sell-item__details-item
+            a.market-search-sell-item__section-link(
+              href=self.link_to('market.section.sell', { section_hid: section.hid })
+            )
+              = section.title

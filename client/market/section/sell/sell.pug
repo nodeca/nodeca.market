@@ -74,7 +74,7 @@ article#content.market-section-sell(
             wire_below: 'market.section.sell:load_next',
             throttle:   100
           }
-        )!= self.partial('@market.blocks.items_sell_list')
+        )!= self.partial('@market.blocks.section_item_offer_list')
 
         .market-section-sell__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

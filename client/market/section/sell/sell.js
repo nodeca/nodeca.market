@@ -331,7 +331,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       let old_height = $('.market-section-sell__item-list').height();
 
       // render & inject item list
-      let $result = $(N.runtime.render('market.blocks.items_sell_list', res));
+      let $result = $(N.runtime.render('market.blocks.section_item_offer_list', res));
 
       return N.wire.emit('navigate.update', {
         $:       $result,
@@ -427,7 +427,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       }
 
       // render & inject item list
-      let $result = $(N.runtime.render('market.blocks.items_sell_list', res));
+      let $result = $(N.runtime.render('market.blocks.section_item_offer_list', res));
 
       return N.wire.emit('navigate.update', {
         $:      $result,

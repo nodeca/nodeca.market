@@ -1,7 +1,7 @@
 
 'use strict';
 
-const _   = require('lodash');
+
 const bag = require('bagjs')({ prefix: 'nodeca' });
 
 

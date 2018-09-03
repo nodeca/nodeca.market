@@ -154,7 +154,7 @@ module.exports = function (N, collectionName) {
   // Returns list of child sections, including subsections until the given deepness.
   // Also, sets `level` property for found sections
   //
-  // - getChildren((section, deepness)
+  // - getChildren(section, deepness)
   // - getChildren(deepness) - for root (on index page)
   // - getChildren() - for all
   //
@@ -190,6 +190,8 @@ module.exports = function (N, collectionName) {
 
     return getSectionsTree().then(sections => {
       let storedSection = sections[sectionID || 'root'];
+
+      if (!storedSection) throw new Error('no such section: ' + (sectionID || 'root'));
 
       fillChildren(storedSection, 0, deepness);
       return children;

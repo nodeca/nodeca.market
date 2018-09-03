@@ -4,7 +4,10 @@
 'use strict';
 
 
+const _                = require('lodash');
 const sanitize_section = require('nodeca.market/lib/sanitizers/section');
+const docid_sections   = require('nodeca.market/lib/search/docid_sections');
+const sphinx_escape    = require('nodeca.search').escape;
 
 
 module.exports = function (N, apiPath) {
@@ -52,6 +55,14 @@ module.exports = function (N, apiPath) {
 
     env.data.search = {};
 
+    // check query length because 1-character requests consume too much resources
+    if ($query.query.trim().length < 2) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_query_too_short')
+      };
+    }
+
     if ($query.query)      env.data.search.query = $query.query;
     if ($query.is_new)     env.data.search.is_new = true;
     if ($query.barter)     env.data.search.barter = true;
@@ -84,7 +95,71 @@ module.exports = function (N, apiPath) {
   });
 
 
-  N.wire.on(apiPath, async function todo(env) {
+  // Send sql query to sphinx, get a response
+  //
+  N.wire.on(apiPath, async function execute_search(env) {
+    let query = 'SELECT object_id FROM market_item_offers WHERE MATCH(?) AND public=1';
+    let params = [ sphinx_escape(env.data.search.query) ];
+
+    if (env.data.section && !env.data.search.search_all) {
+      // get hids of specified section and all its non-linked subsections
+      let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
+
+      children = children.filter(s => !s.is_linked);
+
+      let hids = [ env.data.section.hid ];
+
+      if (children.length > 0) {
+        let s = await N.models.market.Section.find()
+                          .where('_id').in(_.map(children, '_id'))
+                          .lean(true);
+
+        hids = hids.concat(_.map(s, 'hid'));
+      }
+
+      query += ' AND section_uid IN (' + '?'.repeat(hids.length) + ')';
+      params = params.concat(hids.map(hid => docid_sections(N, hid)));
+    }
+
+    if (env.data.search.is_new)   query += ' AND is_new=1';
+    if (env.data.search.barter)   query += ' AND barter=1';
+    if (env.data.search.delivery) query += ' AND delivery=1';
+
+    // TODO: currencies
+    /*if (env.data.search.price_min_value) {
+      query += ' AND price>=?';
+      params.push(env.data.search.price_min_value);
+    }
+
+    if (env.data.search.price_max_value) {
+      query += ' AND price<=?';
+      params.push(env.data.search.price_max_value);
+    }*/
+
+    // TODO: location
+    /*if (env.data.search.range) {
+      query += ' AND has_location=1 AND GEODIST(latitude, longitude, ?, ?, {in=deg, out=km})<=?';
+      params.push(env.data.search.range);
+    }*/
+
+    // sort is either `date` or `rel`, sphinx searches by relevance by default
+    if (env.data.search.sort === 'date') {
+      query += ' ORDER BY ts DESC';
+    }
+
+    let results = await N.search.execute(query, params);
+
+    env.data.item_ids = results.map(result => result.object_id);
+  });
+
+
+  // Subcall item list
+  //
+  N.wire.on(apiPath, async function subcall_item_list(env) {
+    env.data.build_item_ids = () => {};
+    env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
+
+    await N.wire.emit('internal:market.search_item_offer_list', env);
   });
 
 

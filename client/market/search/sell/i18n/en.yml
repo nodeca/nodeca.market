@@ -1,2 +1,5 @@
 en-US:
   title: Search results
+  no_items: No results found.
+  order_by_rel: Order by relevance
+  order_by_date: Order by date

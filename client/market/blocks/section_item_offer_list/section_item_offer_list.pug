@@ -32,7 +32,7 @@ each item in self.items
           = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
           = ' '
           = self.t.exists('@market.currencies.' + item.price.currency) ? self.t('@market.currencies.' + item.price.currency) : item.price.currency
-          if item.exchange
+          if item.barter_info
             = ' '
             //- TODO: icon-exchange
             span.market-section-sell-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
