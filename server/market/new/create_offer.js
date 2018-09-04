@@ -124,7 +124,7 @@ module.exports = function (N, apiPath) {
 
   // Check and convert currency
   //
-  N.wire.before(apiPath, function convert_currency(env) {
+  N.wire.before(apiPath, async function convert_currency(env) {
     // check that price and currency are present and valid,
     // shouldn't happen because restricted on the client
     if (!(env.params.price_value >= 0)) {
@@ -135,7 +135,8 @@ module.exports = function (N, apiPath) {
       throw N.io.BAD_REQUEST;
     }
 
-    env.data.base_currency_price = 0; // TODO
+    let rate = await N.models.market.CurrencyRate.get(env.params.price_currency);
+    env.data.base_currency_price = env.params.price_value * rate;
   });
 
 

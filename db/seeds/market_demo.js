@@ -57,6 +57,9 @@ async function createItemOffer(section) {
   // only keep 2 significant digits
   price -= price % Math.pow(10, Math.ceil(Math.log(price / 100) / log10));
 
+  let currency = charlatan.Helpers.sample(Object.keys(config.market.currencies));
+  let rate = await models.market.CurrencyRate.get(currency);
+
   let item = new models.market.ItemOffer({
     _id:         new ObjectId(Math.round(ts / 1000)),
 
@@ -69,7 +72,7 @@ async function createItemOffer(section) {
       value:     price,
       currency:  charlatan.Helpers.sample(Object.keys(config.market.currencies))
     },
-    base_currency_price: 0, // TODO
+    base_currency_price: price * rate,
 
     barter_info: charlatan.Helpers.rand(3) ? null : charlatan.Lorem.sentence().slice(0, -1),
     delivery:    charlatan.Helpers.sample([ true, false, false ]),
