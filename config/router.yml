@@ -46,6 +46,30 @@ router:
           match: /\d+/
           type: integer
 
+    market.user.sell_active:
+      "/member{user_hid}/market":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+
+    market.user.sell_archived:
+      "/member{user_hid}/market/archived":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+
+    market.user.buy_active:
+      "/member{user_hid}/market/buy":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+
+    market.user.buy_archived:
+      "/member{user_hid}/market/buy/archived":
+        user_hid:
+          match: /\d+/
+          type: 'integer'
+
     admin.market.sections.index:
       "/market/sections": ~
 

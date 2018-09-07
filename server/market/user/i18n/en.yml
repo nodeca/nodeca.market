@@ -1,0 +1,12 @@
+en-US:
+  sell_active:
+    title_with_user: "Market - #{user}"
+
+  sell_archived:
+    title_with_user: "Market - #{user}"
+
+  buy_active:
+    title_with_user: "Market - #{user}"
+
+  buy_archived:
+    title_with_user: "Market - #{user}"

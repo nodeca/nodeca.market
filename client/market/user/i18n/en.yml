@@ -1,0 +1,18 @@
+en-US:
+  sell_active:
+    title: Market items
+
+  sell_archived:
+    title: Market items
+
+  buy_active:
+    title: Market items
+
+  buy_archived:
+    title: Market items
+
+  tabs:
+    sell_active: Active lots
+    sell_archived: Archived lots
+    buy_active: Active requests
+    buy_archived: Archived requests
