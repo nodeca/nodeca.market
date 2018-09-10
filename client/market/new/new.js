@@ -31,7 +31,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   ];
 
   view.currencyTypes = N.runtime.page_data.currency_types.map(id => ({
-    title: t.exists('@market.currencies.' + id) ? t('@market.currencies.' + id) : id,
+    title: t.exists('@market.currencies.' + id + '.sign') ? t('@market.currencies.' + id + '.sign') : id,
     value: id
   }));
 

@@ -1,0 +1,9 @@
+i18n:
+  en-US:
+    users:
+
+      setting_cat:
+        market: Market
+
+      setting_names:
+        market_displayed_currency: Convert prices to

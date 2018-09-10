@@ -3,6 +3,8 @@
 - self.infractions = self.infractions || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
+- var user = self.users[self.item.user];
+
 article#content.market-item-buy(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-buy__m-bookmarked' : ''
 )
@@ -27,7 +29,6 @@ article#content.market-item-buy(
       .market-item-buy__info
         .market-item-buy__info-item!= self.timetag(self.item.ts, 'relative')
         .market-item-buy__info-item
-          - var user = self.users[self.item.user];
           if user
             a.market-item-buy__user-link._ucard-popover(
               href=self.link_to('users.member', { user_hid: user.hid })
@@ -128,3 +129,10 @@ article#content.market-item-buy(
                 data-item-id=self.item._id
                 data-on-click='market.item.buy:show_ip'
               )= self.t('ip_info')
+
+    .market-item-buy__responses
+      if user && user._id === self.runtime.user_id
+        = self.t('no_responses')
+
+      else if self.runtime.is_member
+        button.btn.btn-secondary= self.t('contact')

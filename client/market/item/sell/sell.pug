@@ -3,6 +3,8 @@
 - self.infractions = self.infractions || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
+- var user = self.users[self.item.user];
+
 article#content.market-item-sell(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-sell__m-bookmarked' : ''
 )
@@ -25,17 +27,12 @@ article#content.market-item-sell(
       h1.market-item-sell__title.page-head__title(itemprop='name')= self.item.title
 
       .market-item-sell__price
-        //- 12300 -> "12 300"
-        //- 12300.1 -> "12 300.10"
-        - let price = (self.item.price || {}).value || 0;
-        = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
-        = ' '
-        = self.t.exists('@market.currencies.' + self.item.price.currency) ? self.t('@market.currencies.' + self.item.price.currency) : self.item.price.currency
+        - var price = self.item.price || {};
+        = self.price(price.value, price.currency)
 
       .market-item-sell__info
         .market-item-sell__info-item!= self.timetag(self.item.ts, 'relative')
         .market-item-sell__info-item
-          - var user = self.users[self.item.user];
           if user
             a.market-item-sell__user-link._ucard-popover(
               href=self.link_to('users.member', { user_hid: user.hid })
@@ -157,3 +154,10 @@ article#content.market-item-sell(
                 data-item-id=self.item._id
                 data-on-click='market.item.sell:show_ip'
               )= self.t('ip_info')
+
+    .market-item-sell__responses
+      if user && user._id === self.runtime.user_id
+        = self.t('no_responses')
+
+      else if self.runtime.is_member
+        button.btn.btn-secondary= self.t('contact')

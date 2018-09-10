@@ -24,6 +24,7 @@ const sanitize_section    = require('nodeca.market/lib/sanitizers/section');
 let setting_names = [
   'can_see_hellbanned',
   'market_can_create_items',
+  'market_displayed_currency',
   'market_items_per_page',
   'market_show_ignored'
 ];
@@ -120,6 +121,21 @@ module.exports = function (N, apiPath) {
     ignored.forEach(row => {
       env.res.ignored_users[row.to] = true;
     });
+  });
+
+
+  // Fetch currency rates
+  //
+  N.wire.after(apiPath, async function fetch_currency_rates(env) {
+    let currencies = _.uniq(env.data.items.map(i => i.price && i.price.currency).filter(Boolean));
+
+    env.res.currency_rates = {};
+
+    for (let c of currencies) {
+      env.res.currency_rates[c] = await N.models.market.CurrencyRate.get(
+        c, env.data.settings.market_displayed_currency
+      );
+    }
   });
 
 

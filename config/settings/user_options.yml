@@ -1,0 +1,6 @@
+setting_schemas:
+  user:
+    market_displayed_currency:
+      hidden: true
+      type: string
+      default: RUB

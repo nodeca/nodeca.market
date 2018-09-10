@@ -45,6 +45,8 @@ module.exports = function (N, collectionName) {
   }, { maxAge: 5 * 60 * 1000 });
 
   CurrencyRate.statics.get = async function getRate(from, to) {
+    if (from && to && from === to) return 1;
+
     let rates = await get_rates();
     let result = 1;
 

@@ -7,6 +7,8 @@ en-US:
   condition: 'Condition:'
   condition_new: 'new'
   condition_used: 'used'
+  no_responses: Nobody responded to your offer yet.
+  contact: Contact seller
 
   views: Views
   report: Report to moderator

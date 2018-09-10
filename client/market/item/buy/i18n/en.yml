@@ -1,5 +1,7 @@
 en-US:
   location: 'Location:'
+  no_responses: Nobody responded to your offer yet.
+  contact: Contact buyer
 
   views: Views
   report: Report to moderator

@@ -2,6 +2,14 @@ i18n:
   en-US:
     market:
       currencies:
-        RUB: ₽
-        USD: $
-        EUR: €
+        RUB:
+          name: '₽, Russian Ruble'
+          sign: ₽
+
+        USD:
+          name: '$, US Dollar'
+          sign: $
+
+        EUR:
+          name: '€, Euro'
+          sign: €

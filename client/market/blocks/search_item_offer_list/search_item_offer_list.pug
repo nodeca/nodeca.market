@@ -28,12 +28,16 @@ each item in self.items
               = self.t('used')
 
         .market-search-sell-item__price
-          //- 12300 -> "12 300"
-          //- 12300.1 -> "12 300.10"
-          - let price = (item.price || {}).value || 0;
-          = price.toFixed(price === ~~price ? 0 : 2).replace(/\d(?=(\d{3})+(\.|$))/g, '$& ')
-          = ' '
-          = self.t.exists('@market.currencies.' + item.price.currency) ? self.t('@market.currencies.' + item.price.currency) : item.price.currency
+          - var price = item.price || {};
+
+          if price.currency === self.settings.market_displayed_currency
+            = self.price(price.value, price.currency)
+          else
+            = self.price(price.value * self.currency_rates[price.currency], self.settings.market_displayed_currency, true)
+            = ' ('
+            = self.price(price.value, price.currency)
+            = ')'
+
           if item.barter_info
             = ' '
             //- TODO: icon-exchange
