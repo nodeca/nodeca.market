@@ -28,7 +28,14 @@ article#content.market-item-sell(
 
       .market-item-sell__price
         - var price = self.item.price || {};
-        = self.price(price.value, price.currency)
+
+        if price.currency === self.settings.market_displayed_currency
+          = self.price(price.value, price.currency)
+        else
+          = self.price(price.value * self.currency_rates[price.currency], self.settings.market_displayed_currency, true)
+          = ' ('
+          = self.price(price.value, price.currency)
+          = ')'
 
       .market-item-sell__info
         .market-item-sell__info-item!= self.timetag(self.item.ts, 'relative')
@@ -161,3 +168,31 @@ article#content.market-item-sell(
 
       else if self.runtime.is_member
         button.btn.btn-secondary= self.t('contact')
+
+    if self.similar_items && self.similar_items.length > 0
+      .market-item-sell-similar
+        .market-item-sell-similar__header= self.t('similar_items')
+
+        ul.market-item-sell-similar__item-list
+          each s in self.similar_items
+            li.market-item-sell-similar-item
+              .market-item-sell-similar-item__photo.thumb
+                if s.item.files && s.item.files.length > 0
+                  img.thumb__image(src=self.link_to('core.gridfs', { bucket: s.item.files[0] + '_sm' }))
+                else
+                  .thumb__content
+
+              .market-search-sell-item__info
+                a.market-item-sell-similar-item__title(href=self.link_to('market.item.sell', { section_hid: s.section_hid, item_hid: s.item.hid }))
+                  = s.item.title
+
+                span.market-item-sell-similar-item__price
+                  - var price = s.item.price || {};
+
+                  if price.currency === self.settings.market_displayed_currency
+                    = self.price(price.value, price.currency)
+                  else
+                    = self.price(price.value * self.currency_rates[price.currency], self.settings.market_displayed_currency, true)
+                    = ' ('
+                    = self.price(price.value, price.currency)
+                    = ')'

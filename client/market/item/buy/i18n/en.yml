@@ -2,6 +2,7 @@ en-US:
   location: 'Location:'
   no_responses: Nobody responded to your offer yet.
   contact: Contact buyer
+  similar_items: 'Similar items:'
 
   views: Views
   report: Report to moderator

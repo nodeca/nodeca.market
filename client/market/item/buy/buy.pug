@@ -136,3 +136,13 @@ article#content.market-item-buy(
 
       else if self.runtime.is_member
         button.btn.btn-secondary= self.t('contact')
+
+    if self.similar_items && self.similar_items.length > 0
+      .market-item-buy-similar
+        .market-item-buy-similar__header= self.t('similar_items')
+
+        ul.market-item-buy-similar__item-list
+          each s in self.similar_items
+            li.market-item-buy-similar-item
+              a.market-item-buy-similar-item__title(href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid }))
+                = s.item.title

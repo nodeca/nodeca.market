@@ -9,6 +9,7 @@ en-US:
   condition_used: 'used'
   no_responses: Nobody responded to your offer yet.
   contact: Contact seller
+  similar_items: 'Similar items:'
 
   views: Views
   report: Report to moderator

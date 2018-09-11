@@ -215,10 +215,70 @@ module.exports = function (N, apiPath) {
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
-    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+    env.res.settings = env.data.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'can_report_abuse',
       'can_see_ip',
+      'market_displayed_currency',
       'market_mod_can_add_infractions'
     ]));
+  });
+
+
+  // Add "similar items" block
+  //
+  N.wire.after(apiPath, async function fill_similar_items(env) {
+    let data = { item_id: env.data.item._id };
+
+    try {
+      await N.wire.emit('internal:market.similar_item_offers', data);
+    } catch (__) {
+      // if similar items can't be fetched, just show empty result
+      return;
+    }
+
+    if (data.results && data.results.length > 0) {
+      let items = await N.models.market.ItemOffer.find()
+                            .where('_id').in(_.map(data.results, 'item_id'))
+                            .lean(true);
+
+      let sections = await N.models.market.Section.find()
+                               .where('_id').in(_.uniq(_.map(items, 'section').map(String)))
+                               .lean(true);
+
+      let access_env = { params: { items, user_info: env.user_info } };
+
+      await N.wire.emit('internal:market.access.item_offer', access_env);
+
+      items = items.filter((__, idx) => access_env.data.access_read[idx]);
+
+      let items_by_id    = _.keyBy(await sanitize_item_offer(N, items, env.user_info), '_id');
+      let sections_by_id = _.keyBy(sections, '_id'); // not sanitized because only hid is used
+
+      env.res.similar_items = data.results.filter(result => items_by_id[result.item_id])
+                                          .map(result => ({
+                                            item:        items_by_id[result.item_id],
+                                            section_hid: sections_by_id[items_by_id[result.item_id].section].hid,
+                                            weight:      result.weight
+                                          }));
+    }
+  });
+
+
+  // Fetch currency rates
+  //
+  N.wire.after(apiPath, async function fetch_currency_rates(env) {
+    let currencies = _.uniq(
+      [ env.res.item ].concat((env.res.similar_items || []).map(s => s.item))
+                      .map(i => i.price && i.price.currency)
+                      .filter(Boolean)
+    );
+
+    env.res.currency_rates = {};
+
+    for (let c of currencies) {
+      env.res.currency_rates[c] = await N.models.market.CurrencyRate.get(
+        c, env.data.settings.market_displayed_currency
+      );
+    }
   });
 };

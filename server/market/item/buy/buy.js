@@ -221,4 +221,44 @@ module.exports = function (N, apiPath) {
       'market_mod_can_add_infractions'
     ]));
   });
+
+
+  // Add "similar items" block
+  //
+  N.wire.after(apiPath, async function fill_similar_items(env) {
+    let data = { item_id: env.data.item._id };
+
+    try {
+      await N.wire.emit('internal:market.similar_item_requests', data);
+    } catch (__) {
+      // if similar items can't be fetched, just show empty result
+      return;
+    }
+
+    if (data.results && data.results.length > 0) {
+      let items = await N.models.market.ItemRequest.find()
+                            .where('_id').in(_.map(data.results, 'item_id'))
+                            .lean(true);
+
+      let sections = await N.models.market.Section.find()
+                               .where('_id').in(_.uniq(_.map(items, 'section').map(String)))
+                               .lean(true);
+
+      let access_env = { params: { items, user_info: env.user_info } };
+
+      await N.wire.emit('internal:market.access.item_request', access_env);
+
+      items = items.filter((__, idx) => access_env.data.access_read[idx]);
+
+      let items_by_id    = _.keyBy(await sanitize_item_request(N, items, env.user_info), '_id');
+      let sections_by_id = _.keyBy(sections, '_id'); // not sanitized because only hid is used
+
+      env.res.similar_items = data.results.filter(result => items_by_id[result.item_id])
+                                          .map(result => ({
+                                            item:        items_by_id[result.item_id],
+                                            section_hid: sections_by_id[items_by_id[result.item_id].section].hid,
+                                            weight:      result.weight
+                                          }));
+    }
+  });
 };
