@@ -1,9 +1,10 @@
 - self.add_raw_data('settings', self.settings)
 
+- self.users = self.users || {};
 - self.infractions = self.infractions || {};
 - self.own_bookmarks = self.own_bookmarks || [];
 
-- var user = self.users[self.item.user];
+- var user = self.users[self.item.user] || {};
 
 article#content.market-item-sell(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-sell__m-bookmarked' : ''
@@ -36,6 +37,8 @@ article#content.market-item-sell(
           = ' ('
           = self.price(price.value, price.currency)
           = ')'
+
+        != self.partial('@market.item.sell.blocks.toolbar_controls')
 
       .market-item-sell__info
         .market-item-sell__info-item!= self.timetag(self.item.ts, 'relative')

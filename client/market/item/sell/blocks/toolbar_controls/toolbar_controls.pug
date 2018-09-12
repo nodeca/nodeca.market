@@ -2,22 +2,14 @@
 
 - var items = []
 
-if self.settings.market_can_create_items
-  - items.push('new_item')
-
+- items.push('user_items')
 - items.push('currency')
 
 - var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
+- var user = self.users[self.item.user] || {};
 
 
-.page-actions.market-section-buy__toolbar-controls
-  if self.settings.market_can_create_items
-    a.btn.btn-secondary.btn-square.icon.icon-plus(
-      href=self.link_to('market.new', { $query: { buy: '' } })
-      class=show_menu ? 'd-none d-sm-inline-block' : ''
-      title=self.t('item_add')
-    )
-
+.page-actions.market-item-sell__toolbar-controls
   if show_menu
     .page-actions__dropdown
       button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
@@ -33,10 +25,10 @@ if self.settings.market_can_create_items
         each item in items
           case item
 
-            when 'new_item'
-              a.dropdown-item.d-sm-none(
-                href=self.link_to('market.new', { $query: { buy: '' } })
-              )= self.t('item_add')
+            when 'user_items'
+              a.dropdown-item(
+                href=self.link_to('market.user.sell_active', { user_hid: user.hid })
+              )= self.t('user_items')
 
             when 'currency'
               button.dropdown-item(
