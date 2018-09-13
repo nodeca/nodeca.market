@@ -59,7 +59,13 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
-      'market_can_create_items'
+      'market_can_create_items',
+      'market_displayed_currency'
     ]));
+
+    if (env.session.currency) {
+      // patch for guests who don't have user store
+      env.res.settings.market_displayed_currency = env.session.currency;
+    }
   });
 };

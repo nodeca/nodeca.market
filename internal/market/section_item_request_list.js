@@ -27,6 +27,7 @@ const sanitize_section      = require('nodeca.market/lib/sanitizers/section');
 let setting_names = [
   'can_see_hellbanned',
   'market_can_create_items',
+  'market_displayed_currency',
   'market_items_per_page',
   'market_show_ignored'
 ];
@@ -48,7 +49,14 @@ module.exports = function (N, apiPath) {
   // Fetch and fill permissions
   //
   N.wire.before(apiPath, async function fetch_and_fill_permissions(env) {
-    env.res.settings = env.data.settings = await env.extras.settings.fetch(setting_names);
+    env.data.settings = await env.extras.settings.fetch(setting_names);
+
+    if (env.session.currency) {
+      // patch for guests who don't have user store
+      env.data.settings.market_displayed_currency = env.session.currency;
+    }
+
+    env.res.settings = env.data.settings;
   });
 
 

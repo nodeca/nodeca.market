@@ -1,0 +1,16 @@
+- var currency_types = '$$ JSON.stringify(Object.keys(N.config.market.currencies)) $$'
+- currency_types = currency_types.sort((a, b) => ((currency_types[a] || {}).priority || 100) - ((currency_types[b] || {}).priority || 100))
+
+.modal.fade.market-currency-select-dlg(tabindex='-1', role='dialog', aria-hidden='true')
+  .modal-dialog(role='document')
+    .modal-content.list-group
+
+      each currency in currency_types
+        a.market-currency-select-dlg__item.list-group-item(
+          href='#'
+          data-on-click=self.apiPath + ':select'
+          data-currency=currency
+          class=self.currency === currency ? 'active' : ''
+        )
+          h4.subscription-dlg__item-heading.list-group-item-heading
+            = self.t('@market.currencies.' + currency + '.sign') + ', ' + self.t('@market.currencies.' + currency + '.name')
