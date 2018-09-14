@@ -270,7 +270,7 @@ module.exports = function (N, apiPath) {
   // Add redirect info
   //
   N.wire.after(apiPath, function redirect_info(env) {
-    env.res.redirect_url = N.router.linkTo('market.item.sell', {
+    env.res.redirect_url = N.router.linkTo('market.item.buy', {
       section_hid: env.data.section.hid,
       item_hid:    env.data.new_item.hid
     });

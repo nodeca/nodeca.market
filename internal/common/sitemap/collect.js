@@ -20,16 +20,8 @@ module.exports = function (N, apiPath) {
 
     let buffer = [];
 
-    buffer.push({ loc: N.router.linkTo('market.index.sell', {}) });
     buffer.push({ loc: N.router.linkTo('market.index.buy', {}) });
-
-    sections.forEach(section => {
-      buffer.push({
-        loc: N.router.linkTo('market.section.sell', {
-          section_hid: section.hid
-        })
-      });
-    });
+    buffer.push({ loc: N.router.linkTo('market.index.wish', {}) });
 
     sections.forEach(section => {
       buffer.push({
@@ -39,28 +31,16 @@ module.exports = function (N, apiPath) {
       });
     });
 
+    sections.forEach(section => {
+      buffer.push({
+        loc: N.router.linkTo('market.section.wish', {
+          section_hid: section.hid
+        })
+      });
+    });
+
     let item_offers_stream = pumpify.obj(
       N.models.market.ItemOffer.collection.find({
-        st: N.models.market.ItemOffer.statuses.VISIBLE
-      }, {
-        section: 1,
-        hid:     1
-      }).sort({ hid: 1 }).stream(),
-
-      through2.obj(function (item, encoding, callback) {
-        this.push({
-          loc: N.router.linkTo('market.item.sell', {
-            section_hid: sections_by_id[item.section].hid,
-            item_hid: item.hid
-          })
-        });
-
-        callback();
-      })
-    );
-
-    let item_requests_stream = pumpify.obj(
-      N.models.market.ItemRequest.collection.find({
         st: N.models.market.ItemOffer.statuses.VISIBLE
       }, {
         section: 1,
@@ -79,9 +59,29 @@ module.exports = function (N, apiPath) {
       })
     );
 
+    let item_wishes_stream = pumpify.obj(
+      N.models.market.ItemWish.collection.find({
+        st: N.models.market.ItemOffer.statuses.VISIBLE
+      }, {
+        section: 1,
+        hid:     1
+      }).sort({ hid: 1 }).stream(),
+
+      through2.obj(function (item, encoding, callback) {
+        this.push({
+          loc: N.router.linkTo('market.item.wish', {
+            section_hid: sections_by_id[item.section].hid,
+            item_hid: item.hid
+          })
+        });
+
+        callback();
+      })
+    );
+
     data.streams.push({
       name: 'market',
-      stream: multi.obj([ from2.obj(buffer), item_offers_stream, item_requests_stream ])
+      stream: multi.obj([ from2.obj(buffer), item_offers_stream, item_wishes_stream ])
     });
   });
 };

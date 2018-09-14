@@ -30,7 +30,7 @@ module.exports = function (N, apiPath) {
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
-    env.data.item = await N.models.market.ItemRequest
+    env.data.item = await N.models.market.ItemOffer
                               .findById(env.params.item_id)
                               .lean(true);
 
@@ -46,7 +46,7 @@ module.exports = function (N, apiPath) {
       user_info: env.user_info
     } };
 
-    await N.wire.emit('internal:market.access.item_request', access_env);
+    await N.wire.emit('internal:market.access.item_offer', access_env);
 
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
   });
@@ -65,7 +65,7 @@ module.exports = function (N, apiPath) {
 
     let report = new N.models.core.AbuseReport({
       src: env.data.item._id,
-      type: N.shared.content_type.MARKET_ITEM_REQUEST,
+      type: N.shared.content_type.MARKET_ITEM_OFFER,
       text: env.params.message,
       from: env.user_info.user_id,
       params_ref: await N.models.core.MessageParams.setParams(params)

@@ -1,0 +1,9 @@
+en-US:
+  search: Search
+  options: Advanced options
+  search_all: Search in all categories
+  query_placeholder: What would you like to find?
+  location: Location
+  location_100km: Near me +100 km
+  location_200km: Near me +200 km
+  location_any: Anywhere

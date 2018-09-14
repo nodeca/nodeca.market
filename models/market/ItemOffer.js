@@ -149,7 +149,7 @@ module.exports = function (N, collectionName) {
 
   // Export statuses
   //
-  ItemOffer.statics.statuses    = statuses;
+  ItemOffer.statics.statuses = statuses;
 
 
   N.wire.on('init:models', function emit_init_ItemOffer() {

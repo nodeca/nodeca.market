@@ -15,3 +15,17 @@ article#content.market-search-buy
       != self.partial('@market.search.buy.blocks.toolbar_controls')
 
     != self.partial('@market.blocks.search_form_buy')
+
+    select.market-search-buy__select-order.form-control.custom-select
+      option(selected=self.search.order !== 'date')= self.t('order_by_rel')
+      option(selected=self.search.order === 'date')= self.t('order_by_date')
+
+    .market-search-buy__sections
+      //- TODO
+
+    if self.items && self.items.length
+      ul.market-search-buy__item-list
+        != self.partial('@market.blocks.search_item_offer_list')
+    else
+      p.market-search-buy__no-items
+        != self.t('no_items')

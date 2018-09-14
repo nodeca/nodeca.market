@@ -13,7 +13,7 @@ if self.settings.market_can_create_items
 .page-actions.market-search-buy__toolbar-controls
   if self.settings.market_can_create_items
     a.btn.btn-secondary.btn-square.icon.icon-plus(
-      href=self.link_to('market.new', { $query: { buy: '' } })
+      href=self.link_to('market.new', { $query: { section: (self.section || {})._id } })
       class=show_menu ? 'd-none d-sm-inline-block' : ''
       title=self.t('item_add')
     )
@@ -35,11 +35,12 @@ if self.settings.market_can_create_items
 
             when 'new_item'
               a.dropdown-item.d-sm-none(
-                href=self.link_to('market.new', { $query: { buy: '' } })
+                href=self.link_to('market.new', { $query: { section: (self.section || {})._id } })
               )= self.t('item_add')
 
             when 'currency'
               button.dropdown-item(
                 type='button'
-                data-on-click='market.blocks.currency_select:begin'
+                data-on-click='market.blocks.currency_select_dlg'
+                data-currency=self.settings.market_displayed_currency
               )= self.t('currency')

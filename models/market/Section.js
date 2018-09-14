@@ -22,8 +22,8 @@ module.exports = function (N, collectionName) {
   set_content_type('MARKET_SECTION', 12);
 
   let cache = {
-    offer_count:   { type: Number, 'default': 0 },
-    request_count: { type: Number, 'default': 0 }
+    offer_count: { type: Number, 'default': 0 },
+    wish_count:  { type: Number, 'default': 0 }
   };
 
   let Section = new Schema({

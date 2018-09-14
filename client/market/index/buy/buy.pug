@@ -10,14 +10,14 @@ article#content.market-index-buy
     != self.partial('@market.blocks.drafts')
 
     header.page-head.market-index-buy__head
-      h1.market-index-buy__title.page-head__title(itemprop='name')= self.t('buy')
+      h1.market-index-buy__title.page-head__title(itemprop='name')= self.t('head_title')
 
       != self.partial('@market.index.buy.blocks.toolbar_controls')
 
     != self.partial('@market.blocks.search_form_buy')
 
     .market-index-buy__switch-type
-      a.market-index-buy__switch-type-link(href=self.link_to('market.index.sell'))= self.t('sell_link')
+      a.market-index-buy__switch-type-link(href=self.link_to('market.index.wish'))= self.t('wish_link')
 
     .market-index-buy__categories
       each section in self.subsections

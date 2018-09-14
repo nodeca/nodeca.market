@@ -15,7 +15,7 @@ module.exports = function (N, apiPath) {
     $query:      {
       type: 'object',
       properties: {
-        buy:     { 'const': '' },
+        wish:    { 'const': '' },
         section: { format: 'mongo' }
       },
       additionalProperties: false
@@ -73,7 +73,7 @@ module.exports = function (N, apiPath) {
     env.res.sections = await sanitize_section(N, env.data.sections, env.user_info);
 
     env.res.defaults = {
-      buy: Object.prototype.hasOwnProperty.call(env.params.$query || {}, 'buy')
+      wish: Object.prototype.hasOwnProperty.call(env.params.$query || {}, 'wish')
     };
 
     if (env.params.$query && env.params.$query.section) {

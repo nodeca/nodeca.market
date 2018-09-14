@@ -1,5 +1,11 @@
 @import "nodeca.core/client/common/_variables"
 
+.market-item-buy__head
+  display flex
+
+.market-item-buy__title-toolbar
+  flex 1 1 0%
+
 .market-item-buy__info
   color $body-color-secondary
   margin 0
@@ -98,7 +104,29 @@
   list-style none
 
 .market-item-buy-similar-item
+  display flex
   margin-top 1rem
 
+$thumb-similar-width  = 51px
+$thumb-similar-height = $thumb-similar-width * '$$ N.config.market.uploads.resize.sm.max_height / N.config.market.uploads.resize.sm.max_width $$'
+
+.market-item-buy-similar-item__photo
+  display inline-block
+  box-shadow 0 0 1px $body-color-secondary
+
+.market-item-buy-similar-item__photo
+.market-item-buy-similar-item__photo > .thumb__image
+  border-radius 2px
+  width $thumb-similar-width
+  height $thumb-similar-height
+
+.market-item-buy-similar-item__info
+  margin-left 1rem
+
 .market-item-buy-similar-item__title
+  display block
   color $body-color + 30%
+
+.market-item-buy-similar-item__price
+  display block
+  color $body-color-secondary

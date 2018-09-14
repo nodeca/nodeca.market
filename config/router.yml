@@ -1,44 +1,35 @@
 router:
   http.get:
-    market.index.sell:
+    market.index.buy:
       "/market": ~
 
-    market.index.buy:
-      "/market/buy": ~
-
-    market.search.sell:
-      "/market/search": ~
+    market.index.wish:
+      "/market/wish": ~
 
     market.search.buy:
-      "/market/buy/search": ~
+      "/market/search": ~
+
+    market.search.wish:
+      "/market/wish/search": ~
 
     market.new:
       "/market/new(/{draft_id})":
         draft_id: /[0-9a-f]{24}/
 
-    market.section.sell:
-      "/market/c{section_hid}":
-        section_hid:
-          match: /\d+/
-          type: integer
-
     market.section.buy:
-      "/market/buy/c{section_hid}":
+      "/market/cat{section_hid}":
         section_hid:
           match: /\d+/
           type: integer
 
-    market.item.sell:
-      "/market/c{section_hid}/{item_hid}":
+    market.section.wish:
+      "/market/wish/cat{section_hid}":
         section_hid:
-          match: /\d+/
-          type: integer
-        item_hid:
           match: /\d+/
           type: integer
 
     market.item.buy:
-      "/market/buy/c{section_hid}/{item_hid}":
+      "/market/cat{section_hid}/{item_hid}":
         section_hid:
           match: /\d+/
           type: integer
@@ -46,26 +37,35 @@ router:
           match: /\d+/
           type: integer
 
-    market.user.sell_active:
+    market.item.wish:
+      "/market/wish/cat{section_hid}/{item_hid}":
+        section_hid:
+          match: /\d+/
+          type: integer
+        item_hid:
+          match: /\d+/
+          type: integer
+
+    market.user.buy_active:
       "/member{user_hid}/market":
         user_hid:
           match: /\d+/
           type: 'integer'
 
-    market.user.sell_archived:
+    market.user.buy_archived:
       "/member{user_hid}/market/archived":
         user_hid:
           match: /\d+/
           type: 'integer'
 
-    market.user.buy_active:
-      "/member{user_hid}/market/buy":
+    market.user.wish_active:
+      "/member{user_hid}/market/wish":
         user_hid:
           match: /\d+/
           type: 'integer'
 
-    market.user.buy_archived:
-      "/member{user_hid}/market/buy/archived":
+    market.user.wish_archived:
+      "/member{user_hid}/market/wish/archived":
         user_hid:
           match: /\d+/
           type: 'integer'

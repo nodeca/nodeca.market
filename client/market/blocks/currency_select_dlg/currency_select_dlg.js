@@ -7,11 +7,7 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 let $dialog;
-let params;
 let result;
 
 
@@ -22,7 +18,7 @@ N.wire.once(module.apiPath, function init_handlers() {
   N.wire.on(module.apiPath + ':select', function select_type_subscription_dlg(data) {
     return N.io.rpc('market.currency_select', { currency: data.$this.data('currency') })
                .then(() => { $dialog.modal('hide'); })
-               .then(() => N.wire.emit('navigate.reload'));  
+               .then(() => N.wire.emit('navigate.reload'));
   });
 
 
@@ -51,7 +47,6 @@ N.wire.on(module.apiPath, function show_currency_dlg(data) {
         // When dialog closes - remove it from body and free resources.
         $dialog.remove();
         $dialog = null;
-        params = null;
 
         if (result) resolve(result);
         else reject('CANCELED');

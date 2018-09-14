@@ -25,20 +25,40 @@ article#content.market-item-buy(
     != self.partial('@market.blocks.drafts')
 
     header.page-head.market-item-buy__head
-      h1.market-item-buy__title.page-head__title(itemprop='name')= self.item.title
+      .market-item-buy__title-toolbar
+        h1.market-item-buy__title.page-head__title(itemprop='name')= self.item.title
 
-      .market-item-buy__info
-        .market-item-buy__info-item!= self.timetag(self.item.ts, 'relative')
-        .market-item-buy__info-item
-          if user
-            a.market-item-buy__user-link._ucard-popover(
-              href=self.link_to('users.member', { user_hid: user.hid })
-              data-user-id=user._id
-              data-user-ref='market_item_buy:'+self.section.hid+':'+self.item.hid
-            )
-              = user.name
+        .market-item-buy__price
+          - var price = self.item.price || {};
+
+          if price.currency === self.settings.market_displayed_currency
+            = self.price(price.value, price.currency)
+          else
+            = self.price(price.value * self.currency_rates[price.currency], self.settings.market_displayed_currency, true)
+            = ' ('
+            = self.price(price.value, price.currency)
+            = ')'
+
+        .market-item-buy__info
+          .market-item-buy__info-item!= self.timetag(self.item.ts, 'relative')
+          .market-item-buy__info-item
+            if user
+              a.market-item-buy__user-link._ucard-popover(
+                href=self.link_to('users.member', { user_hid: user.hid })
+                data-user-id=user._id
+                data-user-ref='market_item_buy:'+self.section.hid+':'+self.item.hid
+              )
+                = user.name
 
       != self.partial('@market.item.buy.blocks.toolbar_controls')
+
+    if self.item.files && self.item.files.length > 0
+      ul.market-item-buy__attach-list.thumb-grid.thumb-grid__m-fluid
+        each file in self.item.files
+          li.market-item-buy__attach-item.thumb-grid__item
+            .thumb-grid__item-inner
+              .thumb
+                img.thumb__image(src=self.link_to('core.gridfs', { bucket: file + '_sm' }))
 
     .market-item-buy__description.markup!= self.item.html
 
@@ -57,6 +77,19 @@ article#content.market-item-buy(
 
               if self.location_name
                 = self.location_name
+
+      .market-item-buy__details-item
+        .market-item-buy__details-key= self.t('delivery')
+        .market-item-buy__details-value= self.item.delivery ? self.t('delivery_available') : self.t('delivery_not_available')
+
+      if self.item.barter_info
+        .market-item-buy__details-item
+          .market-item-buy__details-key= self.t('barter_info')
+          .market-item-buy__details-value= self.item.barter_info
+
+      .market-item-buy__details-item
+        .market-item-buy__details-key= self.t('condition')
+        .market-item-buy__details-value= self.item.is_new ? self.t('condition_new') : self.t('condition_used')
 
     footer.market-item-buy__controls
       ul.market-item-buy__controls-blk
@@ -147,5 +180,23 @@ article#content.market-item-buy(
         ul.market-item-buy-similar__item-list
           each s in self.similar_items
             li.market-item-buy-similar-item
-              a.market-item-buy-similar-item__title(href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid }))
-                = s.item.title
+              .market-item-buy-similar-item__photo.thumb
+                if s.item.files && s.item.files.length > 0
+                  img.thumb__image(src=self.link_to('core.gridfs', { bucket: s.item.files[0] + '_sm' }))
+                else
+                  .thumb__content
+
+              .market-search-buy-item__info
+                a.market-item-buy-similar-item__title(href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid }))
+                  = s.item.title
+
+                span.market-item-buy-similar-item__price
+                  - var price = s.item.price || {};
+
+                  if price.currency === self.settings.market_displayed_currency
+                    = self.price(price.value, price.currency)
+                  else
+                    = self.price(price.value * self.currency_rates[price.currency], self.settings.market_displayed_currency, true)
+                    = ' ('
+                    = self.price(price.value, price.currency)
+                    = ')'

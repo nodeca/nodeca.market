@@ -1,7 +1,0 @@
-en-US:
-  subject:
-    subject: "abuse report about market lot from #{user_name}"
-  body:
-    header: "Complaint from user #{url}:"
-    to: "About [market lot](#{url}):"
-    message_sent_to: "This message sent to: "

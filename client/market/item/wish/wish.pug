@@ -1,0 +1,152 @@
+- self.add_raw_data('settings', self.settings)
+
+- self.users = self.users || {};
+- self.infractions = self.infractions || {};
+- self.own_bookmarks = self.own_bookmarks || [];
+
+- var user = self.users[self.item.user] || {};
+
+article#content.market-item-wish(
+  class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-wish__m-bookmarked' : ''
+)
+  -
+    var navbar_args = {
+      level_up: self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.item.hid } })
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-item-wish__head
+      .market-item-wish__title-toolbar
+        h1.market-item-wish__title.page-head__title(itemprop='name')= self.item.title
+
+        .market-item-wish__info
+          .market-item-wish__info-item!= self.timetag(self.item.ts, 'relative')
+          .market-item-wish__info-item
+            if user
+              a.market-item-wish__user-link._ucard-popover(
+                href=self.link_to('users.member', { user_hid: user.hid })
+                data-user-id=user._id
+                data-user-ref='market_item_wish:'+self.section.hid+':'+self.item.hid
+              )
+                = user.name
+
+      != self.partial('@market.item.wish.blocks.toolbar_controls')
+
+    .market-item-wish__description.markup!= self.item.html
+
+    .market-item-wish__details
+      if self.item.location
+        .market-item-wish__details-item
+          .market-item-wish__details-key= self.t('location')
+          .market-item-wish__details-value
+            a.market-item-wish__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= self.item.location && self.item.location[1]
+              data-longitude= self.item.location && self.item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_name
+                = self.location_name
+
+    footer.market-item-wish__controls
+      ul.market-item-wish__controls-blk
+
+      li.market-item-wish__control-item.market-item-wish__ts
+        != self.timetag(self.item.ts, 'relative')
+
+        - var infraction = self.infractions[self.item._id];
+        if infraction
+          li.market-item-wish__control-item.market-item-wish__infraction(
+            class=infraction.points === 0 ? 'market-item-wish__infraction-m-warning' : ''
+          )
+            a.btn.market-item-wish__action(
+              title=self.t('infraction_title', { points: infraction.points, date: self.date(infraction.ts, 'datetime') })
+              href=self.link_to('users.member', { user_hid: user && user.hid }) + '#infraction' + infraction._id
+            )
+              span.icon.icon-infraction
+
+        if self.settings.can_report_abuse
+          li.market-item-wish__control-item
+            button.btn.market-item-wish__action.market-item-wish__report(
+              title=self.t('report')
+              data-item-id=self.item._id
+              data-on-click='market.item.wish:report'
+            )
+              span.icon.icon-report
+
+      if self.runtime.is_member
+        li.market-item-wish__control-item.market-item-wish__bookmark
+          button.btn.market-item-wish__action.market-item-wish__bookmark-add(
+            data-on-click='market.item.wish:item_bookmark'
+            data-item-id=self.item._id
+            title=self.t('bookmark_add')
+          )
+            span.icon.icon-bookmark
+            span.market-item-wish__bookmarks-count(data-bm-count=self.item.bookmarks)
+
+          button.btn.market-item-wish__action.market-item-wish__bookmark-remove(
+            data-on-click='market.item.wish:item_bookmark'
+            data-item-id=self.item._id
+            data-remove='true'
+            title=self.t('bookmark_remove')
+          )
+            span.icon.icon-bookmark
+            span.market-item-wish__bookmarks-count(data-bm-count=self.item.bookmarks)
+
+      li.market-item-wish__control-item.market-item-wish__views
+        span.icon.icon-views.icon-space-after(
+          title=self.t('views')
+        )
+          = self.item.views
+
+      - var showDropdown = false
+      - showDropdown = showDropdown || self.settings.market_mod_can_add_infractions
+      - showDropdown = showDropdown || self.settings.can_see_ip
+
+      if showDropdown
+        //- no aria parts - visible to moderators only
+        .market-item-wish__control-item.market-item-wish__mod-menu.dropdown.dropup
+          button.btn.btn-square.market-item-wish__action.dropdown-toggle(
+            data-toggle='dropdown'
+            role='button'
+          )
+          .dropdown-menu.dropdown-menu-right(role='menu')
+            if self.settings.market_mod_can_add_infractions
+              button.dropdown-item(
+                data-on-click='market.item.wish:add_infraction'
+                data-item-id=self.item._id
+              )= self.t('add_infraction')
+
+            if self.settings.can_see_ip
+              button.dropdown-item(
+                data-item-id=self.item._id
+                data-on-click='market.item.wish:show_ip'
+              )= self.t('ip_info')
+
+    .market-item-wish__responses
+      if user && user._id === self.runtime.user_id
+        = self.t('no_responses')
+
+      else if self.runtime.is_member
+        button.btn.btn-secondary= self.t('contact')
+
+    if self.similar_items && self.similar_items.length > 0
+      .market-item-wish-similar
+        .market-item-wish-similar__header= self.t('similar_items')
+
+        ul.market-item-wish-similar__item-list
+          each s in self.similar_items
+            li.market-item-wish-similar-item
+              a.market-item-wish-similar-item__title(href=self.link_to('market.item.wish', { section_hid: s.section_hid, item_hid: s.item.hid }))
+                = s.item.title

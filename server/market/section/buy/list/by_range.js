@@ -31,7 +31,7 @@ module.exports = function (N, apiPath) {
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.item_request_list', env);
+    await N.wire.emit('internal:market.section_item_offer_list', env);
   });
 
 
@@ -46,7 +46,7 @@ module.exports = function (N, apiPath) {
     if (env.params.after > 0 && env.data.items.length > 0) {
       let last_item_id = env.data.items[0]._id;
 
-      let item = await N.models.market.ItemRequest.findOne()
+      let item = await N.models.market.ItemOffer.findOne()
                            .where('section').equals(env.data.section._id)
                            .where('_id').lt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
@@ -72,7 +72,7 @@ module.exports = function (N, apiPath) {
     if (env.params.before > 0 && env.data.items.length > 0) {
       let last_item_id = env.data.items[0]._id;
 
-      let item = await N.models.market.ItemRequest.findOne()
+      let item = await N.models.market.ItemOffer.findOne()
                            .where('section').equals(env.data.section._id)
                            .where('_id').gt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
@@ -102,7 +102,7 @@ module.exports = function (N, apiPath) {
     //
     let counters_by_status = await Promise.all(
       env.data.items_visible_statuses.map(st =>
-        N.models.market.ItemRequest
+        N.models.market.ItemOffer
             .where('section').equals(env.data.section._id)
             .where('st').equals(st)
             .count()
@@ -119,7 +119,7 @@ module.exports = function (N, apiPath) {
     if (env.data.items.length) {
       let counters_by_status = await Promise.all(
         env.data.items_visible_statuses.map(st =>
-          N.models.market.ItemRequest
+          N.models.market.ItemOffer
               .where('section').equals(env.data.section._id)
               .where('st').equals(st)
               .where('_id').gt(env.data.items[0]._id)

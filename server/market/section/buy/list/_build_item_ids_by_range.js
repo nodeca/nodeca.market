@@ -33,7 +33,7 @@ module.exports = function (N) {
     // first page, don't need to fetch anything
     if (!env.data.select_start) return [];
 
-    let query = N.models.market.ItemRequest.find();
+    let query = N.models.market.ItemOffer.find();
 
     let entries = await query
                           .where('section').equals(env.data.section._id)
@@ -53,7 +53,7 @@ module.exports = function (N) {
 
     if (env.data.select_after <= 0) return [];
 
-    let query = N.models.market.ItemRequest.find();
+    let query = N.models.market.ItemOffer.find();
 
     if (env.data.select_start) {
       if (env.data.select_after > 0 && env.data.select_before > 0) {

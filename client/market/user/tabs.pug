@@ -1,21 +1,5 @@
 .market-user__tabs.nav.nav-tabs-underlined
   a.nav-link(
-    href=self.link_to('market.user.sell_active', { user_hid: self.user_hid })
-    class=self.active_tab === 'sell_active' ? 'active' : ''
-  )
-    = self.t('sell_active')
-    span.market-user__tab-counter
-      = '(0)'
-
-  a.nav-link(
-    href=self.link_to('market.user.sell_archived', { user_hid: self.user_hid })
-    class=self.active_tab === 'sell_archived' ? 'active' : ''
-  )
-    = self.t('sell_archived')
-    span.market-user__tab-counter
-      = '(0)'
-
-  a.nav-link(
     href=self.link_to('market.user.buy_active', { user_hid: self.user_hid })
     class=self.active_tab === 'buy_active' ? 'active' : ''
   )
@@ -28,5 +12,21 @@
     class=self.active_tab === 'buy_archived' ? 'active' : ''
   )
     = self.t('buy_archived')
+    span.market-user__tab-counter
+      = '(0)'
+
+  a.nav-link(
+    href=self.link_to('market.user.wish_active', { user_hid: self.user_hid })
+    class=self.active_tab === 'wish_active' ? 'active' : ''
+  )
+    = self.t('wish_active')
+    span.market-user__tab-counter
+      = '(0)'
+
+  a.nav-link(
+    href=self.link_to('market.user.wish_archived', { user_hid: self.user_hid })
+    class=self.active_tab === 'wish_archived' ? 'active' : ''
+  )
+    = self.t('wish_archived')
     span.market-user__tab-counter
       = '(0)'

@@ -42,7 +42,7 @@ module.exports = function (N, apiPath) {
 
       // get hid by id
       if (query.from && _.isInteger(+query.from)) {
-        let item = await N.models.market.ItemRequest.findOne()
+        let item = await N.models.market.ItemOffer.findOne()
                               .where('section').equals(env.data.section._id)
                               .where('hid').equals(+query.from)
                               .where('st').in(env.data.items_visible_statuses)
@@ -71,7 +71,7 @@ module.exports = function (N, apiPath) {
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.section_item_request_list', env);
+    await N.wire.emit('internal:market.section_item_offer_list', env);
   });
 
 
@@ -104,7 +104,7 @@ module.exports = function (N, apiPath) {
     //
     let counters_by_status = await Promise.all(
       env.data.items_visible_statuses.map(st =>
-        N.models.market.ItemRequest
+        N.models.market.ItemOffer
             .where('section').equals(env.data.section._id)
             .where('st').equals(st)
             .count()
@@ -121,7 +121,7 @@ module.exports = function (N, apiPath) {
     if (env.data.items.length) {
       let counters_by_status = await Promise.all(
         env.data.items_visible_statuses.map(st =>
-          N.models.market.ItemRequest
+          N.models.market.ItemOffer
               .where('section').equals(env.data.section._id)
               .where('st').equals(st)
               .where('_id').gt(env.data.items[0]._id)
@@ -137,6 +137,16 @@ module.exports = function (N, apiPath) {
       per_page:     env.data.items_per_page,
       chunk_offset: offset
     };
+  });
+
+
+  // Fill available currencies
+  //
+  N.wire.after(apiPath, async function fill_options(env) {
+    let c = N.config.market.currencies || {};
+
+    env.res.currency_types = Object.keys(c)
+                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
   });
 
 
@@ -157,7 +167,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
     let parents = await N.models.market.Section.getParentList(env.data.section._id);
 
-    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents, buy: true });
+    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents });
   });
 
 
@@ -188,7 +198,7 @@ module.exports = function (N, apiPath) {
     if (env.data.items.length > 0) {
       let last_item_id = env.data.items[0]._id;
 
-      let item = await N.models.market.ItemRequest.findOne()
+      let item = await N.models.market.ItemOffer.findOne()
                            .where('section').equals(env.data.section._id)
                            .where('_id').lt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
@@ -214,7 +224,7 @@ module.exports = function (N, apiPath) {
     if (env.data.items.length > 0) {
       let last_item_id = env.data.items[0]._id;
 
-      let item = await N.models.market.ItemRequest.findOne()
+      let item = await N.models.market.ItemOffer.findOne()
                            .where('section').equals(env.data.section._id)
                            .where('_id').gt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
@@ -238,7 +248,7 @@ module.exports = function (N, apiPath) {
     // Fetch last item for the "move to bottom" button
     //
     if (env.data.items.length > 0) {
-      let item = await N.models.market.ItemRequest.findOne()
+      let item = await N.models.market.ItemOffer.findOne()
                            .where('section').equals(env.data.section._id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('hid -_id')

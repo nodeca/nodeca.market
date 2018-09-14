@@ -14,6 +14,7 @@ module.exports = function (N, apiPath) {
       throw N.io.BAD_REQUEST;
     }
 
+    // TODO: for users store it in userstore, for guests in session
     env.session.currency = env.params.currency;
   });
 };

@@ -15,8 +15,8 @@ module.exports = function (N/*, apiPath*/) {
     let match = N.router.matchAll(access_env.params.url).reduce(
       (acc, match) => (
         (
-          match.meta.methods.get === 'market.section.sell' ||
-          match.meta.methods.get === 'market.section.buy'
+          match.meta.methods.get === 'market.section.buy' ||
+          match.meta.methods.get === 'market.section.wish'
         ) ? match : acc
       ),
       null

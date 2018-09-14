@@ -1,7 +1,14 @@
 en-US:
   location: 'Location:'
+  delivery: 'Delivery:'
+  delivery_available: yes
+  delivery_not_available: n/a
+  barter_info: 'In exchange for:'
+  condition: 'Condition:'
+  condition_new: 'new'
+  condition_used: 'used'
   no_responses: Nobody responded to your offer yet.
-  contact: Contact buyer
+  contact: Contact seller
   similar_items: 'Similar items:'
 
   views: Views

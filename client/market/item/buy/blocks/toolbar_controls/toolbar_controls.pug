@@ -33,5 +33,6 @@
             when 'currency'
               button.dropdown-item(
                 type='button'
-                data-on-click='market.blocks.currency_select:begin'
+                data-on-click='market.blocks.currency_select_dlg'
+                data-currency=self.settings.market_displayed_currency
               )= self.t('currency')

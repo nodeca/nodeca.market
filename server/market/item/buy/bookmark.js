@@ -22,7 +22,7 @@ module.exports = function (N, apiPath) {
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
-    env.data.item = await N.models.market.ItemRequest
+    env.data.item = await N.models.market.ItemOffer
                               .findById(env.params.item_id)
                               .lean(true);
 
@@ -38,7 +38,7 @@ module.exports = function (N, apiPath) {
       user_info: env.user_info
     } };
 
-    await N.wire.emit('internal:market.access.item_request', access_env);
+    await N.wire.emit('internal:market.access.item_offer', access_env);
 
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
   });
@@ -50,7 +50,7 @@ module.exports = function (N, apiPath) {
 
     // If `env.params.remove` - remove bookmark
     if (env.params.remove) {
-      await N.models.market.ItemRequestBookmark.remove(
+      await N.models.market.ItemOfferBookmark.remove(
         { user: env.user_info.user_id, item: env.data.item._id }
       );
       return;
@@ -60,7 +60,7 @@ module.exports = function (N, apiPath) {
     let data = { user: env.user_info.user_id, item: env.data.item._id };
 
     // Use `findOneAndUpdate` with `upsert` to avoid duplicates in case of multi click
-    await N.models.market.ItemRequestBookmark.findOneAndUpdate(
+    await N.models.market.ItemOfferBookmark.findOneAndUpdate(
       data,
       { $set: data },
       { upsert: true }
@@ -71,11 +71,11 @@ module.exports = function (N, apiPath) {
   // Update item, fill count
   //
   N.wire.after(apiPath, async function update_item(env) {
-    let count = await N.models.market.ItemRequestBookmark.count({ item: env.data.item._id });
+    let count = await N.models.market.ItemOfferBookmark.count({ item: env.data.item._id });
 
     env.res.count = count;
 
-    await N.models.market.ItemRequest.update(
+    await N.models.market.ItemOffer.update(
       { _id: env.data.item._id },
       { bookmarks: count }
     );

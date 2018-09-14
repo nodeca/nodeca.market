@@ -39,7 +39,7 @@ module.exports = function (N, apiPath) {
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
-    env.data.item = await N.models.market.ItemRequest.findById(env.params.item_id)
+    env.data.item = await N.models.market.ItemOffer.findById(env.params.item_id)
                                .lean(true);
 
     if (!env.data.item) throw N.io.NOT_FOUND;
@@ -93,7 +93,7 @@ module.exports = function (N, apiPath) {
       reason,
       points: env.params.points,
       src: env.data.item._id,
-      src_type: N.shared.content_type.MARKET_ITEM_REQUEST
+      src_type: N.shared.content_type.MARKET_ITEM_OFFER
     });
 
     if (env.params.expire > 0) {

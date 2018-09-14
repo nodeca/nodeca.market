@@ -1,4 +1,4 @@
-// Check permissions to see market offer
+// Check permissions to see market item
 //
 // In:
 //
@@ -28,7 +28,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on('internal:common.access', async function check_market_item_offer_access(access_env) {
     let match = N.router.matchAll(access_env.params.url).reduce(
-      (acc, match) => (match.meta.methods.get === 'market.item.sell' ? match : acc),
+      (acc, match) => (match.meta.methods.get === 'market.item.buy' ? match : acc),
       null
     );
 

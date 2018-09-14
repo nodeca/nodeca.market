@@ -28,7 +28,7 @@ module.exports = function (N, apiPath) {
   // Fetch item IP
   //
   N.wire.on(apiPath, async function fetch_item_ip(env) {
-    let item = await N.models.market.ItemRequest.findById(env.params.item_id)
+    let item = await N.models.market.ItemOffer.findById(env.params.item_id)
                           .select('ip')
                           .lean(true);
 

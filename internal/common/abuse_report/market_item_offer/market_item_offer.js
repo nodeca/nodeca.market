@@ -108,7 +108,7 @@ module.exports = function (N, apiPath) {
 
     locals.project_name = await N.settings.get('general_project_name');
     locals.report_text = params.report.text;
-    locals.item_url = N.router.linkTo('market.item.sell', {
+    locals.item_url = N.router.linkTo('market.item.buy', {
       section_hid: params.data.section.hid,
       item_hid:    params.data.item.hid
     });

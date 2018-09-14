@@ -1,0 +1,49 @@
+- self.search = self.search || {};
+
+form.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:search')
+  if self.section
+    input(
+      type='hidden'
+      name='section'
+      value=self.section._id
+    )
+
+  .market-search-form-wish__input-container
+    .input-group
+      input.market-search-form-wish__query.form-control(
+        type='text'
+        name='query'
+        placeholder=self.t('query_placeholder')
+        value=self.search.query
+      )
+
+      span.input-group-append
+        button.market-search-form-wish__submit.btn.btn-outline-secondary.icon.icon-search(
+          type='submit'
+          title=self.t('search')
+        )
+
+    .market-search-form-wish__meta
+      a.market-search-form-wish__options-toggle(
+        href='#market_search_options'
+        data-on-click='market.blocks.search_form_wish:search_options'
+      )= self.t('options')
+
+      if self.section
+        .form-check.form-check-inline.market-search-form-wish__search-all
+          input.form-check-input#market_search_all(type='checkbox', name='search_all', checked=self.search.search_all)
+          label.form-check-label.market-search-form-wish__search-all-label(for='market_search_all')= self.t('search_all')
+
+  #market_search_options.collapse
+    .market-search-form-wish__options-inner
+      .row
+        .col
+          .form-group.market-search-form-wish__options-control
+            label.market-search-form-wish__options-control-label(for='market_search_options_location')= self.t('location')
+            select.form-control.custom-select#market_search_options_location(
+              name='range'
+              onchange="$('.market-search-form-wish__submit').click();"
+            )
+              option(value='', selected=!self.search.range)= self.t('location_any')
+              option(value=100, selected=self.search.range===100)= self.t('location_100km')
+              option(value=200, selected=self.search.range===200)= self.t('location_200km')

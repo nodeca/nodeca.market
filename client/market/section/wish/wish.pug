@@ -1,0 +1,92 @@
+- self.add_raw_data('settings',   self.settings)
+- self.add_raw_data('pagination', self.pagination)
+
+article#content.market-section-wish(
+  data-keymap= {
+    'home': 'market.section.wish:nav_to_start',
+    'end':  'market.section.wish:nav_to_end'
+  }
+  data-last-item-hid= self.last_item_hid
+  data-top-marker=    self.items && self.items.length > 0 ? self.items[0]._id : null
+  data-bottom-marker= self.items && self.items.length > 0 ? self.items[self.items.length - 1]._id : null
+)
+  -
+    var navbar_args = {
+      title:    self.section.title,
+      level_up: self.parent_hid ?
+                self.link_to('market.section.wish', { section_hid: self.parent_hid }) :
+                self.link_to('market.index.wish'),
+      toolbar:  'market.section.wish.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('market.section.wish', { section_hid: self.section.hid }),
+        link_bottom: self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.last_item_hid } }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-section-wish__head
+      h1.market-section-wish__title.page-head__title(itemprop='name')= self.section.title
+
+      != self.partial('@market.section.wish.blocks.toolbar_controls')
+
+    != self.partial('@market.blocks.search_form_wish')
+    
+    .market-section-wish__subsections
+      each section in self.subsections || []
+        .market-section-wish__subsection(
+          class=section.is_linked ? 'market-section-wish__linked' : ''
+        )
+          a.market-section-wish__subsection-title(
+            href=self.link_to('market.section.wish', { section_hid: section.hid })
+          )= section.title
+
+          span.market-section-wish__subsection-count
+            = ' '
+            = (section.cache || {}).wish_count || 0
+
+    if self.section.is_category === false || (self.items && self.items.length)
+      if self.items && self.items.length
+        .market-section-wish__loading-prev.nojs-hide(
+          class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
+
+        ul.market-section-wish__item-list._affix(
+          data-affix-top={
+            offset:     500,
+            wire_above: 'market.section.wish:load_prev',
+            throttle:   100
+          }
+          data-affix-bottom={
+            offset:     500,
+            wire_below: 'market.section.wish:load_next',
+            throttle:   100
+          }
+        )!= self.partial('@market.blocks.section_item_wish_list')
+
+        .market-section-wish__loading-next.nojs-hide(
+          class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
+
+        nav.pager.js-hide
+          if self.head.prev
+            a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
+
+          if self.head.next
+            a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+      else
+        p.market-section-wish__no-items
+          != self.t('no_items')

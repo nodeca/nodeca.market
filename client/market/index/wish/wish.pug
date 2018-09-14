@@ -1,0 +1,35 @@
+article#content.market-index-wish
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-index-wish__head
+      h1.market-index-wish__title.page-head__title(itemprop='name')= self.t('head_title')
+
+      != self.partial('@market.index.wish.blocks.toolbar_controls')
+
+    != self.partial('@market.blocks.search_form_wish')
+
+    .market-index-wish__switch-type
+      a.market-index-wish__switch-type-link(href=self.link_to('market.index.buy'))= self.t('buy_link')
+
+    .market-index-wish__categories
+      each section in self.subsections
+        .market-index-wish__section
+          .market-index-wish__section-title
+            a.market-index-wish__section-link(
+              href=self.link_to('market.section.wish', { section_hid: section.hid })
+            )= section.title
+
+          each subsection in section.child_list
+            .market-index-wish__subsection
+              a.market-index-wish__subsection-link(
+                class=subsection.is_linked ? 'market-index-wish__linked-section' : ''
+                href=self.link_to('market.section.wish', { section_hid: subsection.hid })
+              )= subsection.title

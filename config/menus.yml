@@ -2,7 +2,7 @@ menus:
   common:
     navbar:
       market:
-        to: market.index.sell
+        to: market.index.buy
 
   admin:
     navbar:

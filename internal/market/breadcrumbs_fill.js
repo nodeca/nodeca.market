@@ -39,14 +39,14 @@ module.exports = function (N, apiPath) {
     // first element - always link to market root
     env.res.breadcrumbs = [ {
       text: env.t('@common.menus.navbar.market'),
-      route: 'market.index.sell'
+      route: 'market.index.buy'
     } ];
 
-    if (data.buy) {
+    if (data.wish) {
       // first element - always link to market root
       env.res.breadcrumbs.push({
-        text: env.t('@market.breadcrumbs_fill.buy'),
-        route: 'market.index.buy'
+        text: env.t('@market.breadcrumbs_fill.wish'),
+        route: 'market.index.wish'
       });
     }
 
@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
       _.map(bc_list, function (section_info) {
         return {
           text: section_info.title,
-          route: 'market.section.' + (data.buy ? 'buy' : 'sell'),
+          route: 'market.section.' + (data.wish ? 'wish' : 'buy'),
           params: { section_hid: section_info.hid }
         };
       })

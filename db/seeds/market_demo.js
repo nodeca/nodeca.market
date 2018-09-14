@@ -102,7 +102,7 @@ async function createItemOffer(section) {
 }
 
 
-async function createItemRequest(section) {
+async function createItemWish(section) {
   let md = charlatan.Lorem.paragraphs(charlatan.Helpers.rand(5, 1)).join('\n\n');
   let user = users[charlatan.Helpers.rand(USER_COUNT)];
 
@@ -120,7 +120,7 @@ async function createItemRequest(section) {
 
   let ts = new Date(2010, 0, postDay++);
 
-  let item = new models.market.ItemRequest({
+  let item = new models.market.ItemWish({
     _id:      new ObjectId(Math.round(ts / 1000)),
 
     html:     result.html,
@@ -128,7 +128,7 @@ async function createItemRequest(section) {
 
     title:    charlatan.Lorem.sentence().slice(0, -1),
 
-    st:       models.market.ItemRequest.statuses.VISIBLE,
+    st:       models.market.ItemWish.statuses.VISIBLE,
     section,
     user,
 
@@ -186,7 +186,7 @@ async function updateSectionStat(section) {
 
 async function fillBigSection(section) {
   for (let i = 0; i < ITEM_COUNT_IN_BIG_SECTION; i++) {
-    await createItemRequest(section);
+    await createItemWish(section);
   }
 
   for (let i = 0; i < ITEM_COUNT_IN_BIG_SECTION; i++) {
@@ -264,7 +264,7 @@ async function createItems() {
 
     // create item
     for (let i = charlatan.Helpers.rand(3); i > 0; i--) {
-      await createItemRequest(section);
+      await createItemWish(section);
     }
 
     for (let i = charlatan.Helpers.rand(3); i > 0; i--) {

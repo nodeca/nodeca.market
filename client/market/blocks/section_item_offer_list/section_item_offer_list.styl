@@ -1,48 +1,48 @@
 @import "nodeca.core/client/common/_variables"
 
-.market-section-sell-item
+.market-section-buy-item
   display flex
   margin-top 1rem
 
-.market-section-sell-item__info
+.market-section-buy-item__info
   margin-left 1rem
 
-.market-section-sell-item__title
-.market-section-sell-item__price
+.market-section-buy-item__title
+.market-section-buy-item__price
   font-size $font-size-lg
 
-.market-section-sell-item__location-link
-.market-section-sell-item__user-link
+.market-section-buy-item__location-link
+.market-section-buy-item__user-link
   color $body-color-secondary
 
-.market-section-sell-item__ignored-mark
+.market-section-buy-item__ignored-mark
   display none
-.market-section-sell-item__m-ignored
-  .market-section-sell-item__ignored-mark
+.market-section-buy-item__m-ignored
+  .market-section-buy-item__ignored-mark
     display inline-block
 
-.market-section-sell-item__details
+.market-section-buy-item__details
   color $body-color-secondary
   margin 0
   padding 0
   list-style none
 
-.market-section-sell-item__details-item
+.market-section-buy-item__details-item
   display inline
 
-.market-section-sell-item__details-item + .market-section-sell-item__details-item
+.market-section-buy-item__details-item + .market-section-buy-item__details-item
   &:before
     content ' | '
 
-.market-section-sell-item__icon
+.market-section-buy-item__icon
   color $body-color-secondary
 
-@keyframes market-section-sell-item-flash-animation {
+@keyframes market-section-buy-item-flash-animation {
   from  { background: $decorator-color;  }
   to    { background: none; }
 }
 
-.market-section-sell-item__m-highlight
-  animation market-section-sell-item-flash-animation 1.5s
-  .market-section-sell-item__highlight-marker
+.market-section-buy-item__m-highlight
+  animation market-section-buy-item-flash-animation 1.5s
+  .market-section-buy-item__highlight-marker
     display block

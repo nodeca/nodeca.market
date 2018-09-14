@@ -8,7 +8,7 @@ search:
       rt_attr_float: [ price, latitude, longitude ]
       rt_attr_bool: [ has_location, barter, delivery, is_new, public, visible ]
 
-    'market_item_requests : _default_content':
+    'market_item_wishes : _default_content':
       rt_field: [ content, title ]
       rt_attr_timestamp: [ ts ]
       rt_attr_string: [ object_id ]

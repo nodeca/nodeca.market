@@ -1,0 +1,40 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-section-wish-item
+  margin-top 1rem
+
+.market-section-wish-item__title
+  font-size $font-size-lg
+
+.market-section-wish-item__location-link
+.market-section-wish-item__user-link
+  color $body-color-secondary
+
+.market-section-wish-item__ignored-mark
+  display none
+.market-section-wish-item__m-ignored
+  .market-section-wish-item__ignored-mark
+    display inline-block
+
+.market-section-wish-item__details
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-section-wish-item__details-item
+  display inline
+
+.market-section-wish-item__details-item + .market-section-wish-item__details-item
+  &:before
+    content ' | '
+
+@keyframes market-section-wish-item-flash-animation {
+  from  { background: $decorator-color;  }
+  to    { background: none; }
+}
+
+.market-section-wish-item__m-highlight
+  animation market-section-wish-item-flash-animation 1.5s
+  .market-section-wish-item__highlight-marker
+    display block

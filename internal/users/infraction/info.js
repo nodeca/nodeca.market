@@ -1,4 +1,4 @@
-// Fill urls and titles for market items (`MARKET_ITEM_OFFER`, `MARKET_ITEM_REQUEST`)
+// Fill urls and titles for market items (`MARKET_ITEM_OFFER`, `MARKET_ITEM_WISH`)
 //
 // In:
 //
@@ -56,7 +56,7 @@ module.exports = function (N, apiPath) {
 
       info_env.info[item._id] = {
         title: item.title,
-        url: N.router.linkTo('market.item.sell', {
+        url: N.router.linkTo('market.item.buy', {
           section_hid: section.hid,
           item_hid:    item.hid
         }),
@@ -66,18 +66,18 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch infractions issued for market item requests
+  // Fetch infractions issued for market item wishes
   //
-  N.wire.on(apiPath, async function market_item_requests_fetch_infraction_info(info_env) {
+  N.wire.on(apiPath, async function market_item_wishes_fetch_infraction_info(info_env) {
     let item_ids = _.map(info_env.infractions.filter(
-                          i => i.src_type === N.shared.content_type.MARKET_ITEM_REQUEST
+                          i => i.src_type === N.shared.content_type.MARKET_ITEM_WISH
                         ), 'src');
     if (!item_ids.length) return;
 
 
     // Fetch items
     //
-    let items = await N.models.market.ItemRequest.find()
+    let items = await N.models.market.ItemWish.find()
                             .where('_id').in(item_ids)
                             .lean(true);
 
@@ -92,7 +92,7 @@ module.exports = function (N, apiPath) {
       user_info: info_env.user_info
     } };
 
-    await N.wire.emit('internal:market.access.item_request', access_env);
+    await N.wire.emit('internal:market.access.item_wish', access_env);
 
     items = items.filter((__, idx) => access_env.data.access_read[idx]);
 
@@ -104,7 +104,7 @@ module.exports = function (N, apiPath) {
 
       info_env.info[item._id] = {
         title: item.title,
-        url: N.router.linkTo('market.item.buy', {
+        url: N.router.linkTo('market.item.wish', {
           section_hid: section.hid,
           item_hid:    item.hid
         }),

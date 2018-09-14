@@ -55,7 +55,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.offer.section(N.runtime.page_data.defaults.section);
   }
 
-  if (N.runtime.page_data.defaults.buy) {
+  if (N.runtime.page_data.defaults.wish) {
     view.offer.type('buy');
   }
 
@@ -244,7 +244,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     };
 
     Promise.resolve()
-      .then(() => N.io.rpc('market.new.create_request', params))
+      .then(() => N.io.rpc('market.new.create_wish', params))
       .then(res => N.wire.emit('navigate.to', res.redirect_url))
       .catch(err => {
         view.isSubmitting(false);

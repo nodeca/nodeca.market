@@ -54,7 +54,7 @@ article#content.market-section-buy(
 
           span.market-section-buy__subsection-count
             = ' '
-            = (section.cache || {}).request_count || 0
+            = (section.cache || {}).offer_count || 0
 
     if self.section.is_category === false || (self.items && self.items.length)
       if self.items && self.items.length
@@ -74,7 +74,7 @@ article#content.market-section-buy(
             wire_below: 'market.section.buy:load_next',
             throttle:   100
           }
-        )!= self.partial('@market.blocks.section_item_request_list')
+        )!= self.partial('@market.blocks.section_item_offer_list')
 
         .market-section-buy__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

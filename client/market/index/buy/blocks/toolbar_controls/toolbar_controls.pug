@@ -16,7 +16,7 @@ if self.runtime.is_member
 .page-actions.market-index-buy__toolbar-controls
   if self.settings.market_can_create_items
     a.btn.btn-secondary.btn-square.icon.icon-plus(
-      href=self.link_to('market.new', { $query: { buy: '' } })
+      href=self.link_to('market.new')
       class=show_menu ? 'd-none d-sm-inline-block' : ''
       title=self.t('item_add')
     )
@@ -38,7 +38,7 @@ if self.runtime.is_member
 
             when 'new_item'
               a.dropdown-item.d-sm-none(
-                href=self.link_to('market.new', { $query: { buy: '' } })
+                href=self.link_to('market.new')
               )= self.t('item_add')
 
             when 'my_items'

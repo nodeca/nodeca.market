@@ -4,9 +4,9 @@
 'use strict';
 
 
-const _                     = require('lodash');
-const sanitize_section      = require('nodeca.market/lib/sanitizers/section');
-const sanitize_item_request = require('nodeca.market/lib/sanitizers/item_request');
+const _                   = require('lodash');
+const sanitize_section    = require('nodeca.market/lib/sanitizers/section');
+const sanitize_item_offer = require('nodeca.market/lib/sanitizers/item_offer');
 
 
 module.exports = function (N, apiPath) {
@@ -20,13 +20,13 @@ module.exports = function (N, apiPath) {
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
-    let item = await N.models.market.ItemRequest.findOne()
+    let item = await N.models.market.ItemOffer.findOne()
                          .where('hid').equals(env.params.item_hid)
                          .lean(true);
 
     if (!item) {
       // maybe offer type is wrong, redirect in that case
-      item = await N.models.market.ItemOffer.findOne()
+      item = await N.models.market.ItemWish.findOne()
                        .where('hid').equals(env.params.item_hid)
                        .lean(true);
 
@@ -37,14 +37,14 @@ module.exports = function (N, apiPath) {
         user_info: env.user_info
       } };
 
-      await N.wire.emit('internal:market.access.item_offer', access_env);
+      await N.wire.emit('internal:market.access.item_wish', access_env);
 
       if (!access_env.data.access_read) throw N.io.NOT_FOUND;
 
       throw {
         code: N.io.REDIRECT,
         head: {
-          Location: N.router.linkTo('market.item.sell', {
+          Location: N.router.linkTo('market.item.wish', {
             section_hid: env.params.section_hid,
             item_hid:    env.params.item_hid
           })
@@ -57,7 +57,7 @@ module.exports = function (N, apiPath) {
       user_info: env.user_info
     } };
 
-    await N.wire.emit('internal:market.access.item_request', access_env);
+    await N.wire.emit('internal:market.access.item_offer', access_env);
 
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
 
@@ -112,7 +112,7 @@ module.exports = function (N, apiPath) {
     }
 
     env.res.section = await sanitize_section(N, env.data.section, env.user_info);
-    env.res.item    = await sanitize_item_request(N, env.data.item, env.user_info);
+    env.res.item    = await sanitize_item_offer(N, env.data.item, env.user_info);
   });
 
 
@@ -137,7 +137,7 @@ module.exports = function (N, apiPath) {
 
     // add current section
     parents.push(env.data.section._id);
-    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents, buy: true });
+    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents });
   });
 
 
@@ -156,7 +156,7 @@ module.exports = function (N, apiPath) {
       let score = Math.floor(time[0] * 1000 + time[1] / 1000);
       let key   = env.data.item._id + '-' + env.session_id;
 
-      N.redis.zscore('views:market_item_request:track_last', key, function (err, old_score) {
+      N.redis.zscore('views:market_item_offer:track_last', key, function (err, old_score) {
         if (err) return;
 
         // Check if user has loaded the same page in the last 10 minutes,
@@ -165,10 +165,10 @@ module.exports = function (N, apiPath) {
         //
         if (Math.abs(score - old_score) < 10 * 60 * 1000) { return; }
 
-        N.redis.zadd('views:market_item_request:track_last', score, key, function (err) {
+        N.redis.zadd('views:market_item_offer:track_last', score, key, function (err) {
           if (err) return;
 
-          N.redis.hincrby('views:market_item_request:count', String(env.data.item._id), 1, function () {});
+          N.redis.hincrby('views:market_item_offer:count', String(env.data.item._id), 1, function () {});
         });
       });
     });
@@ -178,7 +178,7 @@ module.exports = function (N, apiPath) {
   // Fetch and fill bookmarks
   //
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
-    let bookmarks = await N.models.market.ItemRequestBookmark.find()
+    let bookmarks = await N.models.market.ItemOfferBookmark.find()
                               .where('user').equals(env.user_info.user_id)
                               .where('item').equals(env.data.item._id)
                               .lean(true);
@@ -215,11 +215,17 @@ module.exports = function (N, apiPath) {
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
-    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+    env.res.settings = env.data.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'can_report_abuse',
       'can_see_ip',
+      'market_displayed_currency',
       'market_mod_can_add_infractions'
     ]));
+
+    if (env.session.currency) {
+      // patch for guests who don't have user store
+      env.res.settings.market_displayed_currency = env.session.currency;
+    }
   });
 
 
@@ -229,14 +235,14 @@ module.exports = function (N, apiPath) {
     let data = { item_id: env.data.item._id };
 
     try {
-      await N.wire.emit('internal:market.similar_item_requests', data);
+      await N.wire.emit('internal:market.similar_item_offers', data);
     } catch (__) {
       // if similar items can't be fetched, just show empty result
       return;
     }
 
     if (data.results && data.results.length > 0) {
-      let items = await N.models.market.ItemRequest.find()
+      let items = await N.models.market.ItemOffer.find()
                             .where('_id').in(_.map(data.results, 'item_id'))
                             .lean(true);
 
@@ -246,11 +252,11 @@ module.exports = function (N, apiPath) {
 
       let access_env = { params: { items, user_info: env.user_info } };
 
-      await N.wire.emit('internal:market.access.item_request', access_env);
+      await N.wire.emit('internal:market.access.item_offer', access_env);
 
       items = items.filter((__, idx) => access_env.data.access_read[idx]);
 
-      let items_by_id    = _.keyBy(await sanitize_item_request(N, items, env.user_info), '_id');
+      let items_by_id    = _.keyBy(await sanitize_item_offer(N, items, env.user_info), '_id');
       let sections_by_id = _.keyBy(sections, '_id'); // not sanitized because only hid is used
 
       env.res.similar_items = data.results.filter(result => items_by_id[result.item_id])
@@ -259,6 +265,25 @@ module.exports = function (N, apiPath) {
                                             section_hid: sections_by_id[items_by_id[result.item_id].section].hid,
                                             weight:      result.weight
                                           }));
+    }
+  });
+
+
+  // Fetch currency rates
+  //
+  N.wire.after(apiPath, async function fetch_currency_rates(env) {
+    let currencies = _.uniq(
+      [ env.res.item ].concat((env.res.similar_items || []).map(s => s.item))
+                      .map(i => i.price && i.price.currency)
+                      .filter(Boolean)
+    );
+
+    env.res.currency_rates = {};
+
+    for (let c of currencies) {
+      env.res.currency_rates[c] = await N.models.market.CurrencyRate.get(
+        c, env.data.settings.market_displayed_currency
+      );
     }
   });
 };

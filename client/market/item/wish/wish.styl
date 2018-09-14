@@ -1,0 +1,110 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-item-wish__head
+  display flex
+
+.market-item-wish__title-toolbar
+  flex 1 1 0%
+
+.market-item-wish__info
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-item-wish__info-item
+  display inline
+
+.market-item-wish__user-link
+  color $body-color-secondary
+
+.market-item-wish__info-item + .market-item-wish__info-item
+  &:before
+    content ' | '
+
+.market-item-wish__details
+  display table
+
+.market-item-wish__details-item
+  display table-row
+
+.market-item-wish__details-key
+  display table-cell
+  color $body-color-secondary
+  text-align right
+  padding-right 0.5rem
+
+.market-item-wish__details-value
+  display table-cell
+
+.market-item-wish__controls-blk
+  margin 0 0 .5rem 0
+  padding 0
+  list-style none
+
+.market-item-wish__control-item
+  color $body-color-secondary
+  display inline-block
+
+.market-item-wish__action
+  background-color transparent
+  color $body-color-secondary
+
+  &:hover
+  &:focus
+  &:active
+    color $body-color-secondary - 20%
+    background-color $body-bg-secondary
+
+.market-item-wish__infraction .icon
+  color $brand-danger
+.market-item-wish__infraction-m-warning .icon
+  color $brand-warning
+
+.market-item-wish__bookmark-remove
+  display none
+
+// override .btn+.btn margin
+.market-item-wish__bookmark-remove.market-item-wish__bookmark-remove
+  margin 0
+
+.market-item-wish__m-bookmarked
+  .market-item-wish__bookmark-remove
+    display inline-block
+    opacity 1
+    .icon
+      color $brand-success
+  .market-item-wish__bookmark-add
+    display none
+
+.market-item-wish__bookmarks-count
+  font-size $font-size-xs
+  color $body-color-secondary
+
+.market-item-wish__bookmarks-count:after
+  content attr(data-bm-count)
+  margin-left .3em
+
+.market-item-wish__bookmarks-count[data-bm-count="0"]:after
+  display none
+
+.market-item-wish__ts
+  margin-right .75rem
+
+.market-item-wish__views
+  margin-left .75rem
+
+.market-item-wish__responses
+.market-item-wish-similar
+  margin-top 1rem
+
+.market-item-wish-similar__item-list
+  margin 0
+  padding 0
+  list-style none
+
+.market-item-wish-similar-item
+  margin-top 1rem
+
+.market-item-wish-similar-item__title
+  color $body-color + 30%

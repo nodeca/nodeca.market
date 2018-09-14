@@ -15,7 +15,7 @@ module.exports = function (N) {
     if (data.type !== 'inline') return;
 
     let match = N.router.matchAll(data.url).reduce((acc, match) => {
-      if (match.meta.methods.get === 'market.item.sell') return match;
+      if (match.meta.methods.get === 'market.item.buy') return match;
       return acc;
     }, null);
 
@@ -30,7 +30,7 @@ module.exports = function (N) {
                             .lean(true);
 
     // preserve inline link exactly as it was (keep hash tags, etc.)
-    data.html = render(N, 'common.blocks.markup.market_item_sell_link', {
+    data.html = render(N, 'common.blocks.markup.market_item_buy_link', {
       href: data.url,
       item,
       section
@@ -44,13 +44,13 @@ module.exports = function (N) {
     if (data.type !== 'inline') return;
 
     let match = N.router.matchAll(data.url).reduce((acc, match) => {
-      if (match.meta.methods.get === 'market.item.buy') return match;
+      if (match.meta.methods.get === 'market.item.wish') return match;
       return acc;
     }, null);
 
     if (!match) return;
 
-    let item = await N.models.market.ItemRequest.findOne()
+    let item = await N.models.market.ItemWish.findOne()
                          .where('hid').equals(match.params.item_hid)
                          .lean(true);
     if (!item) return;
@@ -60,7 +60,7 @@ module.exports = function (N) {
     if (!section) return;
 
     // preserve inline link exactly as it was (keep hash tags, etc.)
-    data.html = render(N, 'common.blocks.markup.market_item_buy_link', {
+    data.html = render(N, 'common.blocks.markup.market_item_wish_link', {
       href: data.url,
       item,
       section

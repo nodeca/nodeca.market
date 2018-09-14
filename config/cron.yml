@@ -1,5 +1,5 @@
 cron:
   drafts_cleanup: 0 25 4 * * * # everyday at 4:25
-  market_item_request_views_update: 1 */10 * * * * # every 10 minutes
+  market_item_wish_views_update: 1 */10 * * * * # every 10 minutes
   market_item_offer_views_update: 2 */10 * * * * # every 10 minutes
   market_currency_rates_update: 0 35 9 * * * # everyday at 9:35
