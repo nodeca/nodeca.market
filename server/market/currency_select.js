@@ -14,7 +14,13 @@ module.exports = function (N, apiPath) {
       throw N.io.BAD_REQUEST;
     }
 
-    // TODO: for users store it in userstore, for guests in session
-    env.session.currency = env.params.currency;
+    if (env.user_info.is_member) {
+      await N.settings.getStore('user').set(
+        { market_displayed_currency: { value: env.params.currency } },
+        { user_id: env.user_info.user_id }
+      );
+    } else {
+      env.session.currency = env.params.currency;
+    }
   });
 };

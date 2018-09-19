@@ -29,14 +29,7 @@ each item in self.items
 
         .market-search-buy-item__price
           - var price = item.price || {};
-
-          if price.currency === self.settings.market_displayed_currency
-            = self.price(price.value, price.currency)
-          else
-            = self.price(price.value * self.currency_rates[price.currency], self.settings.market_displayed_currency, true)
-            = ' ('
-            = self.price(price.value, price.currency)
-            = ')'
+          = self.price(price.value, price.currency, self.settings.market_displayed_currency, self.currency_rates[price.currency])
 
           if item.barter_info
             = ' '

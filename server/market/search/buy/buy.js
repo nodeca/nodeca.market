@@ -48,20 +48,19 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch current user
+  //
+  N.wire.before(apiPath, async function fetch_user(env) {
+    env.data.user = await N.models.users.User.findOne({ _id: env.user_info.user_id });
+  });
+
+
   // Normalize search params
   //
   N.wire.before(apiPath, async function normalize_params(env) {
     let $query = env.params.$query;
 
     env.data.search = {};
-
-    // check query length because 1-character requests consume too much resources
-    if ($query.query.trim().length < 2) {
-      throw {
-        code: N.io.CLIENT_ERROR,
-        message: env.t('err_query_too_short')
-      };
-    }
 
     if ($query.query)      env.data.search.query = $query.query;
     if ($query.is_new)     env.data.search.is_new = true;
@@ -85,19 +84,25 @@ module.exports = function (N, apiPath) {
       env.data.search.price_max_currency = $query.price_max_currency;
     }
 
-    if (Number($query.range) > 0) {
+    if (Number($query.range) > 0 && env.data.user.location) {
+      // get nearest available range
       env.data.search.range = Number($query.range) >= 150 ? 200 : 100;
     }
 
     if (env.data.section) env.data.search.section = env.data.section._id;
 
     env.res.search = env.data.search;
+
+    // check query length because 1-character requests consume too much resources
+    if ($query.query.trim().length < 2) {
+      env.res.search_error = env.res.search_error || env.t('err_query_too_short');
+    }
   });
 
 
   // Send sql query to sphinx, get a response
   //
-  N.wire.on(apiPath, async function execute_search(env) {
+  async function build_item_ids(env) {
     let query = 'SELECT object_id FROM market_item_offers WHERE MATCH(?) AND public=1';
     let params = [ sphinx_escape(env.data.search.query) ];
 
@@ -117,46 +122,76 @@ module.exports = function (N, apiPath) {
         hids = hids.concat(_.map(s, 'hid'));
       }
 
-      query += ' AND section_uid IN (' + '?'.repeat(hids.length) + ')';
-      params = params.concat(hids.map(hid => docid_sections(N, hid)));
+      if (hids.length > 0) {
+        query += ' AND section_uid IN (' + '?,'.repeat(hids.length - 1) + '?)';
+        params = params.concat(hids.map(hid => docid_sections(N, hid)));
+      }
     }
 
     if (env.data.search.is_new)   query += ' AND is_new=1';
     if (env.data.search.barter)   query += ' AND barter=1';
     if (env.data.search.delivery) query += ' AND delivery=1';
 
-    // TODO: currencies
-    /*if (env.data.search.price_min_value) {
-      query += ' AND price>=?';
-      params.push(env.data.search.price_min_value);
+    let price_min, price_max;
+
+    if (env.data.search.price_min_value) {
+      let rate = await N.models.market.CurrencyRate.get(env.data.search.price_min_currency);
+
+      if (rate) {
+        query += ' AND price>=?';
+        price_min = env.data.search.price_min_value * rate;
+        params.push(price_min);
+      } else {
+        // currency rate not available
+        env.res.search_error = env.res.search_error || env.t('err_invalid_price_range');
+      }
     }
 
     if (env.data.search.price_max_value) {
-      query += ' AND price<=?';
-      params.push(env.data.search.price_max_value);
-    }*/
+      let rate = await N.models.market.CurrencyRate.get(env.data.search.price_max_currency);
 
-    // TODO: location
-    /*if (env.data.search.range) {
+      if (rate) {
+        query += ' AND price>0 AND price<=?';
+        price_max = env.data.search.price_max_value * rate;
+        params.push(price_max);
+      } else {
+        // currency rate not available
+        env.res.search_error = env.res.search_error || env.t('err_invalid_price_range');
+      }
+    }
+
+    if (price_min && price_max && price_min > price_max) {
+      // if user select min and max in different currencies,
+      // impossible range will not be immediately obvious to the user
+      env.res.search_error = env.res.search_error || env.t('err_invalid_price_range');
+    }
+
+    if (env.data.search.range && env.data.user.location) {
       query += ' AND has_location=1 AND GEODIST(latitude, longitude, ?, ?, {in=deg, out=km})<=?';
+      params.push(env.data.user.location[0]);
+      params.push(env.data.user.location[1]);
       params.push(env.data.search.range);
-    }*/
+    }
 
     // sort is either `date` or `rel`, sphinx searches by relevance by default
     if (env.data.search.sort === 'date') {
       query += ' ORDER BY ts DESC';
     }
 
-    let results = await N.search.execute(query, params);
+    if (env.res.search_error) {
+      env.data.item_ids = [];
+    } else {
+      let results = await N.search.execute(query, params);
 
-    env.data.item_ids = results.map(result => result.object_id);
-  });
+      env.data.item_ids = results.map(result => result.object_id);
+    }
+  }
 
 
   // Subcall item list
   //
   N.wire.on(apiPath, async function subcall_item_list(env) {
-    env.data.build_item_ids = () => {};
+    env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
     await N.wire.emit('internal:market.search_item_offer_list', env);
@@ -177,9 +212,13 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fill available currencies
+  // Fill info needed to render search box
   //
-  N.wire.after(apiPath, async function fill_options(env) {
+  N.wire.after(apiPath, async function fill_search_options(env) {
+    let user = await N.models.users.User.findOne({ _id: env.user_info.user_id });
+
+    env.res.location_available = !!user.location;
+
     let c = N.config.market.currencies || {};
 
     env.res.currency_types = Object.keys(c)

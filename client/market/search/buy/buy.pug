@@ -28,4 +28,7 @@ article#content.market-search-buy
         != self.partial('@market.blocks.search_item_offer_list')
     else
       p.market-search-buy__no-items
-        != self.t('no_items')
+        if self.search_error
+          != self.search_error
+        else
+          != self.t('no_items')

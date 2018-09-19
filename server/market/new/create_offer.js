@@ -260,6 +260,13 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Schedule search index update
+  //
+  N.wire.after(apiPath, async function add_search_index(env) {
+    await N.queue.market_item_offers_search_update_by_ids([ env.data.new_item._id ]).postpone();
+  });
+
+
   // Update section counters
   //
   N.wire.after(apiPath, async function update_section(env) {

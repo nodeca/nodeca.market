@@ -30,6 +30,20 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill info needed to render search box
+  //
+  N.wire.after(apiPath, async function fill_search_options(env) {
+    let user = await N.models.users.User.findOne({ _id: env.user_info.user_id });
+
+    env.res.location_available = !!user.location;
+
+    let c = N.config.market.currencies || {};
+
+    env.res.currency_types = Object.keys(c)
+                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
+  });
+
+
   // Fill head meta
   //
   N.wire.after(apiPath, function fill_head(env) {

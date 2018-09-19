@@ -163,7 +163,7 @@ async function createSection(category, sub_section_deep) {
 
   // add sub-sections
   if (!sub_section_deep || charlatan.Helpers.rand(3) === 2) {
-    return;
+    return section;
   }
 
   for (let i = charlatan.Helpers.rand(MAX_SUB_SECTION_COUNT); i > 0; i--) {

@@ -1,4 +1,5 @@
 - self.search = self.search || {};
+- var show_options = !!self.location_available;
 
 form.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:search')
   if self.section
@@ -24,26 +25,29 @@ form.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:sear
         )
 
     .market-search-form-wish__meta
-      a.market-search-form-wish__options-toggle(
-        href='#market_search_options'
-        data-on-click='market.blocks.search_form_wish:search_options'
-      )= self.t('options')
+      if show_options
+        a.market-search-form-wish__options-toggle(
+          href='#market_search_options'
+          data-on-click='market.blocks.search_form_wish:search_options'
+        )= self.t('options')
 
       if self.section
         .form-check.form-check-inline.market-search-form-wish__search-all
           input.form-check-input#market_search_all(type='checkbox', name='search_all', checked=self.search.search_all)
           label.form-check-label.market-search-form-wish__search-all-label(for='market_search_all')= self.t('search_all')
 
-  #market_search_options.collapse
-    .market-search-form-wish__options-inner
-      .row
-        .col
-          .form-group.market-search-form-wish__options-control
-            label.market-search-form-wish__options-control-label(for='market_search_options_location')= self.t('location')
-            select.form-control.custom-select#market_search_options_location(
-              name='range'
-              onchange="$('.market-search-form-wish__submit').click();"
-            )
-              option(value='', selected=!self.search.range)= self.t('location_any')
-              option(value=100, selected=self.search.range===100)= self.t('location_100km')
-              option(value=200, selected=self.search.range===200)= self.t('location_200km')
+  if show_options
+    #market_search_options.collapse
+      .market-search-form-wish__options-inner
+        .row
+          if self.location_available
+            .col
+              .form-group.market-search-form-wish__options-control
+                label.market-search-form-wish__options-control-label(for='market_search_options_location')= self.t('location')
+                select.form-control.custom-select#market_search_options_location(
+                  name='range'
+                  onchange="$('.market-search-form-wish__submit').click();"
+                )
+                  option(value='', selected=!self.search.range)= self.t('location_any')
+                  option(value=100, selected=self.search.range===100)= self.t('location_100km')
+                  option(value=200, selected=self.search.range===200)= self.t('location_200km')
