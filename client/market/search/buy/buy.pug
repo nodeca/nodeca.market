@@ -16,9 +16,12 @@ article#content.market-search-buy
 
     != self.partial('@market.blocks.search_form_buy')
 
-    select.market-search-buy__select-order.form-control.custom-select
-      option(selected=self.search.order !== 'date')= self.t('order_by_rel')
-      option(selected=self.search.order === 'date')= self.t('order_by_date')
+    select.market-search-buy__select-order.form-control.custom-select(
+      onchange="$('.market-search-form-buy__submit').click();"
+    )
+      option(value='rel', selected=self.search.sort === 'rel')= self.t('order_by_rel')
+      option(value='date', selected=self.search.sort === 'date')= self.t('order_by_date')
+      option(value='price', selected=self.search.sort === 'price')= self.t('order_by_price')
 
     .market-search-buy__sections
       //- TODO

@@ -26,15 +26,15 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
 
     .market-search-form-buy__meta
       if show_options
-        a.market-search-form-buy__options-toggle(
+        a.market-search-form-buy__meta-item(
           href='#market_search_options'
           data-on-click='market.blocks.search_form_buy:search_options'
         )= self.t('options')
 
       if self.section
-        .form-check.form-check-inline.market-search-form-buy__search-all
+        span.form-check.form-check-inline.market-search-form-buy__meta-item
           input.form-check-input#market_search_all(type='checkbox', name='search_all', checked=self.search.search_all)
-          label.form-check-label.market-search-form-buy__search-all-label(for='market_search_all')= self.t('search_all')
+          label.form-check-label(for='market_search_all')= self.t('search_all')
 
   if show_options
     #market_search_options.collapse

@@ -27,7 +27,8 @@ module.exports = function (N, apiPath) {
         price_min_currency: { type: 'string' },
         price_max_value:    { type: 'string' },
         price_max_currency: { type: 'string' },
-        range:              { type: 'string' }
+        range:              { type: 'string' },
+        sort:               { type: 'string' }
       },
       additionalProperties: true
     }
@@ -58,11 +59,11 @@ module.exports = function (N, apiPath) {
   // Normalize search params
   //
   N.wire.before(apiPath, async function normalize_params(env) {
-    let $query = env.params.$query;
+    let $query = env.params.$query || {};
 
     env.data.search = {};
+    env.data.search.query = $query.query || '';
 
-    if ($query.query)      env.data.search.query = $query.query;
     if ($query.is_new)     env.data.search.is_new = true;
     if ($query.barter)     env.data.search.barter = true;
     if ($query.delivery)   env.data.search.delivery = true;
@@ -93,17 +94,38 @@ module.exports = function (N, apiPath) {
 
     env.res.search = env.data.search;
 
+    env.data.search.sort = [ 'rel', 'date', 'price' ].indexOf($query.sort) ? $query.sort : 'rel';
+
     // check query length because 1-character requests consume too much resources
-    if ($query.query.trim().length < 2) {
+    if (env.data.search.query.trim().length < 2) {
       env.res.search_error = env.res.search_error || env.t('err_query_too_short');
     }
+  });
+
+
+  // Fetch partial section tree (children, parents, siblings, and parent siblings)
+  //
+  N.wire.before(apiPath, async function get_section_tree(env) {
+    let ids = [ null ]; // root
+
+    if (env.data.section) {
+      ids = ids.concat(await N.models.market.Section.getParentList(env.data.section._id));
+
+      ids.push(env.data.section._id);
+    }
+
+    // TODO: push this on client as a tree
+    //for (let id of ids) {
+    //  console.log(await N.models.market.Section.getChildren(id, 1))
+    //}
   });
 
 
   // Send sql query to sphinx, get a response
   //
   async function build_item_ids(env) {
-    let query = 'SELECT object_id FROM market_item_offers WHERE MATCH(?) AND public=1';
+    let query = 'WHERE MATCH(?) AND public=1';
+    let need_dist = false;
     let params = [ sphinx_escape(env.data.search.query) ];
 
     if (env.data.section && !env.data.search.search_all) {
@@ -167,15 +189,26 @@ module.exports = function (N, apiPath) {
     }
 
     if (env.data.search.range && env.data.user.location) {
-      query += ' AND has_location=1 AND GEODIST(latitude, longitude, ?, ?, {in=deg, out=km})<=?';
-      params.push(env.data.user.location[0]);
-      params.push(env.data.user.location[1]);
+      query += ' AND has_location=1 AND calc_dist<=?';
       params.push(env.data.search.range);
+      need_dist = true;
     }
 
     // sort is either `date` or `rel`, sphinx searches by relevance by default
-    if (env.data.search.sort === 'date') {
+    if (env.data.search.sort === 'price') {
+      query += ' ORDER BY price ASC';
+    } else if (env.data.search.sort === 'date') {
       query += ' ORDER BY ts DESC';
+    }
+
+    if (need_dist) {
+      query = 'SELECT object_id, GEODIST(latitude, longitude, ?, ?, {in=deg, out=km}) as calc_dist ' +
+              'FROM market_item_offers ' + query;
+
+      params.unshift(env.data.user.location[0]);
+      params.unshift(env.data.user.location[1]);
+    } else {
+      query = 'SELECT object_id FROM market_item_offers ' + query;
     }
 
     if (env.res.search_error) {
@@ -215,9 +248,11 @@ module.exports = function (N, apiPath) {
   // Fill info needed to render search box
   //
   N.wire.after(apiPath, async function fill_search_options(env) {
-    let user = await N.models.users.User.findOne({ _id: env.user_info.user_id });
+    if (env.user_info.is_member) {
+      let user = await N.models.users.User.findOne({ _id: env.user_info.user_id });
 
-    env.res.location_available = !!user.location;
+      if (user) env.res.location_available = !!user.location;
+    }
 
     let c = N.config.market.currencies || {};
 
