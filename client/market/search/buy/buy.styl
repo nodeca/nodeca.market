@@ -6,7 +6,40 @@
 .market-search-buy__title
   flex 1 1 0%
 
+.market-search-buy__sections-order-block
+  margin-top 1rem
+  display flex
+
+.market-search-buy__sections
+  flex 1 1 0%
+
 .market-search-buy__select-order
-   float right
-   width auto
-   margin-top 1rem
+  width auto
+
+$max-section-indent = 5
+
+.market-search-buy__section
+  margin-left 20px * ($max-section-indent - 1)
+
+for $level in (0..$max-section-indent - 2)
+  .market-search-buy__section-level-{$level}
+    margin-left 20px * $level
+
+.market-search-buy__section-active
+  font-weight bold
+
+.market-search-buy__section-title
+  color $body-color
+
+.market-search-buy__section-count
+  color $body-color-secondary
+  vertical-align sub
+  font-size $font-size-xs
+
+.market-search-buy__item-list
+  margin 0
+  padding 0
+  list-style none
+
+.market-search-buy__error
+  margin-top 1rem

@@ -5,6 +5,7 @@
 
 
 const _                = require('lodash');
+const memoize          = require('promise-memoize');
 const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 const docid_sections   = require('nodeca.market/lib/search/docid_sections');
 const sphinx_escape    = require('nodeca.search').escape;
@@ -35,10 +36,17 @@ module.exports = function (N, apiPath) {
   });
 
 
+  let fetchSections = memoize(() =>
+    N.models.market.Section.find().select('title hid').lean(true).exec(),
+    { maxAge: 60000 });
+
+
   // Fetch section
   //
   N.wire.before(apiPath, async function fetch_section(env) {
-    if (!env.params.$query || !env.params.$query.section) return;
+    let $query = env.params.$query || {};
+
+    if (!$query.section) return;
 
     env.data.section = await N.models.market.Section.findById(env.params.$query.section)
                                  .lean(true);
@@ -103,32 +111,23 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch partial section tree (children, parents, siblings, and parent siblings)
+  // Build SphinxQL query based on user input
   //
-  N.wire.before(apiPath, async function get_section_tree(env) {
-    let ids = [ null ]; // root
-
-    if (env.data.section) {
-      ids = ids.concat(await N.models.market.Section.getParentList(env.data.section._id));
-
-      ids.push(env.data.section._id);
-    }
-
-    // TODO: push this on client as a tree
-    //for (let id of ids) {
-    //  console.log(await N.models.market.Section.getChildren(id, 1))
-    //}
-  });
-
-
-  // Send sql query to sphinx, get a response
+  // In:
+  //  - env.data.section
+  //  - env.data.search
+  //  - section_stats (Boolean) - returns count(*) group by section_uid
   //
-  async function build_item_ids(env) {
+  // Out:
+  //  - returns [ query, params ]
+  //  - populates env.res.search_error (String) on error
+  //
+  async function build_query(env, section_stats) {
     let query = 'WHERE MATCH(?) AND public=1';
     let need_dist = false;
     let params = [ sphinx_escape(env.data.search.query) ];
 
-    if (env.data.section && !env.data.search.search_all) {
+    if (env.data.section && !env.data.search.search_all && !section_stats) {
       // get hids of specified section and all its non-linked subsections
       let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
 
@@ -194,22 +193,117 @@ module.exports = function (N, apiPath) {
       need_dist = true;
     }
 
-    // sort is either `date` or `rel`, sphinx searches by relevance by default
-    if (env.data.search.sort === 'price') {
-      query += ' ORDER BY price ASC';
-    } else if (env.data.search.sort === 'date') {
-      query += ' ORDER BY ts DESC';
-    }
+    if (section_stats) {
+      if (need_dist) {
+        query = 'SELECT section_uid, count(*) AS count, ' +
+                'GEODIST(latitude, longitude, ?, ?, {in=deg, out=km}) AS calc_dist ' +
+                'FROM market_item_offers ' + query;
 
-    if (need_dist) {
-      query = 'SELECT object_id, GEODIST(latitude, longitude, ?, ?, {in=deg, out=km}) as calc_dist ' +
+        params.unshift(env.data.user.location[0]);
+        params.unshift(env.data.user.location[1]);
+      } else {
+        query = 'SELECT section_uid, count(*) AS count FROM market_item_offers ' + query;
+      }
+
+      // limit is 20 by default, need to increase it to get stats for all sections
+      query += ' GROUP BY section_uid LIMIT 1000';
+    } else {
+      if (need_dist) {
+        query = 'SELECT object_id, GEODIST(latitude, longitude, ?, ?, {in=deg, out=km}) AS calc_dist ' +
               'FROM market_item_offers ' + query;
 
-      params.unshift(env.data.user.location[0]);
-      params.unshift(env.data.user.location[1]);
-    } else {
-      query = 'SELECT object_id FROM market_item_offers ' + query;
+        params.unshift(env.data.user.location[0]);
+        params.unshift(env.data.user.location[1]);
+      } else {
+        query = 'SELECT object_id FROM market_item_offers ' + query;
+      }
+
+      // sort is either `date` or `rel`, sphinx searches by relevance by default
+      if (env.data.search.sort === 'price') {
+        query += ' ORDER BY price ASC';
+      } else if (env.data.search.sort === 'date') {
+        query += ' ORDER BY ts DESC';
+      }
     }
+
+    return [ query, params ];
+  }
+
+
+  // Fetch search result statistics for each section
+  //
+  N.wire.before(apiPath, async function get_section_tree(env) {
+    let [ query, params ] = await build_query(env, true);
+    let counts_by_uid = {};
+
+    if (!env.res.search_error) {
+      for (let { section_uid, count } of await N.search.execute(query, params)) {
+        counts_by_uid[section_uid] = count;
+      }
+    }
+
+    let section_tree = await N.models.market.Section.getChildren();
+
+    // not sanitizing because fetchSections only returns _id, hid and title
+    let all_sections = _.keyBy(await fetchSections(), '_id');
+
+    let sections_sorted = [];
+    let nodes = {};
+
+    // sort result in the same order as ids
+    section_tree.forEach(subsectionInfo => {
+      // ignore linked categories
+      if (subsectionInfo.is_linked) return;
+
+      let foundSection = _.find(all_sections, s => s._id.equals(subsectionInfo._id));
+
+      if (!foundSection) return; // continue
+
+      foundSection = Object.assign({}, foundSection);
+      foundSection.level = subsectionInfo.level;
+      foundSection.parent = subsectionInfo.parent._id ? subsectionInfo.parent._id.toString() : null;
+      foundSection.search_results = counts_by_uid[docid_sections(N, foundSection.hid)] || 0;
+      sections_sorted.push(foundSection);
+      nodes[foundSection._id] = foundSection;
+    });
+
+    let result = [];
+    let expand_sections = { null: true };
+
+    if (env.data.section && !env.data.search.search_all) {
+      expand_sections[env.data.section._id] = true;
+
+      for (let id of await N.models.market.Section.getParentList(env.data.section._id)) {
+        expand_sections[id] = true;
+      }
+    }
+
+    // calculate the number of results, do it in reverse order assuming
+    // that children are always below parents in the list
+    for (let i = sections_sorted.length - 1; i >= 0; i--) {
+      let node = sections_sorted[i];
+
+      if (nodes[node.parent]) {
+        nodes[node.parent].search_results += node.search_results;
+      }
+    }
+
+    env.res.search_stats = sections_sorted.filter(node => {
+      // always show active node and its parents
+      if (expand_sections[node._id]) return true;
+
+      // show siblings only if there are any results found for them
+      if (expand_sections[node.parent] && node.search_results > 0) return true;
+
+      return false;
+    });
+  });
+
+
+  // Send sql query to sphinx, get a response
+  //
+  async function build_item_ids(env) {
+    let [ query, params ] = await build_query(env, false);
 
     if (env.res.search_error) {
       env.data.item_ids = [];
