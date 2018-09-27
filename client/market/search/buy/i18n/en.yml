@@ -1,7 +1,8 @@
 en-US:
   title: Search results
-  no_items: No results found.
-  search_all: All
-  order_by_rel: Order by relevance
-  order_by_date: Order by date
-  order_by_price: Order by price
+  results:
+    no_items: No results found.
+    search_all: All
+    order_by_rel: Order by relevance
+    order_by_date: Order by date
+    order_by_price: Order by price

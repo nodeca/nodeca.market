@@ -1,5 +1,22 @@
+- self.add_raw_data('pagination', self.pagination)
+- self.add_raw_data('search', self.search)
+
 article#content.market-search-buy
-  != self.partial('@common.blocks.navbar.logo_apps')
+  -
+    var navbar_args = {
+      title:    self.t('title'),
+      level_up: self.link_to('market.index.buy'),
+      toolbar:  'market.search.buy.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('market.search.buy', { $query: self.search }),
+        link_bottom: '',
+        current:     0,
+        total:       0
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -16,46 +33,12 @@ article#content.market-search-buy
 
     != self.partial('@market.blocks.search_form_buy')
 
-    .market-search-buy__sections-order-block
-      - var active_section = !self.search.search_all && self.search.section;
-      .market-search-buy__sections
-        .market-search-buy__section(
-          class='market-search-buy__section-level-0'
-          class=!active_section ? 'market-search-buy__section-active' : ''
-        )
-          - var query = Object.assign({}, self.search, { search_all: 'on' });
-          a.market-search-buy__section-title(
-            href=self.link_to('market.search.buy', { $query: query })
-          )= self.t('search_all')
-
-        each section in self.search_stats || []
-          .market-search-buy__section(
-            class='market-search-buy__section-level-' + section.level
-            class=active_section === section._id ? 'market-search-buy__section-active' : ''
-          )
-            - var query = Object.assign({}, self.search, { section: section._id });
-            - delete query.search_all;
-            a.market-search-buy__section-title(
-              href=self.link_to('market.search.buy', { $query: query })
-            )= section.title
-
-            span.market-search-buy__section-count
-              = ' '
-              = section.search_results
-
-      select.market-search-buy__select-order.form-control.custom-select(
-        onchange="$('.market-search-form-buy__submit').click();"
-      )
-        option(value='rel', selected=self.search.sort === 'rel')= self.t('order_by_rel')
-        option(value='date', selected=self.search.sort === 'date')= self.t('order_by_date')
-        option(value='price', selected=self.search.sort === 'price')= self.t('order_by_price')
-
-    if self.items && self.items.length
-      ul.market-search-buy__item-list
-        != self.partial('@market.blocks.search_item_offer_list')
-    else
-      .market-search-buy__error
-        if self.search_error
-          != self.search_error
-        else
-          != self.t('no_items')
+    .market-search-buy__results._affix(
+      data-affix-bottom={
+        offset:     500,
+        wire_below: 'market.search.buy:load_next',
+        throttle:   100
+      }
+    )
+      .market-search-buy__loading-next.nojs-hide
+        span.icon.icon-loading-placeholder

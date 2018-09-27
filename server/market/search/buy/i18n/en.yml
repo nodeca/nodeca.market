@@ -1,3 +1,4 @@
 en-US:
-  err_query_too_short: Query is too short
-  err_invalid_price_range: Price range is invalid
+  results:
+    err_query_too_short: Query is too short
+    err_invalid_price_range: Price range is invalid

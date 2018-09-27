@@ -316,7 +316,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
 
       pageState.top_marker    = res.items[0]._id;
       pageState.first_offset  = res.pagination.chunk_offset;
-      pageState.item_count   = res.pagination.total;
+      pageState.item_count    = res.pagination.total;
 
       // update prev/next metadata
       $('link[rel="prev"]').remove();
@@ -414,7 +414,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
 
       pageState.bottom_marker = res.items[res.items.length - 1]._id;
       pageState.first_offset  = res.pagination.chunk_offset - $('.market-section-buy-item').length;
-      pageState.topic_count   = res.pagination.total;
+      pageState.item_count    = res.pagination.total;
 
       // update prev/next metadata
       $('link[rel="next"]').remove();
