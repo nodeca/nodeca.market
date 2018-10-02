@@ -5,3 +5,53 @@
 
 .market-search-wish__title
   flex 1 1 0%
+
+.market-search-wish__sections-order-block
+  margin-top 1rem
+  display flex
+
+.market-search-wish__sections
+  flex 1 1 0%
+
+.market-search-wish__select-order
+  width auto
+
+$max-section-indent = 5
+
+.market-search-wish__section
+  margin-left 20px * ($max-section-indent - 1)
+
+for $level in (0..$max-section-indent - 2)
+  .market-search-wish__section-level-{$level}
+    margin-left 20px * $level
+
+.market-search-wish__section-active
+  font-weight bold
+
+.market-search-wish__section-title
+  color $body-color
+
+.market-search-wish__section-count
+  color $body-color-secondary
+  vertical-align sub
+  font-size $font-size-xs
+
+.market-search-wish__item-list
+  margin 0
+  padding 0
+  list-style none
+
+.market-search-wish__error
+  margin-top 1rem
+
+.market-search-wish__loading-next
+  padding 2rem
+  font-size 4rem
+  line-height 1.1em
+  text-align center
+  background-color $body-bg-secondary
+  color $body-color-secondary + 50%
+  border-radius 4px
+  margin-bottom 2rem
+  margin-top 1rem
+  clear both

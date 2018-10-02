@@ -1,0 +1,47 @@
+.market-search-wish__sections-order-block
+  - var active_section = !self.search.search_all && self.search.section;
+  .market-search-wish__sections
+    .market-search-wish__section(
+      class='market-search-wish__section-level-0'
+      class=!active_section ? 'market-search-wish__section-active' : ''
+    )
+      - var query = Object.assign({}, self.search, { search_all: true });
+      a.market-search-wish__section-title(
+        href=self.link_to('market.search.wish', { $query: query })
+      )= self.t('search_all')
+
+    each section in self.search_stats || []
+      .market-search-wish__section(
+        class='market-search-wish__section-level-' + section.level
+        class=active_section === section._id ? 'market-search-wish__section-active' : ''
+      )
+        - var query = Object.assign({}, self.search, { section: section._id });
+        - delete query.search_all;
+        a.market-search-wish__section-title(
+          href=self.link_to('market.search.wish', { $query: query })
+        )= section.title
+
+        span.market-search-wish__section-count
+          = ' '
+          = section.search_results
+
+  select.market-search-wish__select-order.form-control.custom-select(
+    onchange="$('.market-search-form-wish__submit').click();"
+  )
+    option(value='rel', selected=self.search.sort === 'rel')= self.t('order_by_rel')
+    option(value='date', selected=self.search.sort === 'date')= self.t('order_by_date')
+
+if self.items && self.items.length
+  ul.market-search-wish__item-list
+    != self.partial('@market.blocks.search_item_wish_list')
+
+  .market-search-wish__loading-next.nojs-hide(
+    class=(self.reached_end ? 'd-none' : '')
+  )
+    span.icon.icon-loading-placeholder
+else
+  .market-search-wish__error
+    if self.search_error
+      != self.search_error
+    else
+      != self.t('no_items')

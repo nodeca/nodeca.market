@@ -184,14 +184,10 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
     N.io.rpc('market.search.buy.results',
       Object.assign({}, pageState.search, { skip: pageState.bottom_marker, limit: pageState.per_page })
     ).then(res => {
-      if (!res.items) return;
-
       if (res.reached_end) {
         pageState.reached_end = true;
         reset_loading_placeholders();
       }
-
-      if (res.items.length === 0) return;
 
       pageState.bottom_marker += res.items.length;
       pageState.first_offset  = res.pagination.chunk_offset - $('.market-search-buy-item').length;

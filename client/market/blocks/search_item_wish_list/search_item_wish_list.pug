@@ -1,0 +1,49 @@
+- self.users = self.users || {};
+
+each item in self.items
+  if (self.ignored_users[item.user] && !self.settings.market_show_ignored)
+    //- skip entries created by ignored users
+
+  else
+    - var section = self.sections_by_id[item.section] || {};
+
+    li.market-search-wish-item(
+      id='item' + item.hid
+      class=(self.ignored_users[item.user]) ? 'market-search-wish-item__m-ignored' : ''
+      data-item-id=item._id
+      data-item-hid=item.hid
+    )
+      .market-search-wish-item__title
+        a.market-search-wish-item__title-text(href=self.link_to('market.item.wish', { section_hid: section.hid, item_hid: item.hid }))
+          = item.title
+
+      .market-search-wish-item__location
+        if item.location
+          a.market-search-wish-item__location-link(
+            href= '#'
+            data-on-click= 'common.blocks.location_show_dlg'
+            data-latitude= item.location && item.location[1]
+            data-longitude= item.location && item.location[0]
+          )
+            span.icon.icon-location.icon-space-after
+
+            if self.location_names[item.location[0] + ':' + item.location[1]]
+              = self.location_names[item.location[0] + ':' + item.location[1]]
+
+      .market-search-wish-item__details
+        .market-search-wish-item__details-item!= self.timetag(item.ts, 'relative')
+        .market-search-wish-item__details-item
+          - var user = self.users[item.user];
+          if user
+            a.market-search-wish-item__user-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=user._id
+              data-user-ref='market_search_wish_item:'+section.hid+':'+item.hid
+            )
+              span.market-search-wish-item__ignored-mark.icon.icon-ignore.icon-space-after
+              = user.name
+        .market-search-wish-item__details-item
+          a.market-search-wish-item__section-link(
+            href=self.link_to('market.section.wish', { section_hid: section.hid })
+          )
+            = section.title

@@ -1,4 +1,5 @@
-// Search in market
+// Search placeholder page for market, shows search input only;
+// it doesn't return any results to prevent heavy load from bots
 //
 
 'use strict';
@@ -17,7 +18,8 @@ module.exports = function (N, apiPath) {
         query:              { type: 'string' },
         section:            { format: 'mongo' },
         search_all:         { type: 'string' },
-        range:              { type: 'string' }
+        range:              { type: 'string' },
+        sort:               { type: 'string' }
       },
       additionalProperties: true
     }
@@ -27,9 +29,11 @@ module.exports = function (N, apiPath) {
   // Fetch section
   //
   N.wire.before(apiPath, async function fetch_section(env) {
-    if (!env.params.$query || !env.params.$query.section) return;
+    let params = env.params.$query || {};
 
-    env.data.section = await N.models.market.Section.findById(env.params.$query.section)
+    if (!params.section) return;
+
+    env.data.section = await N.models.market.Section.findById(params.section)
                                  .lean(true);
 
     if (!env.data.section) return;
@@ -38,28 +42,50 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch current user
+  //
+  N.wire.before(apiPath, async function fetch_user(env) {
+    env.data.user = await N.models.users.User.findOne({ _id: env.user_info.user_id });
+  });
+
+
   // Normalize search params
   //
   N.wire.before(apiPath, async function normalize_params(env) {
-    let $query = env.params.$query;
+    let params = env.params.$query || {};
 
     env.data.search = {};
+    env.data.search.query = params.query || '';
 
-    if ($query.query)      env.data.search.query = $query.query;
-    if ($query.search_all) env.data.search.search_all = true;
+    if (params.search_all) env.data.search.search_all = true;
 
-    if (Number($query.range) > 0) {
-      env.data.search.range = Number($query.range) >= 150 ? 200 : 100;
+    if (Number(params.range) > 0 && env.data.user.location) {
+      // get nearest available range
+      env.data.search.range = Number(params.range) >= 150 ? 200 : 100;
     }
 
     if (env.data.section) env.data.search.section = env.data.section._id;
 
     env.res.search = env.data.search;
+
+    env.data.search.sort = [ 'rel', 'date' ].indexOf(params.sort) ? params.sort : 'rel';
   });
 
 
-  N.wire.on(apiPath, async function todo() {
-    // TODO
+  // Fill head meta
+  //
+  N.wire.on(apiPath, async function fill_head(env) {
+    env.res.head = env.res.head || {};
+    env.res.head.title = env.t('title');
+    env.res.head.robots = 'noindex,nofollow';
+
+    env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
+
+    env.res.pagination = {
+      total:        0,
+      per_page:     env.data.items_per_page,
+      chunk_offset: 0
+    };
   });
 
 
@@ -93,14 +119,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fill head meta
-  //
-  N.wire.after(apiPath, function fill_head(env) {
-    env.res.head = env.res.head || {};
-    env.res.head.title = env.t('title');
-  });
-
-
   // Fill breadcrumbs info
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
@@ -111,7 +129,6 @@ module.exports = function (N, apiPath) {
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
-    // TODO: remove this, duplicate
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'market_can_create_items',
       'market_displayed_currency'

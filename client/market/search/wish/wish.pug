@@ -1,5 +1,22 @@
+- self.add_raw_data('pagination', self.pagination)
+- self.add_raw_data('search', self.search)
+
 article#content.market-search-wish
-  != self.partial('@common.blocks.navbar.logo_apps')
+  -
+    var navbar_args = {
+      title:    self.t('title'),
+      level_up: self.link_to('market.index.wish'),
+      toolbar:  'market.search.wish.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('market.search.wish', { $query: self.search }),
+        link_bottom: '',
+        current:     0,
+        total:       0
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -15,3 +32,13 @@ article#content.market-search-wish
       != self.partial('@market.search.wish.blocks.toolbar_controls')
 
     != self.partial('@market.blocks.search_form_wish')
+
+    .market-search-wish__results._affix(
+      data-affix-bottom={
+        offset:     500,
+        wire_below: 'market.search.wish:load_next',
+        throttle:   100
+      }
+    )
+      .market-search-wish__loading-next.nojs-hide
+        span.icon.icon-loading-placeholder
