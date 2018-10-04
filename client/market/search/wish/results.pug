@@ -28,8 +28,8 @@
   select.market-search-wish__select-order.form-control.custom-select(
     onchange="$('.market-search-form-wish__submit').click();"
   )
-    option(value='rel', selected=self.search.sort === 'rel')= self.t('order_by_rel')
-    option(value='date', selected=self.search.sort === 'date')= self.t('order_by_date')
+    each sort_type in self.sort_types
+      option(value=sort_type, selected=self.search.sort === sort_type)= self.t('sort_' + sort_type)
 
 if self.items && self.items.length
   ul.market-search-wish__item-list

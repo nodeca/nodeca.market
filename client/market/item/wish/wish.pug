@@ -139,7 +139,12 @@ article#content.market-item-wish(
         = self.t('no_responses')
 
       else if self.runtime.is_member
-        button.btn.btn-secondary= self.t('contact')
+        button.btn.btn-secondary(
+          data-on-click='market.item.wish:contact'
+          data-to-nick=user.nick
+          data-to-hid=user.hid
+          data-ref='market_item_wish:'+self.section.hid+':'+self.item.hid
+        )= self.t('contact')
 
     if self.similar_items && self.similar_items.length > 0
       .market-item-wish-similar

@@ -39,7 +39,7 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
   if show_options
     #market_search_options.collapse
       .market-search-form-buy__options-inner
-        .row
+        .market-search-form-buy__options-inner-row.row
           .col
             .form-check.form-check-inline
               input.form-check-input#market_search_options_only_new(type='checkbox', name='is_new', checked=self.search.is_new)
@@ -53,7 +53,7 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
               input.form-check-input#market_search_options_delivery(type='checkbox', name='delivery', checked=self.search.delivery)
               label.form-check-label(for='market_search_options_delivery')= self.t('delivery')
 
-        .row
+        .market-search-form-buy__options-inner-row.row
           .col
             .form-group.market-search-form-buy__options-control
               label.market-search-form-buy__options-control-label= self.t('price')

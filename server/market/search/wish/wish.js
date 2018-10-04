@@ -7,6 +7,10 @@
 
 const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 
+// Available sort types, first one is the default
+//
+const SORT_TYPES = [ 'date_desc', 'date_asc', 'rel' ];
+
 
 module.exports = function (N, apiPath) {
 
@@ -67,8 +71,9 @@ module.exports = function (N, apiPath) {
     if (env.data.section) env.data.search.section = env.data.section._id;
 
     env.res.search = env.data.search;
+    env.res.sort_types = SORT_TYPES;
 
-    env.data.search.sort = [ 'rel', 'date' ].indexOf(params.sort) ? params.sort : 'rel';
+    env.data.search.sort = SORT_TYPES.indexOf(params.sort) ? params.sort : SORT_TYPES[0];
   });
 
 

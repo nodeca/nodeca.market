@@ -19,6 +19,10 @@ const MAX_SKIP = 1000;
 //
 const MAX_LIMIT = 50;
 
+// Available sort types, first one is the default
+//
+const SORT_TYPES = [ 'date_desc', 'date_asc', 'price_asc', 'price_desc', 'rel' ];
+
 
 module.exports = function (N, apiPath) {
 
@@ -105,8 +109,9 @@ module.exports = function (N, apiPath) {
     if (env.data.section) env.data.search.section = env.data.section._id;
 
     env.res.search = env.data.search;
+    env.res.sort_types = SORT_TYPES;
 
-    env.data.search.sort = [ 'rel', 'date', 'price' ].indexOf(params.sort) ? params.sort : 'rel';
+    env.data.search.sort = SORT_TYPES.indexOf(params.sort) ? params.sort : SORT_TYPES[0];
 
     // check query length because 1-character requests consume too much resources
     if (env.data.search.query.trim().length < 2) {
@@ -224,11 +229,15 @@ module.exports = function (N, apiPath) {
         query = 'SELECT object_id FROM market_item_offers ' + query;
       }
 
-      // sort is either `date` or `rel`, sphinx searches by relevance by default
-      if (env.data.search.sort === 'price') {
-        query += ' ORDER BY price ASC';
-      } else if (env.data.search.sort === 'date') {
+      // sphinx searches by relevance by default
+      if (env.data.search.sort === 'date_asc') {
+        query += ' ORDER BY ts ASC';
+      } else if (env.data.search.sort === 'date_desc') {
         query += ' ORDER BY ts DESC';
+      } else if (env.data.search.sort === 'price_asc') {
+        query += ' ORDER BY price ASC';
+      } else if (env.data.search.sort === 'price_desc') {
+        query += ' ORDER BY price DESC';
       }
 
       query += ' LIMIT ?,?';

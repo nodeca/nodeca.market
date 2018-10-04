@@ -56,6 +56,18 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // User clicks on "contact" button, create dialog with necessary info
+  // (this is the same API that usercard is using, so users.dialog.create:begin hook below works)
+  //
+  N.wire.on(module.apiPath + ':contact', function create_dialog(data) {
+    return N.wire.emit('users.dialog.create:begin', {
+      nick: data.$this.data('to-nick'),
+      hid: data.$this.data('to-hid'),
+      ref: data.$this.data('ref')
+    });
+  });
+
+
   // When user clicks "create dialog" button in usercard popup,
   // add title & link to editor.
   //
