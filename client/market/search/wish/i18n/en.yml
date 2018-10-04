@@ -1,5 +1,7 @@
 en-US:
   title: Search results
+  msg_multiselect: Multiselect on
+
   results:
     no_items: No results found
     search_all: All

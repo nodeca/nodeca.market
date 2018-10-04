@@ -1,7 +1,8 @@
 'use strict';
 
 
-const _ = require('lodash');
+const _   = require('lodash');
+const bag = require('bagjs')({ prefix: 'nodeca' });
 
 
 // Page state
@@ -29,6 +30,7 @@ const _ = require('lodash');
 // - per_page:           amount of items loaded on each request (for prefetch)
 // - bottom_marker:      last item id (for prefetch)
 // - first_page_loaded:  true if results block (section stats + first N results) has been loaded
+// - selected_items:     array of selected items
 //
 let pageState = {};
 
@@ -70,6 +72,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   pageState.next_loading_start = 0;
   pageState.bottom_marker      = 0;
   pageState.first_page_loaded  = false;
+  pageState.selected_items     = [];
 
   $window.scrollTop(0);
 });
@@ -215,6 +218,14 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       }
 
       return N.wire.emit('navigate.update', navigate_update_params).then(() => {
+        // Update selection state
+        _.intersection(pageState.selected_items, _.map(res.items, '_id')).forEach(itemId => {
+          $(`.market-search-buy-item[data-item-id="${itemId}"]`)
+            .addClass('market-search-buy-item__m-selected')
+            .find('.market-search-buy-item__select-cb')
+            .prop('checked', true);
+        });
+
         // reset lock
         pageState.next_loading_start = 0;
 
@@ -243,4 +254,183 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       params.text = `Re: [${title}](${href})\n\n`;
     }
   });
+});
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Many items selection
+//
+
+function updateToolbar() {
+}
+
+
+let selected_items_key;
+// Flag shift key pressed
+let shift_key_pressed = false;
+// DOM element of first selected item (for many check)
+let $many_select_start;
+
+
+// Handle shift keyup event
+//
+function key_up(event) {
+  // If shift still pressed
+  if (event.shiftKey) return;
+
+  shift_key_pressed = false;
+}
+
+
+// Handle shift keydown event
+//
+function key_down(event) {
+  if (event.shiftKey) {
+    shift_key_pressed = true;
+  }
+}
+
+
+// Save selected items + debounced
+//
+function save_selected_items_immediate() {
+  if (pageState.selected_items.length) {
+    // Expire after 1 day
+    bag.set(selected_items_key, pageState.selected_items, 60 * 60 * 24).catch(() => {});
+  } else {
+    bag.remove(selected_items_key).catch(() => {});
+  }
+}
+const save_selected_items = _.debounce(save_selected_items_immediate, 500);
+
+
+// Load previously selected items
+//
+N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_selected_items() {
+  selected_items_key = `market_search_buy_selected_items_${N.runtime.user_hid}`;
+
+  $(document)
+    .on('keyup', key_up)
+    .on('keydown', key_down);
+
+  // Don't need wait here
+  bag.get(selected_items_key)
+    .then(ids => {
+      ids = ids || [];
+      pageState.selected_items = ids;
+      pageState.selected_items.forEach(itemId => {
+        $(`.market-search-buy-item[data-item-id="${itemId}"]`)
+          .addClass('market-search-buy-item__m-selected')
+          .find('.market-search-buy-item__select-cb')
+          .prop('checked', true);
+      });
+
+      return ids.length ? updateToolbar() : null;
+    })
+    .catch(() => {}); // Suppress storage errors
+});
+
+
+// Init handlers
+//
+N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_init() {
+
+  // Update array of selected items on selection change
+  //
+  N.wire.on(module.apiPath + ':item_check', function market_item_select(data) {
+    let itemId = data.$this.data('item-id');
+
+    if (data.$this.is(':checked') && pageState.selected_items.indexOf(itemId) === -1) {
+      // Select
+      //
+      if ($many_select_start) {
+
+        // If many select started
+        //
+        let $item = data.$this.closest('.market-search-buy-item');
+        let $start = $many_select_start;
+        let itemsBetween;
+
+        $many_select_start = null;
+
+        // If current after `$many_select_start`
+        if ($start.index() < $item.index()) {
+          // Get items between start and current
+          itemsBetween = $start.nextUntil($item, '.market-search-buy-item');
+        } else {
+          // Between current and start (in reverse order)
+          itemsBetween = $item.nextUntil($start, '.market-search-buy-item');
+        }
+
+        itemsBetween.each(function () {
+          let id = $(this).data('item-id');
+
+          if (pageState.selected_items.indexOf(id) === -1) {
+            pageState.selected_items.push(id);
+          }
+
+          $(this).find('.market-search-buy-item__select-cb').prop('checked', true);
+          $(this).addClass('market-search-buy-item__m-selected');
+        });
+
+        pageState.selected_items.push(itemId);
+        $item.addClass('market-search-buy-item__m-selected');
+
+
+      } else if (shift_key_pressed) {
+        // If many select not started and shift key pressed
+        //
+        let $item = data.$this.closest('.market-search-buy-item');
+
+        $many_select_start = $item;
+        $item.addClass('market-search-buy-item__m-selected');
+        pageState.selected_items.push(itemId);
+
+        N.wire.emit('notify.info', t('msg_multiselect'));
+
+
+      } else {
+        // No many select
+        //
+        data.$this.closest('.market-search-buy-item').addClass('market-search-buy-item__m-selected');
+        pageState.selected_items.push(itemId);
+      }
+
+
+    } else if (!data.$this.is(':checked') && pageState.selected_items.indexOf(itemId) !== -1) {
+      // Unselect
+      //
+      data.$this.closest('.market-search-buy-item').removeClass('market-search-buy-item__m-selected');
+      pageState.selected_items = _.without(pageState.selected_items, itemId);
+    }
+
+    save_selected_items();
+    return updateToolbar();
+  });
+
+
+  // Unselect all items
+  //
+  N.wire.on(module.apiPath + ':items_unselect', function market_items_unselect() {
+    pageState.selected_items = [];
+
+    $('.market-search-buy-item__select-cb:checked').each(function () {
+      $(this)
+        .prop('checked', false)
+        .closest('.market-search-buy-item')
+        .removeClass('market-search-buy-item__m-selected');
+    });
+
+    save_selected_items();
+    return updateToolbar();
+  });
+});
+
+
+// Teardown many item selection
+//
+N.wire.on('navigate.exit:' + module.apiPath, function market_item_selection_teardown() {
+  $(document)
+    .off('keyup', key_up)
+    .off('keydown', key_down);
 });

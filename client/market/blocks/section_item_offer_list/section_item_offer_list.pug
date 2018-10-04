@@ -1,5 +1,8 @@
 - self.users = self.users || {};
 
+//- show many operations checkbox
+- var multiselect_allowed = false;
+
 each item in self.items
   if (self.ignored_users[item.user] && !self.settings.market_show_ignored)
     //- skip entries created by ignored users
@@ -64,3 +67,11 @@ each item in self.items
               )
                 span.market-section-buy-item__ignored-mark.icon.icon-ignore.icon-space-after
                 = user.name
+
+      if multiselect_allowed
+        label.market-section-buy-item__select(title=self.t('multiselect_hint'))
+          input.market-section-buy-item__select-cb(
+            type='checkbox'
+            data-item-id=item._id
+            data-on-change='market.section.buy:item_check'
+          )

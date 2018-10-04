@@ -1,7 +1,11 @@
 @import "nodeca.core/client/common/_variables"
 
 .market-section-wish-item
+  display flex
   margin-top 1rem
+
+.market-section-wish-item__info
+  flex 1 1 auto
 
 .market-section-wish-item__title
   font-size $font-size-lg
@@ -38,3 +42,6 @@
   animation market-section-wish-item-flash-animation 1.5s
   .market-section-wish-item__highlight-marker
     display block
+
+.market-section-wish-item__m-selected
+  background-color #ffd

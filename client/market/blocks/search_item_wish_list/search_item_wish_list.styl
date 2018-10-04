@@ -1,7 +1,11 @@
 @import "nodeca.core/client/common/_variables"
 
 .market-search-wish-item
+  display flex
   margin-top 1rem
+
+.market-search-wish-item__info
+  flex 1 1 auto
 
 .market-search-wish-item__title
   font-size $font-size-lg
@@ -29,3 +33,6 @@
 .market-search-wish-item__details-item + .market-search-wish-item__details-item
   &:before
     content ' | '
+
+.market-search-wish-item__m-selected
+  background-color #ffd
