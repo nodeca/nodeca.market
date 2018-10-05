@@ -41,7 +41,7 @@ form.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:sear
       .market-search-form-wish__options-inner
         .market-search-form-wish__options-inner-row.row
           if self.location_available
-            .col
+            .col-md-4.col-12.mb-2.mb-sm-0
               .form-group.market-search-form-wish__options-control
                 label.market-search-form-wish__options-control-label(for='market_search_options_location')= self.t('location')
                 select.form-control.custom-select#market_search_options_location(

@@ -40,21 +40,21 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
     #market_search_options.collapse
       .market-search-form-buy__options-inner
         .market-search-form-buy__options-inner-row.row
-          .col
-            .form-check.form-check-inline
+          .col-12
+            .market-search-form-buy__options-inner-row-check.form-check.form-check-inline
               input.form-check-input#market_search_options_only_new(type='checkbox', name='is_new', checked=self.search.is_new)
               label.form-check-label(for='market_search_options_only_new')= self.t('only_new')
 
-            .form-check.form-check-inline
+            .market-search-form-buy__options-inner-row-check.form-check.form-check-inline
               input.form-check-input#market_search_options_barter(type='checkbox', name='barter', checked=self.search.barter)
               label.form-check-label(for='market_search_options_barter')= self.t('barter')
 
-            .form-check.form-check-inline
+            .market-search-form-buy__options-inner-row-check.form-check.form-check-inline
               input.form-check-input#market_search_options_delivery(type='checkbox', name='delivery', checked=self.search.delivery)
               label.form-check-label(for='market_search_options_delivery')= self.t('delivery')
 
         .market-search-form-buy__options-inner-row.row
-          .col
+          .col-lg-6.col-md-8.col-12.mb-2.mb-sm-0
             .form-group.market-search-form-buy__options-control
               label.market-search-form-buy__options-control-label= self.t('price')
 
@@ -73,7 +73,7 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
                     option(value=currency, selected=currency===self.search.price_min_currency)= self.t.exists('@market.currencies.' + currency + '.sign') ? self.t('@market.currencies.' + currency + '.sign') : currency
 
           if self.location_available
-            .col
+            .col-md-4.col-12.mb-2.mb-sm-0
               .form-group.market-search-form-buy__options-control
                 label.market-search-form-buy__options-control-label(for='market_search_options_location')= self.t('location')
                 select.form-control.custom-select#market_search_options_location(
