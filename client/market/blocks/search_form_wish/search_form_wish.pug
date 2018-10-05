@@ -1,7 +1,7 @@
 - self.search = self.search || {};
 - var show_options = !!self.location_available;
 
-form.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:search')
+form.form-inline.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:search')
   if self.section
     input(
       type='hidden'
@@ -32,19 +32,19 @@ form.market-search-form-wish(data-on-submit='market.blocks.search_form_wish:sear
         )= self.t('options')
 
       if self.section
-        .form-check.form-check-inline.market-search-form-wish__meta-item
+        .form-check-inline.market-search-form-wish__meta-item
           input.form-check-input#market_search_all(type='checkbox', name='search_all', checked=self.search.search_all)
           label.form-check-label.market-search-form-wish__search-all-label(for='market_search_all')= self.t('search_all')
 
   if show_options
-    #market_search_options.collapse
+    .market-search-form-wish__options#market_search_options.collapse
       .market-search-form-wish__options-inner
         .market-search-form-wish__options-inner-row.row
           if self.location_available
-            .col-md-4.col-12.mb-2.mb-sm-0
+            .col-12
               .form-group.market-search-form-wish__options-control
                 label.market-search-form-wish__options-control-label(for='market_search_options_location')= self.t('location')
-                select.form-control.custom-select#market_search_options_location(
+                select.form-control.custom-select.market-search-form-wish__location#market_search_options_location(
                   name='range'
                   onchange="$('.market-search-form-wish__submit').click();"
                 )

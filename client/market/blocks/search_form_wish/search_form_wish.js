@@ -11,23 +11,29 @@ const OPTIONS_STORE_KEY = 'market_search_form_expanded';
 // Expand search form on page load
 //
 N.wire.on(module.apiPath + ':init', function search_init() {
-  return bag.get(OPTIONS_STORE_KEY).then(expanded => {
+  return bag.get(OPTIONS_STORE_KEY).then(({ expanded }) => {
     if (expanded) $('#market_search_options').addClass('show');
-  });
+  }).catch(() => {}); // suppress storage errors
 });
+
+
+function save_search_bar_options() {
+  let expanded = $('#market_search_options').hasClass('show');
+
+  return bag.set(OPTIONS_STORE_KEY, { expanded })
+            .catch(() => {}); // suppress storage errors
+}
 
 
 // Toggle form options
 //
 N.wire.on(module.apiPath + ':search_options', function do_options() {
-  return bag.get(OPTIONS_STORE_KEY).then(expanded => {
-    expanded = !expanded;
+  let expanded = !$('#market_search_options').hasClass('show');
 
-    if (expanded) $('#market_search_options').collapse('show');
-    else $('#market_search_options').collapse('hide');
+  if (expanded) $('#market_search_options').collapse('show');
+  else $('#market_search_options').collapse('hide');
 
-    return bag.set(OPTIONS_STORE_KEY, expanded);
-  });
+  save_search_bar_options();
 });
 
 

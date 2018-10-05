@@ -1,7 +1,7 @@
 - self.search = self.search || {};
 - var show_options = true;
 
-form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search')
+form.form-inline.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search')
   if self.section
     input(
       type='hidden'
@@ -32,35 +32,38 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
         )= self.t('options')
 
       if self.section
-        span.form-check.form-check-inline.market-search-form-buy__meta-item
+        span.form-check-inline.market-search-form-buy__meta-item
           input.form-check-input#market_search_all(type='checkbox', name='search_all', checked=self.search.search_all)
           label.form-check-label(for='market_search_all')= self.t('search_all')
 
   if show_options
-    #market_search_options.collapse
+    .market-search-form-buy__options#market_search_options.collapse
       .market-search-form-buy__options-inner
         .market-search-form-buy__options-inner-row.row
-          .col-12
-            .market-search-form-buy__options-inner-row-check.form-check.form-check-inline
+          .col
+            .market-search-form-buy__options-inner-row-check.form-check-inline
               input.form-check-input#market_search_options_only_new(type='checkbox', name='is_new', checked=self.search.is_new)
               label.form-check-label(for='market_search_options_only_new')= self.t('only_new')
 
-            .market-search-form-buy__options-inner-row-check.form-check.form-check-inline
+            .market-search-form-buy__options-inner-row-check.form-check-inline
               input.form-check-input#market_search_options_barter(type='checkbox', name='barter', checked=self.search.barter)
               label.form-check-label(for='market_search_options_barter')= self.t('barter')
 
-            .market-search-form-buy__options-inner-row-check.form-check.form-check-inline
+            .market-search-form-buy__options-inner-row-check.form-check-inline
               input.form-check-input#market_search_options_delivery(type='checkbox', name='delivery', checked=self.search.delivery)
               label.form-check-label(for='market_search_options_delivery')= self.t('delivery')
 
         .market-search-form-buy__options-inner-row.row
-          .col-lg-6.col-md-8.col-12.mb-2.mb-sm-0
+          .col-md-6.col-12
             .form-group.market-search-form-buy__options-control
               label.market-search-form-buy__options-control-label= self.t('price')
 
               .input-group.market-search-form-buy__price
                 input.form-control.market-search-form-buy__price-value(type='number', step=0.01, min=0, name='price_min_value', value=self.search.price_min_value, placeholder=self.t('price_min_placeholder'))
-                select.form-control.custom-select.input-group-append.market-search-form-buy__price-currency(name='price_min_currency')
+                select.form-control.custom-select.input-group-append.market-search-form-buy__price-currency(
+                  name='price_min_currency'
+                  data-on-change='market.blocks.search_form_buy:price_change'
+                )
                   each currency in self.currency_types
                     option(value=currency, selected=currency===self.search.price_max_currency)= self.t.exists('@market.currencies.' + currency + '.sign') ? self.t('@market.currencies.' + currency + '.sign') : currency
 
@@ -68,15 +71,18 @@ form.market-search-form-buy(data-on-submit='market.blocks.search_form_buy:search
 
               .input-group.market-search-form-buy__price
                 input.form-control.market-search-form-buy__price-value(type='number', step=0.01, min=0, name='price_max_value', value=self.search.price_max_value, placeholder=self.t('price_max_placeholder'))
-                select.form-control.custom-select.input-group-append.market-search-form-buy__price-currency(name='price_max_currency')
+                select.form-control.custom-select.input-group-append.market-search-form-buy__price-currency(
+                  name='price_max_currency'
+                  data-on-change='market.blocks.search_form_buy:price_change'
+                )
                   each currency in self.currency_types
                     option(value=currency, selected=currency===self.search.price_min_currency)= self.t.exists('@market.currencies.' + currency + '.sign') ? self.t('@market.currencies.' + currency + '.sign') : currency
 
           if self.location_available
-            .col-md-4.col-12.mb-2.mb-sm-0
+            .col-md-6.col-12
               .form-group.market-search-form-buy__options-control
                 label.market-search-form-buy__options-control-label(for='market_search_options_location')= self.t('location')
-                select.form-control.custom-select#market_search_options_location(
+                select.form-control.custom-select.market-search-form-buy__location#market_search_options_location(
                   name='range'
                   onchange="$('.market-search-form-buy__submit').click();"
                 )
