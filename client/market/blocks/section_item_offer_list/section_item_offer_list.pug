@@ -14,7 +14,7 @@ each item in self.items
       data-item-id=item._id
       data-item-hid=item.hid
     )
-      .market-section-buy-item__photo.thumb
+      a.market-section-buy-item__photo.thumb(href=self.link_to('market.item.buy', { section_hid: self.section.hid, item_hid: item.hid }))
         if item.files && item.files.length > 0
           img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
         else

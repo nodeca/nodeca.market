@@ -50,7 +50,12 @@ article#content.market-item-buy(
         each file in self.item.files
           li.market-item-buy__attach-item.thumb-grid__item
             .thumb-grid__item-inner
-              .thumb
+              a.thumb(
+                href=self.link_to('core.gridfs', { bucket: file })
+                data-toggle='lightbox'
+                data-type='image'
+                data-gallery='market-gallery'
+              )
                 img.thumb__image(src=self.link_to('core.gridfs', { bucket: file + '_sm' }))
 
     .market-item-buy__description.markup!= self.item.html
@@ -178,7 +183,9 @@ article#content.market-item-buy(
         ul.market-item-buy-similar__item-list
           each s in self.similar_items
             li.market-item-buy-similar-item
-              .market-item-buy-similar-item__photo.thumb
+              a.market-item-buy-similar-item__photo.thumb(
+                href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid })
+              )
                 if s.item.files && s.item.files.length > 0
                   img.thumb__image(src=self.link_to('core.gridfs', { bucket: s.item.files[0] + '_sm' }))
                 else
