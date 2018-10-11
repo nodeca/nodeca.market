@@ -37,8 +37,26 @@ router:
           match: /\d+/
           type: integer
 
+    market.item.buy.edit:
+      "/market/cat{section_hid}/{item_hid}/edit":
+        section_hid:
+          match: /\d+/
+          type: integer
+        item_hid:
+          match: /\d+/
+          type: integer
+
     market.item.wish:
       "/market/wish/cat{section_hid}/{item_hid}":
+        section_hid:
+          match: /\d+/
+          type: integer
+        item_hid:
+          match: /\d+/
+          type: integer
+
+    market.item.wish.edit:
+      "/market/wish/cat{section_hid}/{item_hid}/edit":
         section_hid:
           match: /\d+/
           type: integer

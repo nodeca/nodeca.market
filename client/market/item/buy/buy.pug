@@ -26,7 +26,14 @@ article#content.market-item-buy(
 
     header.page-head.market-item-buy__head
       .market-item-buy__title-toolbar
-        h1.market-item-buy__title.page-head__title(itemprop='name')= self.item.title
+        h1.market-item-buy__title.page-head__title(itemprop='name')
+          span.market-item-buy__title-text= self.item.title
+
+          if user && user._id === self.runtime.user_id
+            a.market-item-buy__edit.icon.icon-edit(
+              href=self.link_to('market.item.buy.edit', { section_hid: self.section.hid, item_hid: self.item.hid })
+              title=self.t('edit')
+            )
 
         .market-item-buy__price
           - var price = self.item.price || {};

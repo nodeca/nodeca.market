@@ -1,0 +1,9 @@
+en-US:
+  title: Edit offer
+  section_placeholder: ''
+  field_title: Title
+  field_section: Category
+  field_description: Description
+  mode_preview: (preview)
+  mode_edit: (edit)
+  submit: Publish

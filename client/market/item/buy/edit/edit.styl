@@ -1,0 +1,27 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-item-buy-edit__currency.market-item-buy-edit__currency
+  flex 0 0 4em
+
+.market-item-buy-edit__preview
+  border 1px dashed $input-border-color
+  padding .5rem
+  border-radius 4px
+  overflow-y auto
+
+  .quote__author-avatar
+    background-color $decorator-color
+
+.market-item-buy-edit__attach-controls
+  position absolute
+  right 0
+  bottom 0
+
+.market-item-buy-edit__attach-control-item > .btn-link
+  color $body-color-secondary + 20%
+  text-shadow 0 0 1px ($body-color-secondary - 60%)
+  &:hover
+    color $body-color-secondary + 40%
+
+.market-item-buy-edit__attach-main
+  color $body-color-secondary

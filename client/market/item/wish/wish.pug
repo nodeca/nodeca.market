@@ -26,7 +26,14 @@ article#content.market-item-wish(
 
     header.page-head.market-item-wish__head
       .market-item-wish__title-toolbar
-        h1.market-item-wish__title.page-head__title(itemprop='name')= self.item.title
+        h1.market-item-wish__title.page-head__title(itemprop='name')
+          span.market-item-wish__title-text= self.item.title
+
+          if user && user._id === self.runtime.user_id
+            a.market-item-wish__edit.icon.icon-edit(
+              href=self.link_to('market.item.wish.edit', { section_hid: self.section.hid, item_hid: self.item.hid })
+              title=self.t('edit')
+            )
 
         .market-item-wish__info
           .market-item-wish__info-item!= self.timetag(self.item.ts, 'relative')

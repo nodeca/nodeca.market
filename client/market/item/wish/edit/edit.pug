@@ -1,0 +1,54 @@
+- self.add_raw_data('item', self.item)
+- self.add_raw_data('parse_options', self.parse_options)
+
+article#content.market-item-wish-edit
+  != self.partial('@common.blocks.navbar.logo_apps')
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@users.blocks.announces')
+
+    header.page-head
+      h1.page-head__title(itemprop='name')= self.t('title')
+
+    form#market-edit-form(novalidate, data-bind='submit: submit, css: { "was-validated": showErrors }')
+      fieldset
+        .row
+          .form-group.col
+            label(for='market-edit-title')= self.t('field_title')
+            input.form-control#market-edit-title(type='text', data-bind="textInput: offer.title", required)
+
+        mixin render_section_tree(parent, level)
+          //- HTML5 doesn't support nested optgroups, so we emulate this
+          //- behavior with non-breaking space indent
+          each section in self.sections
+            if (section.parent || null) === parent
+              if section.is_category
+                optgroup(label=Array(level*4+1).join('\u00A0') + section.title)
+              else
+                option(value=section._id)= Array(level*4+1).join('\u00A0') + section.title
+              +render_section_tree(section._id, level + 1)
+
+        .row
+          .form-group.col
+            label(for='market-edit-section')= self.t('field_section')
+            select.form-control.custom-select#market-edit-section(data-bind="value: offer.section", required)
+              option(value="", disabled, selected, hidden)= self.t('section_placeholder')
+              +render_section_tree(null, 0)
+
+        .row
+          .form-group.col
+            label(for='market-edit-description')
+              = self.t('field_description')
+              = ' '
+              a(href='#', data-bind='click: preview, visible: !showPreview()')= self.t('mode_preview')
+              a(style='display: none', href='#', data-bind='click: preview, visible: showPreview()')= self.t('mode_edit')
+            textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
+            .market-item-wish-edit__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
+
+        .row
+          .form-actions.col
+            button.btn.btn-primary(type='submit', data-bind='enable: !isSubmitting()')= self.t('submit')

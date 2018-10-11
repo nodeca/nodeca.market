@@ -1,0 +1,20 @@
+en-US:
+  title: Edit offer
+  section_placeholder: ''
+  field_title: Title
+  field_price: Price
+  field_section: Category
+  field_description: Description
+  field_photos: 'Photos'
+  field_photos_limit_range: ' (#{min}-#{max})'
+  field_photos_limit_low: ' (>= #{min})'
+  field_barter: Direct exchange
+  field_barter_help: Leave field empty if you're not interested in bartering. Otherwise, specify what you would like to exchange your item for.
+  field_delivery: Delivery is available
+  field_is_new: New item (not used) 
+  mode_preview: (preview)
+  mode_edit: (edit)
+  attach_main: Main photo
+  attach_set_main: Set as main
+  attach_delete: Delete
+  submit: Publish
