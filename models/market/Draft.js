@@ -26,7 +26,7 @@ module.exports = function (N, collectionName) {
     // all uploaded files for this draft in the time order;
     // (`data.files` is a subset of `files` which user can reorder and remove
     // items from)
-    files:          [ Schema.ObjectId ]
+    all_files:      [ Schema.ObjectId ]
   }, {
     versionKey : false
   });
@@ -39,7 +39,7 @@ module.exports = function (N, collectionName) {
   // Remove attached files when draft is removed
   //
   Draft.pre('remove', function () {
-    return Promise.all(this.files.map(id => N.models.core.FileTmp.remove(id, true)));
+    return Promise.all(this.all_files.map(id => N.models.core.FileTmp.remove(id, true)));
   });
 
 

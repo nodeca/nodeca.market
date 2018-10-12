@@ -81,8 +81,12 @@ module.exports = function (N, collectionName) {
       ste: Number
     },
 
-    // Attached photos
+    // Attached visible photos
     files:        [ Schema.ObjectId ],
+
+    // All attached photos (including temporary photos during editing
+    // and previously removed ones)
+    all_files:    [ Schema.ObjectId ],
 
     // Post params
     params_ref:   Schema.ObjectId,

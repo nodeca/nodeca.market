@@ -132,7 +132,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function update_draft(env) {
     env.data.draft.ts = new Date();
-    env.data.draft.files.push(env.res.media.media_id);
+    env.data.draft.all_files.push(env.res.media.media_id);
     await env.data.draft.save();
   });
 

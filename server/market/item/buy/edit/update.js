@@ -1,23 +1,17 @@
-// Create new market offer
+// Update item
 //
 
 'use strict';
 
 
-const _           = require('lodash');
-const charcount   = require('charcount');
-const mongoose    = require('mongoose');
-const pump        = require('util').promisify(require('pump'));
-const resizeParse = require('nodeca.users/server/_lib/resize_parse');
+const _         = require('lodash');
+const charcount = require('charcount');
 
 
 module.exports = function (N, apiPath) {
 
-  const uploadSizes = Object.keys(resizeParse(N.config.market.uploads).resize);
-
-
   N.validate(apiPath, {
-    draft_id:       { format: 'mongo' },
+    item_id:        { format: 'mongo', required: true },
     title:          { type: 'string',  required: true },
     price_value:    { type: 'number',  required: true },
     price_currency: { type: 'string',  required: true },
@@ -42,15 +36,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Check permissions
-  //
-  N.wire.before(apiPath, async function check_permissions(env) {
-    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
-
-    if (!can_create_items) throw N.io.FORBIDDEN;
-  });
-
-
   // Check title length
   //
   N.wire.before(apiPath, async function check_title_length(env) {
@@ -61,6 +46,49 @@ module.exports = function (N, apiPath) {
         code: N.io.CLIENT_ERROR,
         message: env.t('err_title_too_short', min_length)
       };
+    }
+  });
+
+
+  // Fetch item
+  //
+  N.wire.before(apiPath, async function fetch_item(env) {
+    let item = await N.models.market.ItemOffer.findById(env.params.item_id).lean(true);
+
+    if (!item) throw N.io.NOT_FOUND;
+
+    let access_env = { params: {
+      items: item,
+      user_info: env.user_info
+    } };
+
+    await N.wire.emit('internal:market.access.item_offer', access_env);
+
+    if (!access_env.data.access_read) throw N.io.NOT_FOUND;
+
+    env.data.item = item;
+  });
+
+
+  // Filter files
+  //
+  N.wire.before(apiPath, async function filter_files(env) {
+    let uploaded = _.keyBy(env.data.item.all_files);
+
+    // restrict files to only those uploaded for this item
+    env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
+  });
+
+
+  // Check permissions
+  //
+  N.wire.before(apiPath, async function check_permissions(env) {
+    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+
+    if (!can_create_items) throw N.io.FORBIDDEN;
+
+    if (String(env.user_info.user_id) !== String(env.data.item.user)) {
+      throw N.io.FORBIDDEN;
     }
   });
 
@@ -76,18 +104,6 @@ module.exports = function (N, apiPath) {
 
     // Should never happen, restricted on client
     if (section.is_category) throw N.io.BAD_REQUEST;
-  });
-
-
-  // Fetch draft
-  //
-  N.wire.before(apiPath, async function fetch_draft(env) {
-    env.data.draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
-
-    let uploaded = _.keyBy(env.data.draft.all_files);
-
-    // restrict files to only files that were uploaded for this draft
-    env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
   });
 
 
@@ -178,45 +194,20 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Create offer
+  // Update item
   //
-  N.wire.on(apiPath, async function create_offer(env) {
-    let files = [];
+  N.wire.on(apiPath, async function update_item(env) {
+    // save it using model to trigger 'post' hooks (e.g. param_ref update)
+    let item = await N.models.market.ItemOffer.findById(env.data.item._id)
+                         .lean(false);
 
-    for (let file of env.data.files) {
-      let new_id = new mongoose.Types.ObjectId();
-
-      files.push(new_id);
-
-      for (let size of uploadSizes) {
-        let info = await N.models.core.FileTmp.getInfo(file + (size === 'orig' ? '' : '_' + size));
-
-        if (!info) continue;
-
-        let params = { contentType: info.contentType };
-
-        if (size === 'orig') {
-          params._id = new_id;
-        } else {
-          params.filename = new_id + '_' + size;
-        }
-
-        await pump(
-          N.models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
-          N.models.core.File.createWriteStream(params)
-        );
-      }
-    }
-
-    let statuses = N.models.market.ItemOffer.statuses;
-    let item = new N.models.market.ItemOffer();
+    if (!item) throw N.io.NOT_FOUND;
 
     item.imports = env.data.parse_result.imports;
     item.import_users = env.data.parse_result.import_users;
     item.title = env.params.title;
     item.html = env.data.parse_result.html;
     item.md = env.params.description;
-    item.ip = env.req.ip;
     item.params = env.data.parse_options;
     item.price = {
       value:    env.params.price_value,
@@ -226,30 +217,12 @@ module.exports = function (N, apiPath) {
     item.barter_info = env.params.barter_info;
     item.delivery = env.params.delivery;
     item.is_new = env.params.is_new;
-    item.files = item.all_files = files;
-
-    if (env.user_info.hb) {
-      item.st  = statuses.HB;
-      item.ste = statuses.VISIBLE;
-    } else {
-      item.st  = statuses.VISIBLE;
-    }
-
+    item.files = env.data.files;
     item.section = env.data.section._id;
-    item.user    = env.user_info.user_id;
 
     item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
 
-    await item.save();
-
-    env.data.new_item = item;
-  });
-
-
-  // Remove draft
-  //
-  N.wire.after(apiPath, async function remove_draft(env) {
-    if (env.data.draft) await env.data.draft.remove();
+    env.data.new_item = await item.save();
   });
 
 
@@ -270,6 +243,14 @@ module.exports = function (N, apiPath) {
   // Update section counters
   //
   N.wire.after(apiPath, async function update_section(env) {
+    if (env.data.item.section.toString() !== env.params.section) {
+      let old_section = await N.models.market.Section.findById(env.data.item.section).lean(true);
+
+      if (old_section) {
+        await N.models.market.Section.updateCache(old_section._id);
+      }
+    }
+
     await N.models.market.Section.updateCache(env.data.section._id);
   });
 
@@ -286,7 +267,7 @@ module.exports = function (N, apiPath) {
 
   // Mark user as active
   //
-  N.wire.after(apiPath, async function set_active_flag(env) {
-    await N.wire.emit('internal:users.mark_user_active', env);
+  N.wire.after(apiPath, function set_active_flag(env) {
+    return N.wire.emit('internal:users.mark_user_active', env);
   });
 };

@@ -4,6 +4,7 @@
 'use strict';
 
 
+const _                  = require('lodash');
 const sanitize_section   = require('nodeca.market/lib/sanitizers/section');
 const sanitize_item_wish = require('nodeca.market/lib/sanitizers/item_wish');
 
@@ -20,15 +21,6 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, function check_user_auth(env) {
     if (!env.user_info.is_member) throw N.io.FORBIDDEN;
-  });
-
-
-  // Check permissions
-  //
-  N.wire.before(apiPath, async function check_permissions(env) {
-    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
-
-    if (!can_create_items) throw N.io.FORBIDDEN;
   });
 
 
@@ -51,7 +43,19 @@ module.exports = function (N, apiPath) {
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
 
     env.data.item = item;
-    env.res.item  = await sanitize_item_wish(N, env.data.item, env.user_info);
+  });
+
+
+  // Check permissions
+  //
+  N.wire.before(apiPath, async function check_permissions(env) {
+    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+
+    if (!can_create_items) throw N.io.FORBIDDEN;
+
+    if (String(env.user_info.user_id) !== String(env.data.item.user)) {
+      throw N.io.FORBIDDEN;
+    }
   });
 
 
@@ -100,11 +104,15 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fill head meta
+  // Fill response
   //
-  N.wire.after(apiPath, function fill_head(env) {
+  N.wire.after(apiPath, async function fill_response(env) {
     env.res.head = env.res.head || {};
     env.res.head.title = env.t('title');
+    env.res.item = await sanitize_item_wish(N, env.data.item, env.user_info);
+
+    // add private fields that aren't exposed by sanitizer
+    env.res.item.md = env.data.item.md;
   });
 
 

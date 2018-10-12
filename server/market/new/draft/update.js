@@ -58,7 +58,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function update_draft(env) {
     let data = _.omit(env.params, 'draft_id');
-    let uploaded = _.keyBy(env.data.draft.files);
+    let uploaded = _.keyBy(env.data.draft.all_files);
 
     // restrict files to only files that were uploaded for this draft
     data.files = data.files.filter(id => uploaded.hasOwnProperty(id));

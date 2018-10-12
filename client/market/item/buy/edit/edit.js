@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 
 // Knockout bindings root object.
 let view = null;
