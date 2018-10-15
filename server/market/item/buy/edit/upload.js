@@ -7,8 +7,6 @@
 const _           = require('lodash');
 const mime        = require('mime-types').lookup;
 const path        = require('path');
-
-// TODO: move those into nodeca.users/lib ?
 const resize      = require('nodeca.users/models/users/_lib/resize');
 const resizeParse = require('nodeca.users/server/_lib/resize_parse');
 
@@ -19,8 +17,8 @@ module.exports = function (N, apiPath) {
 
 
   N.validate(apiPath, {
-    draft_id: { format: 'mongo', required: true },
-    file:     { type: 'string',  required: true }
+    item_id: { format: 'mongo', required: true },
+    file:    { type: 'string',  required: true }
   });
 
 
@@ -31,23 +29,36 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch item
+  //
+  N.wire.before(apiPath, async function fetch_item(env) {
+    let item = await N.models.market.ItemOffer.findById(env.params.item_id).lean(true);
+
+    if (!item) throw N.io.NOT_FOUND;
+
+    let access_env = { params: {
+      items: item,
+      user_info: env.user_info
+    } };
+
+    await N.wire.emit('internal:market.access.item_offer', access_env);
+
+    if (!access_env.data.access_read) throw N.io.NOT_FOUND;
+
+    env.data.item = item;
+  });
+
+
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
     let can_create_items = await env.extras.settings.fetch('market_can_create_items');
 
     if (!can_create_items) throw N.io.FORBIDDEN;
-  });
 
-
-  // Find current draft
-  //
-  N.wire.before(apiPath, async function find_draft(env) {
-    env.data.draft = await N.models.market.Draft.findOne()
-                               .where('_id').equals(env.params.draft_id)
-                               .where('user').equals(env.user_info.user_id);
-
-    if (!env.data.draft) throw N.io.NOT_FOUND;
+    if (String(env.user_info.user_id) !== String(env.data.item.user)) {
+      throw N.io.FORBIDDEN;
+    }
   });
 
 
@@ -128,11 +139,15 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Attach this file to draft
+  // Attach this file to market item
   //
-  N.wire.after(apiPath, async function update_draft(env) {
-    env.data.draft.ts = new Date();
-    env.data.draft.all_files.push(env.res.media.media_id);
-    await env.data.draft.save();
+  N.wire.after(apiPath, async function update_item(env) {
+    let item = await N.models.market.ItemOffer.findById(env.data.item._id)
+                         .lean(false);
+
+    if (!item) throw N.io.NOT_FOUND;
+
+    item.all_files.push(env.res.media.media_id);
+    await item.save();
   });
 };

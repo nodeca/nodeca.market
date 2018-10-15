@@ -51,4 +51,4 @@ article#content.market-item-wish-edit
 
         .row
           .form-actions.col
-            button.btn.btn-primary(type='submit', data-bind='enable: !isSubmitting()')= self.t('submit')
+            button.btn.btn-primary(type='submit', data-bind='enable: isDirty() && !isSubmitting()')= self.t('submit')

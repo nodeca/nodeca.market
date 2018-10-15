@@ -31,11 +31,23 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     description:    ko.observable(item.md)
   };
 
-
   view.showPreview  = ko.observable(false);
   view.previewHtml  = ko.observable('');
   view.isSubmitting = ko.observable(false);
   view.showErrors   = ko.observable(false);
+
+  let initialState = ko.observable();
+
+  view.isDirty = ko.computed({
+    read() {
+      return initialState() !== ko.toJSON(view.offer);
+    },
+    write(value) {
+      initialState(value ? null : ko.toJSON(view.offer));
+    }
+  });
+
+  view.isDirty(false);
 
   function updatePreview() {
     N.parser.md2html({

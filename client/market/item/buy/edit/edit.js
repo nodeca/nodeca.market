@@ -42,7 +42,6 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     is_new:         ko.observable(item.is_new)
   };
 
-
   // force price to be numeric (better to do with extenders, but subscription is easier to do)
   view.offer.price_value.subscribe(v => {
     if (v) view.offer.price_value(Number(v));
@@ -52,6 +51,19 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   view.previewHtml  = ko.observable('');
   view.isSubmitting = ko.observable(false);
   view.showErrors   = ko.observable(false);
+
+  let initialState = ko.observable();
+
+  view.isDirty = ko.computed({
+    read() {
+      return initialState() !== ko.toJSON(view.offer);
+    },
+    write(value) {
+      initialState(value ? null : ko.toJSON(view.offer));
+    }
+  });
+
+  view.isDirty(false);
 
   function updatePreview() {
     N.parser.md2html({

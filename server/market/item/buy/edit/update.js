@@ -36,20 +36,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Check title length
-  //
-  N.wire.before(apiPath, async function check_title_length(env) {
-    let min_length = await env.extras.settings.fetch('market_title_min_length');
-
-    if (charcount(env.params.title.trim()) < min_length) {
-      throw {
-        code: N.io.CLIENT_ERROR,
-        message: env.t('err_title_too_short', min_length)
-      };
-    }
-  });
-
-
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
@@ -70,16 +56,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Filter files
-  //
-  N.wire.before(apiPath, async function filter_files(env) {
-    let uploaded = _.keyBy(env.data.item.all_files);
-
-    // restrict files to only those uploaded for this item
-    env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
-  });
-
-
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
@@ -90,6 +66,30 @@ module.exports = function (N, apiPath) {
     if (String(env.user_info.user_id) !== String(env.data.item.user)) {
       throw N.io.FORBIDDEN;
     }
+  });
+
+
+  // Check title length
+  //
+  N.wire.before(apiPath, async function check_title_length(env) {
+    let min_length = await env.extras.settings.fetch('market_title_min_length');
+
+    if (charcount(env.params.title.trim()) < min_length) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_title_too_short', min_length)
+      };
+    }
+  });
+
+
+  // Filter files
+  //
+  N.wire.before(apiPath, async function filter_files(env) {
+    let uploaded = _.keyBy(env.data.item.all_files);
+
+    // restrict files to only those uploaded for this item
+    env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
   });
 
 
