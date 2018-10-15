@@ -4,6 +4,6 @@ en-US:
   field_title: Title
   field_section: Category
   field_description: Description
-  mode_preview: (preview)
-  mode_edit: (edit)
+  mode_preview: Preview
+  mode_edit: Edit
   submit: Publish

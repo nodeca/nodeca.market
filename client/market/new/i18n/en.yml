@@ -14,8 +14,8 @@ en-US:
   field_barter_help: Leave field empty if you're not interested in bartering. Otherwise, specify what you would like to exchange your item for.
   field_delivery: Delivery is available
   field_is_new: New item (not used) 
-  mode_preview: (preview)
-  mode_edit: (edit)
+  mode_preview: Preview
+  mode_edit: Edit
   attach_main: Main photo
   attach_set_main: Set as main
   attach_delete: Delete

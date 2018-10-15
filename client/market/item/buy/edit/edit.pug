@@ -19,12 +19,12 @@ article#content.market-item-buy-edit
       fieldset
         .row
           .form-group.col
-            label(for='market-edit-title')= self.t('field_title')
+            label.market-item-buy-edit__label(for='market-edit-title')= self.t('field_title')
             input.form-control#market-edit-title(type='text', data-bind="textInput: offer.title", required)
 
         .row
           .form-group.col-lg-3.col-md-4.col-sm-6
-            label(for='market-edit-price')= self.t('field_price')
+            label.market-item-buy-edit__label(for='market-edit-price')= self.t('field_price')
             .input-group
               input.form-control#market-edit-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value", required)
               select.form-control.market-item-buy-edit__currency.custom-select.input-group-append(data-bind="value: offer.price_currency, options: currencyTypes, optionsText: 'title', optionsValue: 'value'", required)
@@ -42,7 +42,7 @@ article#content.market-item-buy-edit
 
         .row
           .form-group.col
-            label(for='market-edit-section')= self.t('field_section')
+            label.market-item-buy-edit__label(for='market-edit-section')= self.t('field_section')
             select.form-control.custom-select#market-edit-section(data-bind="value: offer.section", required)
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +render_section_tree(null, 0)
@@ -74,7 +74,7 @@ article#content.market-item-buy-edit
                 multiple
               )
 
-              label
+              label.market-item-buy-edit__label
                 = self.t('field_photos')
                 if min_images !== null && max_images !== null
                   if max_images !== null
@@ -124,17 +124,20 @@ article#content.market-item-buy-edit
 
         .row
           .form-group.col
-            label(for='market-edit-description')
-              = self.t('field_description')
-              = ' '
-              a(href='#', data-bind='click: preview, visible: !showPreview()')= self.t('mode_preview')
-              a(style='display: none', href='#', data-bind='click: preview, visible: showPreview()')= self.t('mode_edit')
+            ul.market-item-buy-edit__tabs.nav.nav-tabs
+              li.nav-item
+                span.market-item-buy-edit__label.nav-link.disabled= self.t('field_description')
+              li.nav-item
+                a.nav-link(href='#', data-bind='click: togglePreview.bind($data, false), css: { "active": !showPreview() }')=self.t('mode_edit')
+              li.nav-item
+                a.nav-link(href='#', data-bind='click: togglePreview.bind($data, true), css: { "active": showPreview() }')=self.t('mode_preview')
+
             textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
             .market-item-buy-edit__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
 
         .row
           .form-group.col
-            label(for='market-edit-barter')= self.t('field_barter')
+            label.market-item-buy-edit__label(for='market-edit-barter')= self.t('field_barter')
             input.form-control#market-edit-barter(type='text', data-bind='textInput: offer.barter_info')
             small.form-text.text-muted= self.t('field_barter_help')
 

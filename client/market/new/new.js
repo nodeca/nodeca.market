@@ -147,10 +147,11 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     promise.catch(err => N.wire.emit('error', err));
   }
 
-  view.preview = function preview() {
-    // true - switch to preview mode
-    // false - switch back to editing
-    let showPreview = !view.showPreview();
+  // true - switch to preview mode
+  // false - switch back to editing
+  // null - toggle mode
+  view.togglePreview = function preview(mode) {
+    let showPreview = typeof mode === 'boolean' ? mode : !view.showPreview();
 
     view.showPreview(showPreview);
 

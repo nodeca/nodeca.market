@@ -18,7 +18,7 @@ article#content.market-item-wish-edit
       fieldset
         .row
           .form-group.col
-            label(for='market-edit-title')= self.t('field_title')
+            label.market-item-wish-edit__label(for='market-edit-title')= self.t('field_title')
             input.form-control#market-edit-title(type='text', data-bind="textInput: offer.title", required)
 
         mixin render_section_tree(parent, level)
@@ -34,18 +34,21 @@ article#content.market-item-wish-edit
 
         .row
           .form-group.col
-            label(for='market-edit-section')= self.t('field_section')
+            label.market-item-wish-edit__label(for='market-edit-section')= self.t('field_section')
             select.form-control.custom-select#market-edit-section(data-bind="value: offer.section", required)
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +render_section_tree(null, 0)
 
         .row
           .form-group.col
-            label(for='market-edit-description')
-              = self.t('field_description')
-              = ' '
-              a(href='#', data-bind='click: preview, visible: !showPreview()')= self.t('mode_preview')
-              a(style='display: none', href='#', data-bind='click: preview, visible: showPreview()')= self.t('mode_edit')
+            ul.market-item-wish-edit__tabs.nav.nav-tabs
+              li.nav-item
+                span.market-item-wish-edit__label.nav-link.disabled= self.t('field_description')
+              li.nav-item
+                a.nav-link(href='#', data-bind='click: togglePreview.bind($data, false), css: { "active": !showPreview() }')=self.t('mode_edit')
+              li.nav-item
+                a.nav-link(href='#', data-bind='click: togglePreview.bind($data, true), css: { "active": showPreview() }')=self.t('mode_preview')
+
             textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
             .market-item-wish-edit__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
 
