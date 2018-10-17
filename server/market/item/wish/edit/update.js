@@ -6,6 +6,10 @@
 
 const charcount = require('charcount');
 
+// If same user edits the same post within 5 minutes, all changes
+// made within that period will be squashed into one diff.
+const HISTORY_GRACE_PERIOD = 5 * 60 * 1000;
+
 
 module.exports = function (N, apiPath) {
 
@@ -143,6 +147,78 @@ module.exports = function (N, apiPath) {
     item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
 
     env.data.new_item = await item.save();
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, async function save_history(env) {
+    let orig_item = env.data.item;
+    let new_item  = env.data.new_item;
+
+    let last_record = await N.models.market.ItemWishHistory.findOne()
+                                .where('item').equals(orig_item._id)
+                                .sort('-_id')
+                                .lean(true);
+
+    let last_update_time = last_record ? last_record.ts   : orig_item.ts;
+    let last_update_user = last_record ? last_record.user : orig_item.user;
+    let now = new Date();
+
+    // if the same user edits the same post within grace period, history won't be changed
+    if (!(last_update_time > now - HISTORY_GRACE_PERIOD &&
+          last_update_time < now &&
+          String(last_update_user) === String(env.user_info.user_id))) {
+
+      /* eslint-disable no-undefined */
+      last_record = await new N.models.market.ItemWishHistory({
+        item:        orig_item._id,
+        user:        env.user_info.user_id,
+        section:     orig_item.section,
+        title:       orig_item.title,
+        md:          orig_item.md,
+        location:    orig_item.location,
+        params_ref:  orig_item.params_ref,
+        ip:          env.req.ip
+      }).save();
+    }
+
+    // if the next history entry would be the same as the last one
+    // (e.g. user saves post without changes or reverts change within 5 min),
+    // remove redundant history entry
+    if (last_record) {
+      let last_item_str = JSON.stringify({
+        item:        last_record.item,
+        user:        last_record.user,
+        section:     last_record.section,
+        title:       last_record.title,
+        md:          last_record.md,
+        location:    last_record.location,
+        params_ref:  last_record.params_ref
+      });
+
+      let next_item_str = JSON.stringify({
+        item:        new_item._id,
+        user:        env.user_info.user_id,
+        section:     new_item.section,
+        title:       new_item.title,
+        md:          new_item.md,
+        location:    new_item.location,
+        params_ref:  new_item.params_ref
+      });
+
+      if (last_item_str === next_item_str) {
+        await N.models.market.ItemWishHistory.remove({ _id: last_record._id });
+      }
+    }
+
+    await N.models.market.ItemWish.update(
+      { _id: orig_item._id },
+      { $set: {
+        last_edit_ts: new Date(),
+        edit_count: await N.models.market.ItemWishHistory.count({ item: orig_item._id })
+      } }
+    );
   });
 
 

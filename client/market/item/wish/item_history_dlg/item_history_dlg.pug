@@ -1,0 +1,61 @@
+.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+  .modal-dialog.modal-lg
+    .modal-content
+      .modal-header
+        h4.modal-title= self.t('title')
+        button.close(type='button', tabindex='-1', data-dismiss='modal') &times;
+      .modal-body.market-item-wish-history-dlg__content
+        each entry in self.entries.reverse()
+          - var user = self.users[entry.user];
+
+          .market-item-wish-history-dlg__entry
+            .market-item-wish-history-dlg__meta
+              .market-item-wish-history-dlg__meta-author
+                if user
+                  a.market-item-wish-history-dlg__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                    = user.nick
+              .market-item-wish-history-dlg__meta-ts!= self.timetag(entry.ts, 'relative')
+
+            if entry.title_diff
+              .market-item-wish-history-dlg__title
+                != entry.title_diff
+
+            if entry.text_diff
+              .market-item-wish-history-dlg__diff
+                != entry.text_diff
+
+            .market-item-wish-history-dlg__details
+              each kv in entry.attr_diffs
+                - var key = kv[0], value = kv[1], new_value = kv[2];
+                .market-item-wish-history-dlg__details-item
+                  .market-item-wish-history-dlg__details-key= self.t(key)
+                  .market-item-wish-history-dlg__details-value
+                    case key
+                      when 'section'
+                        .diff-line
+                          - var section = self.sections[value] || {};
+                          a(href=self.link_to('market.section.wish', { section_hid: section.hid }))= section.title
+                      when 'location'
+                        .diff-line
+                          if value
+                            a(
+                              href= '#'
+                              data-on-click= 'common.blocks.location_show_dlg'
+                              data-latitude= value && value[1]
+                              data-longitude= value && value[0]
+                            )
+                              span.icon.icon-location.icon-space-after
+
+                              if self.location_names[value[0] + ':' + value[1]]
+                                = self.location_names[value[0] + ':' + value[1]]
+                      default
+                        if new_value
+                          if new_value !== value
+                            .diff-line
+                              del= value
+                              = ' '
+                              ins= new_value
+                          else
+                            .diff-line= value
+                        else
+                          != value

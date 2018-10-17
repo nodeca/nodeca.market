@@ -141,6 +141,15 @@ article#content.market-item-buy(
             span.icon.icon-bookmark
             span.market-item-buy__bookmarks-count(data-bm-count=self.item.bookmarks)
 
+      if self.item.edit_count
+        li.market-item-buy__control-item.market-item-buy__history
+          button.btn.market-item-buy__action(
+            title=self.t('last_edited', { date: self.date(self.item.last_edit_ts, 'datetime') })
+            data-on-click='market.item.buy:history'
+            data-item-id=self.item._id
+          )
+            span.icon.icon-history.icon-space-after= self.item.edit_count
+
       li.market-item-buy__control-item.market-item-buy__views
         span.icon.icon-views.icon-space-after(
           title=self.t('views')

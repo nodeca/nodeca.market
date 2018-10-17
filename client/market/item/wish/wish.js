@@ -56,6 +56,17 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Show history popup
+  //
+  N.wire.on(module.apiPath + ':history', function item_history(data) {
+    let item_id = data.$this.data('item-id');
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('market.item.wish.show_history', { item_id }))
+      .then(res => N.wire.emit('market.item.wish.item_history_dlg', res));
+  });
+
+
   // User clicks on "contact" button, create dialog with necessary info
   // (this is the same API that usercard is using, so users.dialog.create:begin hook below works)
   //
