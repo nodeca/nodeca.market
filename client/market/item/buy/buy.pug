@@ -141,7 +141,7 @@ article#content.market-item-buy(
             span.icon.icon-bookmark
             span.market-item-buy__bookmarks-count(data-bm-count=self.item.bookmarks)
 
-      if self.item.edit_count
+      if self.settings.can_see_history && self.item.edit_count
         li.market-item-buy__control-item.market-item-buy__history
           button.btn.market-item-buy__action(
             title=self.t('last_edited', { date: self.date(self.item.last_edit_ts, 'datetime') })

@@ -218,6 +218,7 @@ module.exports = function (N, apiPath) {
     env.res.settings = env.data.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'can_report_abuse',
       'can_see_ip',
+      'can_see_history',
       'market_displayed_currency',
       'market_mod_can_add_infractions'
     ]));
