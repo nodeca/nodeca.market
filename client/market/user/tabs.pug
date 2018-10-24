@@ -8,10 +8,10 @@
       = '(0)'
 
   a.nav-link(
-    href=self.link_to('market.user.buy_archived', { user_hid: self.user_hid })
-    class=self.active_tab === 'buy_archived' ? 'active' : ''
+    href=self.link_to('market.user.buy_closed', { user_hid: self.user_hid })
+    class=self.active_tab === 'buy_closed' ? 'active' : ''
   )
-    = self.t('buy_archived')
+    = self.t('buy_closed')
     span.market-user__tab-counter
       = '(0)'
 
@@ -24,9 +24,9 @@
       = '(0)'
 
   a.nav-link(
-    href=self.link_to('market.user.wish_archived', { user_hid: self.user_hid })
-    class=self.active_tab === 'wish_archived' ? 'active' : ''
+    href=self.link_to('market.user.wish_closed', { user_hid: self.user_hid })
+    class=self.active_tab === 'wish_closed' ? 'active' : ''
   )
-    = self.t('wish_archived')
+    = self.t('wish_closed')
     span.market-user__tab-counter
       = '(0)'

@@ -2,17 +2,17 @@ en-US:
   buy_active:
     title: Market items
 
-  buy_archived:
+  buy_closed:
     title: Market items
 
   wish_active:
     title: Market items
 
-  wish_archived:
+  wish_closed:
     title: Market items
 
   tabs:
     buy_active: Active items
-    buy_archived: Archived items
+    buy_closed: Closed items
     wish_active: Active wishes
-    wish_archived: Archived wishes
+    wish_closed: Closed wishes

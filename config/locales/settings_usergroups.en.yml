@@ -2,7 +2,16 @@ i18n:
   en-US:
     admin:
       core:
+        category_names:
+          perm_market: Market
+          perm_market_moderate: Market moderation
+
         setting_names:
-          market_can_create_items: Create market lots
+          market_can_create_items: Create market items
           market_show_ignored: Show lots from ignored users
           market_mod_can_add_infractions: Can give infractions in market
+          market_mod_can_edit_items: Edit market items
+          market_mod_can_move_items: Open, close or move market items
+          market_mod_can_delete_items: Delete items
+          market_mod_can_hard_delete_items: Hard delete items
+          market_mod_can_see_hard_deleted_items: See hard deleted items

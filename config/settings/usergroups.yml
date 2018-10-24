@@ -13,6 +13,36 @@ setting_schemas:
       type: boolean
       default: false
 
+    market_mod_can_edit_items:
+      priority: 1010
+      category_key: perm_market_moderate
+      type: boolean
+      default: false
+
+    market_mod_can_delete_items:
+      priority: 1020
+      category_key: perm_market_moderate
+      type: boolean
+      default: false
+
+    market_mod_can_hard_delete_items:
+      priority: 1030
+      category_key: perm_market_moderate
+      type: boolean
+      default: false
+
+    market_mod_can_see_hard_deleted_items:
+      priority: 1040
+      category_key: perm_market_moderate
+      type: boolean
+      default: false
+
+    market_mod_can_move_items:
+      priority: 1050
+      category_key: perm_market_moderate
+      type: boolean
+      default: false
+
     market_mod_can_add_infractions:
       priority: 2110
       category_key: perm_infractions

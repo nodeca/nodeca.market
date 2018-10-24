@@ -2,11 +2,11 @@ en-US:
   buy_active:
     title_with_user: "Market - #{user}"
 
-  buy_archived:
+  buy_closed:
     title_with_user: "Market - #{user}"
 
   wish_active:
     title_with_user: "Market - #{user}"
 
-  wish_archived:
+  wish_closed:
     title_with_user: "Market - #{user}"

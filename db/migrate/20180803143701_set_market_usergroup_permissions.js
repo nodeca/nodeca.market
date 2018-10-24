@@ -9,9 +9,14 @@ module.exports.up = async function (N) {
   let adminGroupId = await N.models.users.UserGroup.findIdByName('administrators');
 
   await usergroupStore.set({
-    market_can_create_items:        { value: true },
-    market_show_ignored:            { value: true },
-    market_mod_can_add_infractions: { value: true }
+    market_can_create_items:               { value: true },
+    market_mod_can_add_infractions:        { value: true },
+    market_mod_can_delete_items:           { value: true },
+    market_mod_can_edit_items:             { value: true },
+    market_mod_can_hard_delete_items:      { value: true },
+    market_mod_can_move_items:             { value: true },
+    market_mod_can_see_hard_deleted_items: { value: true },
+    market_show_ignored:                   { value: true }
   }, { usergroup_id: adminGroupId });
 
   // add usergroup settings for members

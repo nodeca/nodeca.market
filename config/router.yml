@@ -70,8 +70,8 @@ router:
           match: /\d+/
           type: 'integer'
 
-    market.user.buy_archived:
-      "/member{user_hid}/market/archived":
+    market.user.buy_closed:
+      "/member{user_hid}/market/closed":
         user_hid:
           match: /\d+/
           type: 'integer'
@@ -82,8 +82,8 @@ router:
           match: /\d+/
           type: 'integer'
 
-    market.user.wish_archived:
-      "/member{user_hid}/market/wish/archived":
+    market.user.wish_closed:
+      "/member{user_hid}/market/wish/closed":
         user_hid:
           match: /\d+/
           type: 'integer'

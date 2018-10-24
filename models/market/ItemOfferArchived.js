@@ -8,30 +8,7 @@ const Schema         = Mongoose.Schema;
 
 module.exports = function (N, collectionName) {
 
-  function set_content_type(name, value) {
-    let duplicate = _.invert(_.get(N, 'shared.content_type', {}))[value];
-
-    if (typeof duplicate !== 'undefined') {
-      throw new Error(`Duplicate content type id=${value} for ${name} and ${duplicate}`);
-    }
-
-    _.set(N, 'shared.content_type.' + name, value);
-  }
-
-  set_content_type('MARKET_ITEM_OFFER', 13);
-
-  let statuses = {
-    VISIBLE:      1,
-    HB:           2, // hellbanned
-    PENDING:      3, // reserved, not used now
-    DELETED:      4,
-    DELETED_HARD: 5
-  };
-
-
-  statuses.LIST_DELETABLE = [ statuses.VISIBLE, statuses.HB, statuses.PENDING ];
-
-  let ItemOffer = new Schema({
+  let ItemOfferArchived = new Schema({
     section:      Schema.ObjectId,
     hid:          Number,
     user:         Schema.ObjectId,
@@ -57,7 +34,8 @@ module.exports = function (N, collectionName) {
     location:     [ Number, Number ],
 
     // State (normal, closed, soft-deleted, hard-deleted, hellbanned,...)
-    // constants should be defined globally
+    // constants should be defined globally;
+    // Same values as in ItemOffer
     st:           Number,
     ste:          Number, // real state, if user is hellbanned
                           // (general `state` is used for fast selects)
@@ -104,18 +82,15 @@ module.exports = function (N, collectionName) {
   /////////////////////////////////////////////////////////////////////////////
 
   // lookup _id by hid (for routing)
-  ItemOffer.index({ hid: 1 });
+  ItemOfferArchived.index({ hid: 1 });
 
   // get a list of user items
-  ItemOffer.index({ user: 1, _id: -1, st: 1 });
-
-  // get a list of items in a section
-  ItemOffer.index({ section: 1, _id: -1, st: 1 });
+  ItemOfferArchived.index({ user: 1, _id: -1, st: 1 });
 
 
   // Set 'hid' for the new item.
   // This hook should always be the last one to avoid counter increment on error
-  ItemOffer.pre('save', async function () {
+  ItemOfferArchived.pre('save', async function () {
     if (!this.isNew) return;
 
     // hid is already defined when this item was created
@@ -128,7 +103,7 @@ module.exports = function (N, collectionName) {
 
   // Remove empty "imports" and "import_users" fields
   //
-  ItemOffer.pre('save', function () {
+  ItemOfferArchived.pre('save', function () {
     if (this.imports && this.imports.length === 0) {
       /*eslint-disable no-undefined*/
       this.imports = undefined;
@@ -143,7 +118,7 @@ module.exports = function (N, collectionName) {
 
   // Store parser options separately and save reference to them
   //
-  ItemOffer.pre('save', async function () {
+  ItemOfferArchived.pre('save', async function () {
     if (!this.params) return;
 
     let id = await N.models.core.MessageParams.setParams(this.params);
@@ -154,16 +129,11 @@ module.exports = function (N, collectionName) {
   });
 
 
-  // Export statuses
-  //
-  ItemOffer.statics.statuses = statuses;
-
-
-  N.wire.on('init:models', function emit_init_ItemOffer() {
-    return N.wire.emit('init:models.' + collectionName, ItemOffer);
+  N.wire.on('init:models', function emit_init_ItemOfferArchived() {
+    return N.wire.emit('init:models.' + collectionName, ItemOfferArchived);
   });
 
-  N.wire.on('init:models.' + collectionName, function init_model_ItemOffer(schema) {
+  N.wire.on('init:models.' + collectionName, function init_model_ItemOfferArchived(schema) {
     N.models[collectionName] = Mongoose.model(collectionName, schema);
   });
 };

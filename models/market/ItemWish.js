@@ -87,8 +87,11 @@ module.exports = function (N, collectionName) {
   // lookup _id by hid (for routing)
   ItemWish.index({ hid: 1 });
 
-  // get a list of items in a section
+  // get a list of user items
   ItemWish.index({ user: 1, _id: -1, st: 1 });
+
+  // get a list of items in a section
+  ItemWish.index({ section: 1, _id: -1, st: 1 });
 
 
   // Set 'hid' for the new item.
