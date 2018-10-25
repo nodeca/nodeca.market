@@ -29,7 +29,7 @@ article#content.market-item-wish(
         h1.market-item-wish__title.page-head__title(itemprop='name')
           span.market-item-wish__title-text= self.item.title
 
-          if user && user._id === self.runtime.user_id
+          if self.item.user === self.runtime.user_id && self.runtime.is_member || self.settings.market_mod_can_edit_items
             a.market-item-wish__edit.icon.icon-edit(
               href=self.link_to('market.item.wish.edit', { section_hid: self.section.hid, item_hid: self.item.hid })
               title=self.t('edit')
@@ -125,30 +125,6 @@ article#content.market-item-wish(
           title=self.t('views')
         )
           = self.item.views
-
-      - var showDropdown = false
-      - showDropdown = showDropdown || self.settings.market_mod_can_add_infractions
-      - showDropdown = showDropdown || self.settings.can_see_ip
-
-      if showDropdown
-        //- no aria parts - visible to moderators only
-        .market-item-wish__control-item.market-item-wish__mod-menu.dropdown.dropup
-          button.btn.btn-square.market-item-wish__action.dropdown-toggle(
-            data-toggle='dropdown'
-            role='button'
-          )
-          .dropdown-menu.dropdown-menu-right(role='menu')
-            if self.settings.market_mod_can_add_infractions
-              button.dropdown-item(
-                data-on-click='market.item.wish:add_infraction'
-                data-item-id=self.item._id
-              )= self.t('add_infraction')
-
-            if self.settings.can_see_ip
-              button.dropdown-item(
-                data-item-id=self.item._id
-                data-on-click='market.item.wish:show_ip'
-              )= self.t('ip_info')
 
     .market-item-wish__responses
       if user && user._id === self.runtime.user_id

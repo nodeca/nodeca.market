@@ -17,8 +17,6 @@ en-US:
   abuse_reported: Your report has been sent
   bookmark_add: Add to bookmarks
   bookmark_remove: Remove from bookmarks
-  ip_info: IP info
-  add_infraction: Add infraction
   infraction_added: Infraction has been added
   infraction_title: "#{points} ((point|points)):points, added at #{date}"
   last_edited: "Last edited on #{date}"
