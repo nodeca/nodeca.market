@@ -29,23 +29,25 @@ article#content.market-item-buy-edit
               input.form-control#market-edit-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value", required)
               select.form-control.market-item-buy-edit__currency.custom-select.input-group-append(data-bind="value: offer.price_currency, options: currencyTypes, optionsText: 'title', optionsValue: 'value'", required)
 
-        mixin render_section_tree(parent, level)
-          //- HTML5 doesn't support nested optgroups, so we emulate this
-          //- behavior with non-breaking space indent
-          each section in self.sections
-            if (section.parent || null) === parent
-              if section.is_category
-                optgroup(label=Array(level*4+1).join('\u00A0') + section.title)
-              else
-                option(value=section._id)= Array(level*4+1).join('\u00A0') + section.title
-              +render_section_tree(section._id, level + 1)
+        mixin sections_tree(sections, deepness)
+          each section in sections
+
+            - var prefix = Array(deepness).join('\u2003\u2003');
+
+            option(
+              disabled=section.is_category
+              value=section._id
+            )=prefix + section.title
+
+            if section.children && section.children.length
+              +sections_tree(section.children, deepness + 1)
 
         .row
           .form-group.col
             label.market-item-buy-edit__label(for='market-edit-section')= self.t('field_section')
             select.form-control.custom-select#market-edit-section(data-bind="value: offer.section", required)
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
-              +render_section_tree(null, 0)
+              +sections_tree(self.sections, 1)
 
         -
           var min_images = null, max_images = null;

@@ -21,15 +21,6 @@ function get_source(post) {
   // make sure source ends with newline
   result = result.replace(/\n?$/, '\n');
 
-  // add attachments
-  if (post.files.length) {
-    result += '\n';
-    result += post.files.map(function (item) {
-      return '![](' + N.router.linkTo('core.gridfs', { bucket: item }) + ')';
-    }).join('\n');
-    result += '\n';
-  }
-
   return result;
 }
 

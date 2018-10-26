@@ -4,10 +4,6 @@
 'use strict';
 
 
-const _                = require('lodash');
-const sanitize_section = require('nodeca.market/lib/sanitizers/section');
-
-
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -52,37 +48,27 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch section tree
+  // Fill default params
   //
-  N.wire.on(apiPath, async function fetch_sections(env) {
-    let section_info = (await N.models.market.Section.getChildren()).filter(s => !s.is_linked);
-
-    let _ids = section_info.map(s => s._id);
-
-    let sections = await N.models.market.Section.find()
-                             .where('_id').in(_ids)
-                             .lean(true);
-
-    let sections_by_id = _.keyBy(sections, '_id');
-
-    // sort result in the same order as ids
-    env.data.sections = section_info.map(info =>
-      Object.assign({}, sections_by_id[info._id], { level: info.level })
-    );
-
-    env.res.sections = await sanitize_section(N, env.data.sections, env.user_info);
-
+  N.wire.on(apiPath, async function fill_defaults(env) {
     env.res.defaults = {
       wish: Object.prototype.hasOwnProperty.call(env.params.$query || {}, 'wish')
     };
 
     if (env.params.$query && env.params.$query.section) {
-      let selected_section = env.res.sections.filter(s => String(s._id) === env.params.$query.section)[0];
+      let selected_section = await N.models.market.Section.findById(env.params.$query.section).lean(true);
 
       if (selected_section && !selected_section.is_category) {
         env.res.defaults.section = selected_section._id;
       }
     }
+  });
+
+
+  // Fill sections tree by subcall
+  //
+  N.wire.after(apiPath, async function fill_sections_tree(env) {
+    await N.wire.emit('internal:market.sections_tree', env);
   });
 
 

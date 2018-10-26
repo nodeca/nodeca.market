@@ -223,6 +223,7 @@ module.exports = function (N, apiPath) {
       'market_displayed_currency',
       'market_mod_can_add_infractions',
       'market_mod_can_delete_items',
+      'market_mod_can_hard_delete_items',
       'market_mod_can_edit_items',
       'market_mod_can_move_items'
     ]));
