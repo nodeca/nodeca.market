@@ -1,4 +1,5 @@
 en-US:
+  closed: Item closed
   location: 'Location:'
   delivery: 'Delivery:'
   delivery_available: yes

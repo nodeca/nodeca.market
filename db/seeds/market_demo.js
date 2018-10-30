@@ -78,7 +78,7 @@ async function createItemOffer(section) {
     delivery:    charlatan.Helpers.sample([ true, false, false ]),
     is_new:      charlatan.Helpers.sample([ true, true, false ]),
 
-    st:          models.market.ItemOffer.statuses.VISIBLE,
+    st:          models.market.ItemOffer.statuses.OPEN,
     section,
     user,
 
@@ -128,7 +128,7 @@ async function createItemWish(section) {
 
     title:    charlatan.Lorem.sentence().slice(0, -1),
 
-    st:       models.market.ItemWish.statuses.VISIBLE,
+    st:       models.market.ItemWish.statuses.OPEN,
     section,
     user,
 

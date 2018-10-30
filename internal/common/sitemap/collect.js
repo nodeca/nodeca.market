@@ -41,7 +41,7 @@ module.exports = function (N, apiPath) {
 
     let item_offers_stream = pumpify.obj(
       N.models.market.ItemOffer.collection.find({
-        st: N.models.market.ItemOffer.statuses.VISIBLE
+        st: N.models.market.ItemOffer.statuses.OPEN
       }, {
         section: 1,
         hid:     1
@@ -61,7 +61,7 @@ module.exports = function (N, apiPath) {
 
     let item_wishes_stream = pumpify.obj(
       N.models.market.ItemWish.collection.find({
-        st: N.models.market.ItemOffer.statuses.VISIBLE
+        st: N.models.market.ItemOffer.statuses.OPEN
       }, {
         section: 1,
         hid:     1

@@ -230,9 +230,9 @@ module.exports = function (N, apiPath) {
 
     if (env.user_info.hb) {
       item.st  = statuses.HB;
-      item.ste = statuses.VISIBLE;
+      item.ste = statuses.OPEN;
     } else {
-      item.st  = statuses.VISIBLE;
+      item.st  = statuses.OPEN;
     }
 
     item.section = env.data.section._id;

@@ -93,12 +93,11 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   //
   N.wire.on(module.apiPath + ':delete', function item_delete(data) {
     let request = {
-      item_id: data.$this.data('item-id'),
-      as_moderator: data.$this.data('as-moderator') || false
+      item_id: data.$this.data('item-id')
     };
     let params = {
       canDeleteHard: N.runtime.page_data.settings.market_mod_can_hard_delete_items,
-      asModerator: request.as_moderator
+      asModerator: true
     };
 
     return Promise.resolve()
@@ -120,10 +119,12 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   // Undelete item
   //
   N.wire.on(module.apiPath + ':undelete', function item_undelete(data) {
-    let item_id = data.$this.data('item-id');
+    let request = {
+      item_id: data.$this.data('item-id')
+    };
 
     return Promise.resolve()
-      .then(() => N.io.rpc('market.item.wish.undelete', { item_id }))
+      .then(() => N.io.rpc('market.item.wish.undelete', request))
       .then(() => N.wire.emit('navigate.reload'))
       .then(() => N.wire.emit('notify.info', t('undelete_item_done')));
   });

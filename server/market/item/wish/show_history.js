@@ -43,7 +43,7 @@ module.exports = function (N, apiPath) {
       user_info: env.user_info
     } };
 
-    await N.wire.emit('internal:market.access.item_offer', access_env);
+    await N.wire.emit('internal:market.access.item_wish', access_env);
 
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
   });

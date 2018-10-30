@@ -38,6 +38,12 @@ module.exports = function (N, apiPath) {
                          .where('hid').equals(match.params.item_hid)
                          .lean(true);
 
+    if (!item) {
+      item = await N.models.market.ItemWishArchived.findOne()
+                       .where('hid').equals(match.params.item_hid)
+                       .lean(true);
+    }
+
     if (!item) return;
 
     let access_env_sub = {
@@ -103,7 +109,9 @@ module.exports = function (N, apiPath) {
     };
 
     let setting_names = [
-      'can_see_hellbanned'
+      'can_see_hellbanned',
+      'market_mod_can_delete_items',
+      'market_mod_can_see_hard_deleted_items'
     ];
 
     let settings = await N.settings.get(setting_names, params, {});
@@ -113,10 +121,18 @@ module.exports = function (N, apiPath) {
 
       let item = locals.cache[id];
 
-      let visibleSt = [ statuses.VISIBLE ];
+      let visibleSt = [ statuses.OPEN, statuses.CLOSED ];
 
       if (locals.data.user_info.hb || settings.can_see_hellbanned) {
         visibleSt.push(statuses.HB);
+      }
+
+      if (settings.market_mod_can_delete_items) {
+        visibleSt.push(statuses.DELETED);
+      }
+
+      if (settings.market_mod_can_see_hard_deleted_items) {
+        visibleSt.push(statuses.DELETED_HARD);
       }
 
       if (visibleSt.indexOf(item.st) === -1) {

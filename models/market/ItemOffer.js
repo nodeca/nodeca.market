@@ -21,15 +21,14 @@ module.exports = function (N, collectionName) {
   set_content_type('MARKET_ITEM_OFFER', 13);
 
   let statuses = {
-    VISIBLE:      1,
-    HB:           2, // hellbanned
+    OPEN:         1, // only in active model
+    CLOSED:       2, // only in archive
     PENDING:      3, // reserved, not used now
-    DELETED:      4,
-    DELETED_HARD: 5
+    DELETED:      4, // only in archive
+    DELETED_HARD: 5, // only in archive
+    HB:           6  // hellbanned, can be in both models depending on ste
   };
 
-
-  statuses.LIST_DELETABLE = [ statuses.VISIBLE, statuses.HB, statuses.PENDING ];
 
   let ItemOffer = new Schema({
     section:      Schema.ObjectId,

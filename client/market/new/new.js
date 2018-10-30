@@ -82,6 +82,9 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   view.showErrors   = ko.observable(false);
 
   function saveDraft(force) {
+    // prevent debounced save when user quits the page
+    if (!view) return;
+
     let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
     if (JSON.stringify(savedDraft) === JSON.stringify(object) && !force) return Promise.resolve();

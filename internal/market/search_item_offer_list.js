@@ -51,7 +51,7 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, function define_visible_statuses(env) {
     let statuses = N.models.market.ItemOffer.statuses;
 
-    env.data.items_visible_statuses = [ statuses.VISIBLE ];
+    env.data.items_visible_statuses = [ statuses.OPEN ];
 
     if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
       env.data.items_visible_statuses.push(statuses.HB);

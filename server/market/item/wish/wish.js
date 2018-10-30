@@ -25,32 +25,12 @@ module.exports = function (N, apiPath) {
                          .lean(true);
 
     if (!item) {
-      // maybe offer type is wrong, redirect in that case
-      item = await N.models.market.ItemOffer.findOne()
+      item = await N.models.market.ItemWishArchived.findOne()
                        .where('hid').equals(env.params.item_hid)
                        .lean(true);
-
-      if (!item) throw N.io.NOT_FOUND;
-
-      let access_env = { params: {
-        items: item,
-        user_info: env.user_info
-      } };
-
-      await N.wire.emit('internal:market.access.item_offer', access_env);
-
-      if (!access_env.data.access_read) throw N.io.NOT_FOUND;
-
-      throw {
-        code: N.io.REDIRECT,
-        head: {
-          Location: N.router.linkTo('market.item.buy', {
-            section_hid: env.params.section_hid,
-            item_hid:    env.params.item_hid
-          })
-        }
-      };
     }
+
+    if (!item) throw N.io.NOT_FOUND;
 
     let access_env = { params: {
       items: item,

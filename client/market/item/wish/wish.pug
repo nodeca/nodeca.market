@@ -1,3 +1,7 @@
+- var itemStatuses = '$$ JSON.stringify(N.models.market.ItemWish.statuses) $$'
+- var isOpen = (self.item.st === itemStatuses.OPEN || self.item.ste === itemStatuses.OPEN)
+- var isClosed = (self.item.st === itemStatuses.CLOSED || self.item.ste === itemStatuses.CLOSED)
+
 - self.add_raw_data('settings', self.settings)
 - self.add_raw_data('section_hid', self.section.hid)
 
@@ -8,6 +12,10 @@
 - var user = self.users[self.item.user] || {};
 
 article#content.market-item-wish(
+  class=isOpen ? 'market-item-wish__m-open' : ''
+  class=isClosed ? 'market-item-wish__m-closed' : ''
+  class=(self.item.st === itemStatuses.DELETED) ? 'market-item-wish__m-deleted' : ''
+  class=(self.item.st === itemStatuses.DELETED_HARD) ? 'market-item-wish__m-deleted-hard' : ''
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-wish__m-bookmarked' : ''
 )
   -
@@ -28,6 +36,8 @@ article#content.market-item-wish(
     header.page-head.market-item-wish__head
       .market-item-wish__title-toolbar
         h1.market-item-wish__title.page-head__title(itemprop='name')
+          span.market-item-wish__closed-mark.icon.icon-closed.icon-space-after(title=self.t('closed'))
+
           span.market-item-wish__title-text= self.item.title
 
           if self.item.user === self.runtime.user_id && self.runtime.is_member || self.settings.market_mod_can_edit_items
@@ -132,7 +142,7 @@ article#content.market-item-wish(
         = self.t('no_responses')
 
       else if self.runtime.is_member
-        button.btn.btn-secondary(
+        button.btn.btn-secondary.market-item-wish__contact(
           data-on-click='market.item.wish:contact'
           data-to-nick=user.nick
           data-to-hid=user.hid
