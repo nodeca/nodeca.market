@@ -32,6 +32,12 @@ module.exports = function (N, apiPath) {
                           .select('ip')
                           .lean(true);
 
+    if (!item) {
+      item = await N.models.market.ItemOfferArchived.findById(env.params.item_id)
+                       .select('ip')
+                       .lean(true);
+    }
+
     if (!item) throw N.io.NOT_FOUND;
 
     if (!item.ip) {

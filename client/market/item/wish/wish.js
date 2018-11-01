@@ -109,7 +109,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       })
       .then(() =>
         N.wire.emit('navigate.to', {
-          apiPath: 'market.section',
+          apiPath: 'market.section.wish',
           params: { section_hid: N.runtime.page_data.section_hid }
         })
       );

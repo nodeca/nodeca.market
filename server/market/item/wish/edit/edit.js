@@ -29,6 +29,12 @@ module.exports = function (N, apiPath) {
                          .where('hid').equals(env.params.item_hid)
                          .lean(true);
 
+    if (!item) {
+      item = await N.models.market.ItemWishArchived.findOne()
+                       .where('hid').equals(env.params.item_hid)
+                       .lean(true);
+    }
+
     if (!item) throw N.io.NOT_FOUND;
 
     let access_env = { params: {

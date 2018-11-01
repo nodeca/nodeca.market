@@ -28,6 +28,14 @@ module.exports = function (N, apiPath) {
                               .findById(env.params.item_id)
                               .lean(true);
 
+    if (!item) {
+      item = await N.models.market.ItemWishArchived
+                       .findById(env.params.item_id)
+                       .lean(true);
+
+      env.data.item_is_archived = true;
+    }
+
     if (!item) throw N.io.NOT_FOUND;
 
     if (item.st === statuses.DELETED || item.st === statuses.DELETED_HARD) {
@@ -60,15 +68,10 @@ module.exports = function (N, apiPath) {
     //
     if (env.params.as_moderator) {
       let settings = await env.extras.settings.fetch([
-        'market_mod_can_delete_items',
-        'market_mod_can_hard_delete_items'
+        'market_mod_can_move_items',
       ]);
 
-      if (!settings.market_mod_can_delete_items && env.params.method === 'soft') {
-        throw N.io.FORBIDDEN;
-      }
-
-      if (!settings.market_mod_can_hard_delete_items && env.params.method === 'hard') {
+      if (!settings.market_mod_can_move_items) {
         throw N.io.FORBIDDEN;
       }
 
@@ -100,9 +103,13 @@ module.exports = function (N, apiPath) {
       update = { st: statuses.CLOSED };
     }
 
-    // move item to archive
-    await N.models.market.ItemWish.remove({ _id: item._id });
-    await N.models.market.ItemWishArchived.create(Object.assign({}, env.data.item, update));
+    // move item to archive if it wasn't there already, update otherwise
+    if (env.data.item_is_archived) {
+      await N.models.market.ItemWishArchived.update({ _id: item._id }, update);
+    } else {
+      await N.models.market.ItemWish.remove({ _id: item._id });
+      await N.models.market.ItemWishArchived.create(Object.assign({}, env.data.item, update));
+    }
   });
 
 

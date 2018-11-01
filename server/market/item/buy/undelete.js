@@ -1,4 +1,4 @@
-// Remove item by id
+// Restore item by id
 //
 
 'use strict';
@@ -10,9 +10,7 @@ const _ = require('lodash');
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    item_id: { format: 'mongo', required: true },
-    reason:  { type: 'string' },
-    method:  { type: 'string', 'enum': [ 'hard', 'soft' ], required: true }
+    item_id: { format: 'mongo', required: true }
   });
 
 
@@ -28,57 +26,48 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, async function fetch_item(env) {
     let statuses = N.models.market.ItemOffer.statuses;
 
-    let item = await N.models.market.ItemOffer
+    let item = await N.models.market.ItemOfferArchived
                               .findById(env.params.item_id)
                               .lean(true);
 
+    env.data.item_is_archived = true;
+
     if (!item) {
-      item = await N.models.market.ItemOfferArchived
+      // maybe item is already in active collection
+      // (race condition or a mistake somewhere else)
+      item = await N.models.market.ItemOffer
                        .findById(env.params.item_id)
                        .lean(true);
 
-      env.data.item_is_archived = true;
+      env.data.item_is_archived = false;
     }
 
     if (!item) throw N.io.NOT_FOUND;
 
-    if (item.st === statuses.DELETED || item.st === statuses.DELETED_HARD) {
-      throw N.io.NOT_FOUND;
-    }
-
     env.data.item = item;
-  });
-
-
-  // Check if user can see this item
-  //
-  N.wire.before(apiPath, async function check_access(env) {
-    let access_env = { params: {
-      items: env.data.item,
-      user_info: env.user_info
-    } };
-
-    await N.wire.emit('internal:market.access.item_offer', access_env);
-
-    if (!access_env.data.access_read) throw N.io.NOT_FOUND;
   });
 
 
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
+    let statuses = N.models.market.ItemOffer.statuses;
+
     let settings = await env.extras.settings.fetch([
       'market_mod_can_delete_items',
-      'market_mod_can_hard_delete_items'
+      'market_mod_can_see_hard_deleted_items'
     ]);
 
-    if (!settings.market_mod_can_delete_items && env.params.method === 'soft') {
-      throw N.io.FORBIDDEN;
+    if (env.data.item.st === statuses.DELETED && settings.market_mod_can_delete_items) {
+      return;
     }
 
-    if (!settings.market_mod_can_hard_delete_items && env.params.method === 'hard') {
-      throw N.io.FORBIDDEN;
+    if (env.data.item.st === statuses.DELETED_HARD && settings.market_mod_can_see_hard_deleted_items) {
+      return;
     }
+
+    // We should not show that item exists if no permissions
+    throw N.io.NOT_FOUND;
   });
 
 
@@ -105,6 +94,40 @@ module.exports = function (N, apiPath) {
     } else {
       await N.models.market.ItemOffer.remove({ _id: item._id });
       await N.models.market.ItemOfferArchived.create(Object.assign({}, env.data.item, update));
+    }
+  });
+
+
+  // Undelete item
+  //
+  N.wire.on(apiPath, async function undelete_item(env) {
+    let statuses = N.models.market.ItemOffer.statuses;
+    let item = env.data.item;
+
+    let update = {
+      $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
+    };
+
+    _.assign(update, item.prev_st);
+
+    await N.models.market.ItemOffer.update({ _id: item._id }, update);
+
+    if (item.prev_st.st === statuses.OPEN || item.prev_st.ste === statuses.OPEN) {
+      // item is open, so it should be in active collection now
+      if (!env.data.item_is_archived) {
+        await N.models.market.ItemOffer.update({ _id: item._id }, update);
+      } else {
+        await N.models.market.ItemOfferArchived.remove({ _id: item._id });
+        await N.models.market.ItemOffer.create(Object.assign({}, env.data.item, update));
+      }
+    } else {
+      // item should remain archived
+      if (env.data.item_is_archived) {
+        await N.models.market.ItemOfferArchived.update({ _id: item._id }, update);
+      } else {
+        await N.models.market.ItemOffer.remove({ _id: item._id });
+        await N.models.market.ItemOfferArchived.create(Object.assign({}, env.data.item, update));
+      }
     }
   });
 

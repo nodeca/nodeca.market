@@ -31,6 +31,12 @@ module.exports = function (N, apiPath) {
                               .findById(env.params.item_id)
                               .lean(true);
 
+    if (!env.data.item) {
+      env.data.item = await N.models.market.ItemOfferArchived
+                                .findById(env.params.item_id)
+                                .lean(true);
+    }
+
     if (!env.data.item) throw N.io.NOT_FOUND;
   });
 

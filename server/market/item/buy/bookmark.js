@@ -26,6 +26,12 @@ module.exports = function (N, apiPath) {
                               .findById(env.params.item_id)
                               .lean(true);
 
+    if (!env.data.item) {
+      env.data.item = await N.models.market.ItemOfferArchived
+                                .findById(env.params.item_id)
+                                .lean(true);
+    }
+
     if (!env.data.item) throw N.io.NOT_FOUND;
   });
 
@@ -76,6 +82,11 @@ module.exports = function (N, apiPath) {
     env.res.count = count;
 
     await N.models.market.ItemOffer.update(
+      { _id: env.data.item._id },
+      { bookmarks: count }
+    );
+
+    await N.models.market.ItemOfferArchived.update(
       { _id: env.data.item._id },
       { bookmarks: count }
     );

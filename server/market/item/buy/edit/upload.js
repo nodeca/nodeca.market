@@ -34,6 +34,10 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, async function fetch_item(env) {
     let item = await N.models.market.ItemOffer.findById(env.params.item_id).lean(true);
 
+    if (!item) {
+      item = await N.models.market.ItemOfferArchived.findById(env.params.item_id).lean(true);
+    }
+
     if (!item) throw N.io.NOT_FOUND;
 
     let access_env = { params: {
@@ -144,6 +148,11 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function update_item(env) {
     let item = await N.models.market.ItemOffer.findById(env.data.item._id)
                          .lean(false);
+
+    if (!item) {
+      item = await N.models.market.ItemOfferArchived.findById(env.data.item._id)
+                       .lean(false);
+    }
 
     if (!item) throw N.io.NOT_FOUND;
 

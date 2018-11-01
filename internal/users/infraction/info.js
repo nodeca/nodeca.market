@@ -29,9 +29,13 @@ module.exports = function (N, apiPath) {
 
     // Fetch items
     //
-    let items = await N.models.market.ItemOffer.find()
+    let items = []
+          .concat(await N.models.market.ItemOffer.find()
                             .where('_id').in(item_ids)
-                            .lean(true);
+                            .lean(true))
+          .concat(await N.models.market.ItemOfferArchived.find()
+                            .where('_id').in(item_ids)
+                            .lean(true));
 
     // Fetch sections
     //
@@ -77,9 +81,13 @@ module.exports = function (N, apiPath) {
 
     // Fetch items
     //
-    let items = await N.models.market.ItemWish.find()
+    let items = []
+          .concat(await N.models.market.ItemWish.find()
                             .where('_id').in(item_ids)
-                            .lean(true);
+                            .lean(true))
+          .concat(await N.models.market.ItemWishArchived.find()
+                            .where('_id').in(item_ids)
+                            .lean(true));
 
     // Fetch sections
     //
