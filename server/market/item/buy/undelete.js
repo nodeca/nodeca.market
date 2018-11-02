@@ -4,9 +4,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -24,8 +21,6 @@ module.exports = function (N, apiPath) {
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
-    let statuses = N.models.market.ItemOffer.statuses;
-
     let item = await N.models.market.ItemOfferArchived
                               .findById(env.params.item_id)
                               .lean(true);
@@ -71,47 +66,31 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Remove item
-  //
-  N.wire.on(apiPath, async function delete_item(env) {
-    let statuses = N.models.market.ItemOffer.statuses;
-
-    let item = env.data.item;
-    let update = {
-      st: env.params.method === 'hard' ? statuses.DELETED_HARD : statuses.DELETED,
-      $unset: { ste: 1 },
-      prev_st: _.pick(item, [ 'st', 'ste' ]),
-      del_by: env.user_info.user_id
-    };
-
-    if (env.params.reason) {
-      update.del_reason = env.params.reason;
-    }
-
-    // move item to archive if it wasn't there already, update otherwise
-    if (env.data.item_is_archived) {
-      await N.models.market.ItemOfferArchived.update({ _id: item._id }, update);
-    } else {
-      await N.models.market.ItemOffer.remove({ _id: item._id });
-      await N.models.market.ItemOfferArchived.create(Object.assign({}, env.data.item, update));
-    }
-  });
-
-
   // Undelete item
   //
   N.wire.on(apiPath, async function undelete_item(env) {
     let statuses = N.models.market.ItemOffer.statuses;
+    let market_items_expire = await N.settings.get('market_items_expire');
     let item = env.data.item;
 
     let update = {
       $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
     };
 
-    _.assign(update, item.prev_st);
+    if (market_items_expire > 0 && item.ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
+      // undeleting previously open, but old item: should close automatically
+      if (item.prev_st.st === statuses.HB && item.prev_st.ste === statuses.OPEN) {
+        item.prev_st.ste = statuses.CLOSED;
+      } else if (item.prev_st.st === statuses.OPEN) {
+        item.prev_st.st = statuses.CLOSED;
+      }
+    }
+
+    Object.assign(update, item.prev_st);
 
     await N.models.market.ItemOffer.update({ _id: item._id }, update);
 
+    /* eslint-disable no-lonely-if */
     if (item.prev_st.st === statuses.OPEN || item.prev_st.ste === statuses.OPEN) {
       // item is open, so it should be in active collection now
       if (!env.data.item_is_archived) {

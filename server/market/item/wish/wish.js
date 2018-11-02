@@ -201,6 +201,7 @@ module.exports = function (N, apiPath) {
       'can_see_ip',
       'market_can_create_items',
       'market_displayed_currency',
+      'market_items_expire',
       'market_mod_can_add_infractions',
       'market_mod_can_delete_items',
       'market_mod_can_hard_delete_items',

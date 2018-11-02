@@ -4,14 +4,17 @@ i18n:
       core:
         group_names:
           market: Market
+          market_general: General
           market_editor: Editor
 
         category_names:
-          market: Market
+          market_common: Common
           market_item: Item
           market_items_markup: Market items markup
 
         setting_names:
+          market_items_expire: Max time for items to be active, older ones will be closed automatically (days)
+          market_drafts_expire: Max time to store drafts (days)
           market_title_min_length: Min title length
           market_desc_min_length: Min description length
           market_items_min_images: Min number of images in a lot

@@ -68,7 +68,7 @@ module.exports = function (N, apiPath) {
     //
     if (env.params.as_moderator) {
       let settings = await env.extras.settings.fetch([
-        'market_mod_can_move_items',
+        'market_mod_can_move_items'
       ]);
 
       if (!settings.market_mod_can_move_items) {

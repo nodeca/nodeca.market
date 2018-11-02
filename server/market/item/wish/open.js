@@ -67,12 +67,20 @@ module.exports = function (N, apiPath) {
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
+    let market_items_expire = await N.settings.get('market_items_expire');
+
+    // cannot open old items (pointless, they'd be auto-closed again),
+    // is restricted on the client also
+    if (market_items_expire > 0 && env.data.item.ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
+      throw N.io.FORBIDDEN;
+    }
+
     //
     // Check moderator permissions
     //
     if (env.params.as_moderator) {
       let settings = await env.extras.settings.fetch([
-        'market_mod_can_move_items',
+        'market_mod_can_move_items'
       ]);
 
       if (!settings.market_mod_can_move_items) {

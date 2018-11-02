@@ -85,5 +85,10 @@ module.exports = function (N, apiPath) {
       { _id: env.data.item._id },
       { bookmarks: count }
     );
+
+    await N.models.market.ItemWishArchived.update(
+      { _id: env.data.item._id },
+      { bookmarks: count }
+    );
   });
 };

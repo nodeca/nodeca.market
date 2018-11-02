@@ -11,7 +11,8 @@ if self.item.user === self.runtime.user_id && self.settings.market_can_create_it
   if self.item.st === itemStatuses.OPEN || self.item.ste === itemStatuses.OPEN
     - items.push('close')
   if self.item.st === itemStatuses.CLOSED || self.item.ste === itemStatuses.CLOSED
-    - items.push('open')
+    if !(self.settings.market_items_expire > 0 && new Date(self.item.ts) < Date.now() - self.settings.market_items_expire * 24 * 60 * 60 * 1000)
+      - items.push('open')
 
 if items.length > 0
   - items.push('divider')
@@ -34,7 +35,8 @@ if self.settings.market_mod_can_move_items
   if self.item.st === itemStatuses.OPEN || self.item.ste === itemStatuses.OPEN
     - items.push('mod_close')
   if self.item.st === itemStatuses.CLOSED || self.item.ste === itemStatuses.CLOSED
-    - items.push('mod_open')
+    if !(self.settings.market_items_expire > 0 && new Date(self.item.ts) < Date.now() - self.settings.market_items_expire * 24 * 60 * 60 * 1000)
+      - items.push('mod_open')
 
   - items.push('mod_move')
 
