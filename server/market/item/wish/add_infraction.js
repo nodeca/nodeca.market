@@ -98,7 +98,7 @@ module.exports = function (N, apiPath) {
       reason,
       points: env.params.points,
       src: env.data.item._id,
-      src_type: N.shared.content_type.MARKET_ITEM_REQUEST
+      src_type: N.shared.content_type.MARKET_ITEM_WISH
     });
 
     if (env.params.expire > 0) {

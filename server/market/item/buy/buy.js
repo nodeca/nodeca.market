@@ -28,6 +28,7 @@ module.exports = function (N, apiPath) {
       item = await N.models.market.ItemOfferArchived.findOne()
                        .where('hid').equals(env.params.item_hid)
                        .lean(true);
+      env.data.item_is_archived = true;
     }
 
     if (!item) throw N.io.NOT_FOUND;
@@ -113,11 +114,28 @@ module.exports = function (N, apiPath) {
   // Fill breadcrumbs info
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
-    let parents = await N.models.market.Section.getParentList(env.data.section._id);
+    if (env.data.item_is_archived) {
+      env.res.breadcrumbs = [ {
+        text: env.t('@common.menus.navbar.market'),
+        route: 'market.index.buy'
+      } ];
 
-    // add current section
-    parents.push(env.data.section._id);
-    await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents });
+      let user = await N.models.users.User.findById(env.data.item.user).lean(true);
+
+      if (user) {
+        env.res.breadcrumbs.push({
+          text: env.t('breadcrumbs_archive', { nick: user.nick }),
+          route: 'market.user.buy_closed',
+          params: { user_hid: user.hid }
+        });
+      }
+    } else {
+      let parents = await N.models.market.Section.getParentList(env.data.section._id);
+
+      // add current section
+      parents.push(env.data.section._id);
+      await N.wire.emit('internal:market.breadcrumbs_fill', { env, parents });
+    }
   });
 
 

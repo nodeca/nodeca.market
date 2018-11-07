@@ -36,6 +36,10 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, async function fetch_item_section(params) {
     params.data.item = await N.models.market.ItemOffer.findById(params.report.src).lean(true);
 
+    if (!params.data.item) {
+      params.data.item = await N.models.market.ItemOfferArchived.findById(params.report.src).lean(true);
+    }
+
     if (!params.data.item) throw N.io.NOT_FOUND;
 
     params.data.section = await N.models.market.Section.findById(params.data.item.section).lean(true);

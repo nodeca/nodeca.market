@@ -71,7 +71,7 @@ module.exports = function (N, apiPath) {
 
     let report = new N.models.core.AbuseReport({
       src: env.data.item._id,
-      type: N.shared.content_type.MARKET_ITEM_REQUEST,
+      type: N.shared.content_type.MARKET_ITEM_WISH,
       text: env.params.message,
       from: env.user_info.user_id,
       params_ref: await N.models.core.MessageParams.setParams(params)

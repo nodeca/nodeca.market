@@ -1,4 +1,6 @@
 en-US:
+  breadcrumbs_archive: "#{nick}'s archive"
+
   ip_info:
     err_no_ip: IP address for this item is not specified
 
