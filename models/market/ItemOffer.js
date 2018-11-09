@@ -29,6 +29,8 @@ module.exports = function (N, collectionName) {
     HB:           6  // hellbanned, can be in both models depending on ste
   };
 
+  statuses.LIST_VISIBLE   = [ statuses.OPEN, statuses.CLOSED ];
+
 
   let ItemOffer = new Schema({
     section:      Schema.ObjectId,

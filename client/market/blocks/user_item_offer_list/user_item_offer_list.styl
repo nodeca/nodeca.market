@@ -1,0 +1,36 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-user-buy-item
+  display flex
+  margin-top 1rem
+
+.market-user-buy-item__info
+  margin-left 1rem
+  flex 1 1 auto
+
+.market-user-buy-item__title
+.market-user-buy-item__price
+  font-size $font-size-lg
+
+.market-user-buy-item__location-link
+.market-user-buy-item__section-link
+  color $body-color-secondary
+
+.market-user-buy-item__details
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-user-buy-item__details-item
+  display inline
+
+.market-user-buy-item__details-item + .market-user-buy-item__details-item
+  &:before
+    content ' | '
+
+.market-user-buy-item__icon
+  color $body-color-secondary
+
+.market-user-buy-item__m-selected
+  background-color #ffd

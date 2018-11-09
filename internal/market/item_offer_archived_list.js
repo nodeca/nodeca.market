@@ -17,9 +17,9 @@
 'use strict';
 
 
-const _                  = require('lodash');
-const sanitize_item_wish = require('nodeca.market/lib/sanitizers/item_wish');
-const sanitize_section   = require('nodeca.market/lib/sanitizers/section');
+const _                   = require('lodash');
+const sanitize_item_offer = require('nodeca.market/lib/sanitizers/item_offer');
+const sanitize_section    = require('nodeca.market/lib/sanitizers/section');
 
 let setting_names = [
   'can_see_hellbanned',
@@ -49,7 +49,7 @@ module.exports = function (N, apiPath) {
   // Define visible item statuses
   //
   N.wire.before(apiPath, function define_visible_statuses(env) {
-    let statuses = N.models.market.ItemWish.statuses;
+    let statuses = N.models.market.ItemOffer.statuses;
 
     env.data.items_visible_statuses = statuses.LIST_VISIBLE.slice(0);
 
@@ -70,7 +70,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function fetch_and_sort_items(env) {
 
-    let items = await N.models.market.ItemWish.find()
+    let items = await N.models.market.ItemOfferArchived.find()
                           .where('_id').in(env.data.item_ids)
                           .where('st').in(env.data.items_visible_statuses)
                           .lean(true);
@@ -131,6 +131,21 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch currency rates
+  //
+  N.wire.after(apiPath, async function fetch_currency_rates(env) {
+    let currencies = _.uniq(env.data.items.map(i => i.price && i.price.currency).filter(Boolean));
+
+    env.res.currency_rates = {};
+
+    for (let c of currencies) {
+      env.res.currency_rates[c] = await N.models.market.CurrencyRate.get(
+        c, env.data.settings.market_displayed_currency
+      );
+    }
+  });
+
+
   // Fetch locations
   //
   N.wire.after(apiPath, async function fetch_locations(env) {
@@ -151,6 +166,6 @@ module.exports = function (N, apiPath) {
   // Sanitize and fill items
   //
   N.wire.after(apiPath, async function items_sanitize_and_fill(env) {
-    env.res.items = await sanitize_item_wish(N, env.data.items, env.user_info);
+    env.res.items = await sanitize_item_offer(N, env.data.items, env.user_info);
   });
 };

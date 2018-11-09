@@ -11,10 +11,10 @@ const LIMIT = 50; // max items to fetch before and after
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    section_hid: { type: 'integer', minimum: 1, required: true },
-    start:       { format: 'mongo', required: true },
-    before:      { type: 'integer', minimum: 0, maximum: LIMIT, required: true },
-    after:       { type: 'integer', minimum: 0, maximum: LIMIT, required: true }
+    user_hid: { type: 'integer', minimum: 1, required: true },
+    start:    { format: 'mongo', required: true },
+    before:   { type: 'integer', minimum: 0, maximum: LIMIT, required: true },
+    after:    { type: 'integer', minimum: 0, maximum: LIMIT, required: true }
   });
 
 
@@ -24,14 +24,13 @@ module.exports = function (N, apiPath) {
   // Subcall item list
   //
   N.wire.on(apiPath, async function subcall_item_list(env) {
-    env.data.section_hid    = env.params.section_hid;
     env.data.select_start   = env.params.start;
     env.data.select_before  = env.params.before;
     env.data.select_after   = env.params.after;
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.section_item_wish_list', env);
+    await N.wire.emit('internal:market.item_offer_list_archived', env);
   });
 
 
@@ -46,8 +45,8 @@ module.exports = function (N, apiPath) {
     if (env.params.after > 0 && env.data.items.length > 0) {
       let last_item_id = env.data.items[0]._id;
 
-      let item = await N.models.market.ItemWish.findOne()
-                           .where('section').equals(env.data.section._id)
+      let item = await N.models.market.ItemWishArchived.findOne()
+                           .where('user').equals(env.data.user._id)
                            .where('_id').lt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('_id')
@@ -56,8 +55,8 @@ module.exports = function (N, apiPath) {
 
       // `item` is only used to check if there is a post afterwards
       if (item) {
-        env.res.head.next = N.router.linkTo('market.section.wish', {
-          section_hid: env.data.section.hid,
+        env.res.head.next = N.router.linkTo('market.user.wish_closed', {
+          user_hid: env.data.user.hid,
           $query: {
             from: String(env.data.items[env.data.items.length - 1].hid),
             next: ''
@@ -72,8 +71,8 @@ module.exports = function (N, apiPath) {
     if (env.params.before > 0 && env.data.items.length > 0) {
       let last_item_id = env.data.items[0]._id;
 
-      let item = await N.models.market.ItemWish.findOne()
-                           .where('section').equals(env.data.section._id)
+      let item = await N.models.market.ItemWishArchived.findOne()
+                           .where('user').equals(env.data.user._id)
                            .where('_id').gt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('_id')
@@ -82,8 +81,8 @@ module.exports = function (N, apiPath) {
 
       // `item` is only used to check if there is a post afterwards
       if (item) {
-        env.res.head.prev = N.router.linkTo('market.section.wish', {
-          section_hid: env.data.section.hid,
+        env.res.head.prev = N.router.linkTo('market.user.wish_closed', {
+          user_hid: env.data.user.hid,
           $query: {
             from: String(env.data.items[0].hid),
             prev: ''
@@ -102,8 +101,8 @@ module.exports = function (N, apiPath) {
     //
     let counters_by_status = await Promise.all(
       env.data.items_visible_statuses.map(st =>
-        N.models.market.ItemWish
-            .where('section').equals(env.data.section._id)
+        N.models.market.ItemWishArchived
+            .where('user').equals(env.data.user._id)
             .where('st').equals(st)
             .count()
       )
@@ -119,8 +118,8 @@ module.exports = function (N, apiPath) {
     if (env.data.items.length) {
       let counters_by_status = await Promise.all(
         env.data.items_visible_statuses.map(st =>
-          N.models.market.ItemWish
-              .where('section').equals(env.data.section._id)
+          N.models.market.ItemWishArchived
+              .where('user').equals(env.data.user._id)
               .where('st').equals(st)
               .where('_id').gt(env.data.items[0]._id)
               .count()

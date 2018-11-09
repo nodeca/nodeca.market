@@ -1,16 +1,4 @@
 en-US:
-  buy_active:
-    title: Market items
-
-  buy_closed:
-    title: Market items
-
-  wish_active:
-    title: Market items
-
-  wish_closed:
-    title: Market items
-
   tabs:
     buy_active: Active items
     buy_closed: Closed items

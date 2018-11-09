@@ -1,0 +1,67 @@
+//- show many operations checkbox
+- var multiselect_allowed = false;
+
+each item in self.items
+  - var section = self.sections_by_id[item.section] || {};
+
+  li.market-user-buy-item(
+    id='item' + item.hid
+    data-item-id=item._id
+    data-item-hid=item.hid
+  )
+    a.market-user-buy-item__photo.thumb(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+      if item.files && item.files.length > 0
+        img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+      else
+        .thumb__content= self.t('no_photo')
+    .market-user-buy-item__info
+      .market-user-buy-item__title
+        a.market-user-buy-item__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+          = item.title
+        if !item.is_new
+          sub.market-user-buy-item__icon
+            = ' '
+            = self.t('used')
+
+      .market-user-buy-item__price
+        - var price = item.price || {};
+        = self.price(price.value, price.currency, self.settings.market_displayed_currency, self.currency_rates[price.currency])
+
+        if item.barter_info
+          = ' '
+          //- TODO: icon-exchange
+          span.market-user-buy-item__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+
+      .market-user-buy-item__location
+        if item.location
+          a.market-user-buy-item__location-link(
+            href= '#'
+            data-on-click= 'common.blocks.location_show_dlg'
+            data-latitude= item.location && item.location[1]
+            data-longitude= item.location && item.location[0]
+          )
+            span.icon.icon-location.icon-space-after
+
+            if self.location_names[item.location[0] + ':' + item.location[1]]
+              = self.location_names[item.location[0] + ':' + item.location[1]]
+
+        if item.delivery
+          = ' '
+          //- TODO: icon-delivery
+          span.market-user-buy-item__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
+
+      .market-user-buy-item__details
+        .market-user-buy-item__details-item!= self.timetag(item.ts, 'relative')
+        .market-user-buy-item__details-item
+          a.market-user-buy-item__section-link(
+            href=self.link_to('market.section.buy', { section_hid: section.hid })
+          )
+            = section.title
+
+    if multiselect_allowed
+      label.market-user-buy-item__select(title=self.t('multiselect_hint'))
+        input.market-user-buy-item__select-cb(
+          type='checkbox'
+          data-item-id=item._id
+          data-on-change='market.blocks.user_item_offer_list:item_check'
+        )

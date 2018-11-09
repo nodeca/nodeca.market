@@ -70,7 +70,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function fetch_and_sort_items(env) {
 
-    let items = await N.models.market.ItemWish.find()
+    let items = await N.models.market.ItemWishArchived.find()
                           .where('_id').in(env.data.item_ids)
                           .where('st').in(env.data.items_visible_statuses)
                           .lean(true);
