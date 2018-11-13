@@ -101,6 +101,43 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch number of actimembers, leaders, pending and blocked users;
+  // needed to display this information on tabs
+  //
+  N.wire.before(apiPath, async function fetch_stats(env) {
+    if (!env.data.can_manage_users) return;
+
+    let [
+      members,
+      owners,
+      blocked,
+      pending_members,
+      pending_owners,
+      log_records
+    ] = await Promise.all([
+      N.models.clubs.Membership.count({ club: env.data.club._id }),
+      N.models.clubs.Membership.count({ club: env.data.club._id, is_owner: true }),
+      N.models.clubs.Blocked.count({ club: env.data.club._id }),
+      env.data.club.is_closed ?
+        N.models.clubs.MembershipPending.count({ club: env.data.club._id }) :
+        Promise.resolve(),
+      N.models.clubs.OwnershipPending.count({ club: env.data.club._id }),
+      env.data.can_see_log ?
+        N.models.clubs.ClubAuditLog.count({ club: env.data.club._id }) :
+        Promise.resolve()
+    ]);
+
+    env.res.stats = {
+      members,
+      owners,
+      blocked,
+      pending_members,
+      pending_owners,
+      log_records
+    };
+  });
+
+
   // Fill pagination (progress)
   //
   N.wire.after(apiPath, async function fill_pagination(env) {

@@ -26,6 +26,8 @@ let setting_names = [
   'market_can_create_items',
   'market_displayed_currency',
   'market_items_per_page',
+  'market_mod_can_delete_items',
+  'market_mod_can_see_hard_deleted_items',
   'market_show_ignored'
 ];
 
@@ -46,15 +48,24 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Define visible item statuses
+  // Define visible item statuses,
+  // archive collection can have only CLOSED, HB and DELETED statuses
   //
   N.wire.before(apiPath, function define_visible_statuses(env) {
-    let statuses = N.models.market.ItemWish.statuses;
+    let statuses = N.models.market.ItemOffer.statuses;
 
-    env.data.items_visible_statuses = statuses.LIST_VISIBLE.slice(0);
+    env.data.items_visible_statuses = [ statuses.CLOSED ];
 
     if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
       env.data.items_visible_statuses.push(statuses.HB);
+    }
+
+    if (env.data.settings.market_mod_can_delete_items) {
+      env.data.items_visible_statuses.push(statuses.DELETED);
+    }
+
+    if (env.data.settings.market_mod_can_see_hard_deleted_items) {
+      env.data.items_visible_statuses.push(statuses.DELETED_HARD);
     }
   });
 

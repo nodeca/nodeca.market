@@ -29,8 +29,6 @@ module.exports = function (N, collectionName) {
     HB:           6  // hellbanned, can be in both models depending on ste
   };
 
-  statuses.LIST_VISIBLE   = [ statuses.OPEN, statuses.CLOSED ];
-
 
   let ItemOffer = new Schema({
     section:      Schema.ObjectId,
@@ -108,10 +106,10 @@ module.exports = function (N, collectionName) {
   ItemOffer.index({ hid: 1 });
 
   // get a list of user items
-  ItemOffer.index({ user: 1, _id: -1, st: 1 });
+  ItemOffer.index({ user: 1, st: 1, _id: -1 });
 
   // get a list of items in a section
-  ItemOffer.index({ section: 1, _id: -1, st: 1 });
+  ItemOffer.index({ section: 1, st: 1, _id: -1 });
 
 
   // Set 'hid' for the new item.

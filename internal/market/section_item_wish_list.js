@@ -60,12 +60,13 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Define visible item statuses
+  // Define visible item statuses,
+  // active collection can have only OPEN and HB statuses
   //
   N.wire.before(apiPath, function define_visible_statuses(env) {
-    let statuses = N.models.market.ItemWish.statuses;
+    let statuses = N.models.market.ItemOffer.statuses;
 
-    env.data.items_visible_statuses = statuses.LIST_VISIBLE.slice(0);
+    env.data.items_visible_statuses = [ statuses.OPEN ];
 
     if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
       env.data.items_visible_statuses.push(statuses.HB);

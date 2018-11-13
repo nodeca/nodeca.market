@@ -84,7 +84,7 @@ module.exports = function (N, collectionName) {
   ItemOfferArchived.index({ hid: 1 });
 
   // get a list of user items
-  ItemOfferArchived.index({ user: 1, _id: -1, st: 1 });
+  ItemOfferArchived.index({ user: 1, st: 1, _id: -1 });
 
 
   // Set 'hid' for the new item.
