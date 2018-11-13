@@ -16,12 +16,12 @@ article#content.market-user.market-user__m-buy-closed
     != self.partial('@market.user.tabs', { active_tab: 'buy_closed' })
 
     if self.items && self.items.length
-      .market-user-buy__loading-prev.nojs-hide(
+      .market-user__loading-prev.nojs-hide(
         class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
       )
         span.icon.icon-loading-placeholder
 
-      ul.market-user-buy__item-list._affix(
+      ul.market-user__item-list._affix(
         data-affix-top={
           offset:     500,
           wire_above: 'market.user.buy_closed:load_prev',
@@ -34,7 +34,7 @@ article#content.market-user.market-user__m-buy-closed
         }
       )!= self.partial('@market.blocks.user_item_offer_list')
 
-      .market-user-buy__loading-next.nojs-hide(
+      .market-user__loading-next.nojs-hide(
         class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
       )
         span.icon.icon-loading-placeholder
@@ -46,5 +46,5 @@ article#content.market-user.market-user__m-buy-closed
         if self.head.next
           a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
     else
-      p.market-user-buy__no-items
+      p.market-user__no-items
         != self.t('no_items')

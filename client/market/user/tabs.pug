@@ -1,3 +1,5 @@
+- self.stats = self.stats || {};
+
 .market-user__tabs.nav.nav-tabs-underlined
   a.nav-link(
     href=self.link_to('market.user.buy_active', { user_hid: self.user_hid })
@@ -5,7 +7,7 @@
   )
     = self.t('buy_active')
     span.market-user__tab-counter
-      = '(0)'
+      = '(' + String(self.stats.active_offers) + ')'
 
   a.nav-link(
     href=self.link_to('market.user.buy_closed', { user_hid: self.user_hid })
@@ -13,7 +15,7 @@
   )
     = self.t('buy_closed')
     span.market-user__tab-counter
-      = '(0)'
+      = '(' + String(self.stats.closed_offers) + ')'
 
   a.nav-link(
     href=self.link_to('market.user.wish_active', { user_hid: self.user_hid })
@@ -21,7 +23,7 @@
   )
     = self.t('wish_active')
     span.market-user__tab-counter
-      = '(0)'
+      = '(' + String(self.stats.active_wishes) + ')'
 
   a.nav-link(
     href=self.link_to('market.user.wish_closed', { user_hid: self.user_hid })
@@ -29,4 +31,4 @@
   )
     = self.t('wish_closed')
     span.market-user__tab-counter
-      = '(0)'
+      = '(' + String(self.stats.closed_wishes) + ')'

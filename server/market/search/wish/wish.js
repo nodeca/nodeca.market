@@ -5,8 +5,6 @@
 'use strict';
 
 
-const sanitize_section = require('nodeca.market/lib/sanitizers/section');
-
 // Available sort types, first one is the default
 //
 const SORT_TYPES = [ 'date_desc', 'date_asc', 'rel' ];
@@ -39,10 +37,6 @@ module.exports = function (N, apiPath) {
 
     env.data.section = await N.models.market.Section.findById(params.section)
                                  .lean(true);
-
-    if (!env.data.section) return;
-
-    env.res.section = await sanitize_section(N, env.data.section, env.user_info);
   });
 
 

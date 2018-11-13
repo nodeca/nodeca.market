@@ -26,8 +26,6 @@ let setting_names = [
   'market_can_create_items',
   'market_displayed_currency',
   'market_items_per_page',
-  'market_mod_can_delete_items',
-  'market_mod_can_see_hard_deleted_items',
   'market_show_ignored'
 ];
 
@@ -49,23 +47,15 @@ module.exports = function (N, apiPath) {
 
 
   // Define visible item statuses,
-  // archive collection can have only CLOSED, HB and DELETED statuses
+  // active collection can have only OPEN and HB statuses
   //
   N.wire.before(apiPath, function define_visible_statuses(env) {
     let statuses = N.models.market.ItemOffer.statuses;
 
-    env.data.items_visible_statuses = [ statuses.CLOSED ];
+    env.data.items_visible_statuses = [ statuses.OPEN ];
 
     if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
       env.data.items_visible_statuses.push(statuses.HB);
-    }
-
-    if (env.data.settings.market_mod_can_delete_items) {
-      env.data.items_visible_statuses.push(statuses.DELETED);
-    }
-
-    if (env.data.settings.market_mod_can_see_hard_deleted_items) {
-      env.data.items_visible_statuses.push(statuses.DELETED_HARD);
     }
   });
 
@@ -81,7 +71,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function fetch_and_sort_items(env) {
 
-    let items = await N.models.market.ItemWishArchived.find()
+    let items = await N.models.market.ItemWish.find()
                           .where('_id').in(env.data.item_ids)
                           .where('st').in(env.data.items_visible_statuses)
                           .lean(true);
@@ -151,7 +141,7 @@ module.exports = function (N, apiPath) {
                    await N.models.core.Location.info(locations, env.user_info.locale) :
                    [];
 
-    env.res.location_names = {};
+    env.res.location_names = env.res.location_names || {};
 
     for (let i = 0; i < locations.length; i++) {
       env.res.location_names[locations[i][0] + ':' + locations[i][1]] = resolved[i];

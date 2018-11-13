@@ -21,17 +21,27 @@ module.exports = function (N, apiPath) {
   let build_item_ids = require('./_build_item_ids_by_range')(N);
 
 
+  // Fetch section
+  //
+  N.wire.before(apiPath, async function fetch_section(env) {
+    let section = await N.models.market.Section.findOne({ hid: env.params.section_hid }).lean(true);
+
+    if (!section) throw N.io.NOT_FOUND;
+
+    env.data.section = section;
+  });
+
+
   // Subcall item list
   //
   N.wire.on(apiPath, async function subcall_item_list(env) {
-    env.data.section_hid    = env.params.section_hid;
     env.data.select_start   = env.params.start;
     env.data.select_before  = env.params.before;
     env.data.select_after   = env.params.after;
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.section_item_wish_list', env);
+    await N.wire.emit('internal:market.item_wish_active_list', env);
   });
 
 

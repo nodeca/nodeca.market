@@ -1,4 +1,5 @@
 - self.users = self.users || {};
+- self.sections_by_id = self.sections_by_id || {};
 
 //- show many operations checkbox
 - var multiselect_allowed = false;
@@ -8,20 +9,22 @@ each item in self.items
     //- skip entries created by ignored users
 
   else
+    - var section = self.sections_by_id[item.section] || {};
+
     li.market-section-buy-item(
       id='item' + item.hid
       class=(self.ignored_users[item.user]) ? 'market-section-buy-item__m-ignored' : ''
       data-item-id=item._id
       data-item-hid=item.hid
     )
-      a.market-section-buy-item__photo.thumb(href=self.link_to('market.item.buy', { section_hid: self.section.hid, item_hid: item.hid }))
+      a.market-section-buy-item__photo.thumb(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
         if item.files && item.files.length > 0
           img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
         else
           .thumb__content= self.t('no_photo')
       .market-section-buy-item__info
         .market-section-buy-item__title
-          a.market-section-buy-item__title-text(href=self.link_to('market.item.buy', { section_hid: self.section.hid, item_hid: item.hid }))
+          a.market-section-buy-item__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
             = item.title
           if !item.is_new
             sub.market-section-buy-item__icon
@@ -63,7 +66,7 @@ each item in self.items
               a.market-section-buy-item__user-link._ucard-popover(
                 href=self.link_to('users.member', { user_hid: user.hid })
                 data-user-id=user._id
-                data-user-ref='market_section_buy_item:'+self.section.hid+':'+item.hid
+                data-user-ref='market_section_buy_item:'+section.hid+':'+item.hid
               )
                 span.market-section-buy-item__ignored-mark.icon.icon-ignore.icon-space-after
                 = user.name

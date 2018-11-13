@@ -286,6 +286,6 @@ module.exports = function (N, apiPath) {
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.search_item_wish_list', env);
+    await N.wire.emit('internal:market.item_wish_active_list', env);
   });
 };

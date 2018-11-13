@@ -14,3 +14,10 @@ article#content.market-user.market-user__m-buy-active
       h1.market-user__title.page-head__title(itemprop='name')= self.t('title')
 
     != self.partial('@market.user.tabs', { active_tab: 'buy_active' })
+
+    if self.items && self.items.length
+      ul.market-user__item-list
+        != self.partial('@market.blocks.user_item_offer_list')
+    else
+      p.market-user__no-items
+        != self.t('no_items')

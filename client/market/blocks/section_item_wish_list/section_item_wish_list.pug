@@ -1,4 +1,5 @@
 - self.users = self.users || {};
+- self.sections_by_id = self.sections_by_id || {};
 
 //- show many operations checkbox
 - var multiselect_allowed = false;
@@ -8,6 +9,8 @@ each item in self.items
     //- skip entries created by ignored users
 
   else
+    - var section = self.sections_by_id[item.section] || {};
+
     li.market-section-wish-item(
       id='item' + item.hid
       class=(self.ignored_users[item.user]) ? 'market-section-wish-item__m-ignored' : ''
@@ -16,7 +19,7 @@ each item in self.items
     )
       .market-section-wish-item__info
         .market-section-wish-item__title
-          a.market-section-wish-item__title-text(href=self.link_to('market.item.wish', { section_hid: self.section.hid, item_hid: item.hid }))
+          a.market-section-wish-item__title-text(href=self.link_to('market.item.wish', { section_hid: section.hid, item_hid: item.hid }))
             = item.title
 
         .market-section-wish-item__location
@@ -40,7 +43,7 @@ each item in self.items
               a.market-section-wish-item__user-link._ucard-popover(
                 href=self.link_to('users.member', { user_hid: user.hid })
                 data-user-id=user._id
-                data-user-ref='market_section_wish_item:'+self.section.hid+':'+item.hid
+                data-user-ref='market_section_wish_item:'+section.hid+':'+item.hid
               )
                 span.market-section-wish-item__ignored-mark.icon.icon-ignore.icon-space-after
                 = user.name

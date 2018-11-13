@@ -166,7 +166,7 @@ module.exports = function (N, apiPath) {
                    await N.models.core.Location.info(locations, env.user_info.locale) :
                    [];
 
-    env.res.location_names = {};
+    env.res.location_names = env.res.location_names || {};
 
     for (let i = 0; i < locations.length; i++) {
       env.res.location_names[locations[i][0] + ':' + locations[i][1]] = resolved[i];

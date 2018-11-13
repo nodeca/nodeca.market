@@ -4,8 +4,9 @@
 'use strict';
 
 
-const _       = require('lodash');
-const memoize = require('promise-memoize');
+const _                = require('lodash');
+const memoize          = require('promise-memoize');
+const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 
 
 module.exports = function (N, apiPath) {
@@ -64,14 +65,28 @@ module.exports = function (N, apiPath) {
   }
 
 
+  // Fetch section
+  //
+  N.wire.before(apiPath, async function fetch_section(env) {
+    let section = await N.models.market.Section.findOne({ hid: env.params.section_hid }).lean(true);
+
+    if (!section) throw N.io.NOT_FOUND;
+
+    env.data.section = section;
+
+    if (!env.data.section) return;
+
+    env.res.section = await sanitize_section(N, env.data.section, env.user_info);
+  });
+
+
   // Subcall item list
   //
   N.wire.on(apiPath, async function subcall_item_list(env) {
-    env.data.section_hid    = env.params.section_hid;
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.section_item_wish_list', env);
+    await N.wire.emit('internal:market.item_wish_active_list', env);
   });
 
 

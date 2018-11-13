@@ -2,7 +2,6 @@
 //
 // in:
 //
-// - env.data.section_hid
 // - env.data.build_item_ids (env, callback) - should fill `env.data.item_ids` with correct sorting order
 //
 // out:
@@ -11,40 +10,29 @@
 //     res:
 //       settings: ...
 //       items: ...         # array, sanitized, with restricted fields
-//       section: ...       # with restricted fields
 //     data:
 //       items_visible_statuses: ...
 //       settings: ...
-//       section: ...
 //
 'use strict';
 
 
-const _                   = require('lodash');
-const sanitize_item_offer = require('nodeca.market/lib/sanitizers/item_offer');
-const sanitize_section    = require('nodeca.market/lib/sanitizers/section');
+const _                  = require('lodash');
+const sanitize_item_wish = require('nodeca.market/lib/sanitizers/item_wish');
+const sanitize_section   = require('nodeca.market/lib/sanitizers/section');
 
 let setting_names = [
   'can_see_hellbanned',
   'market_can_create_items',
   'market_displayed_currency',
   'market_items_per_page',
+  'market_mod_can_delete_items',
+  'market_mod_can_see_hard_deleted_items',
   'market_show_ignored'
 ];
 
 
 module.exports = function (N, apiPath) {
-
-  // Fetch section
-  //
-  N.wire.before(apiPath, async function fetch_section(env) {
-    let section = await N.models.market.Section.findOne({ hid: env.data.section_hid }).lean(true);
-
-    if (!section) throw N.io.NOT_FOUND;
-
-    env.data.section = section;
-  });
-
 
   // Fetch and fill permissions
   //
@@ -61,15 +49,23 @@ module.exports = function (N, apiPath) {
 
 
   // Define visible item statuses,
-  // active collection can have only OPEN and HB statuses
+  // archive collection can have only CLOSED, HB and DELETED statuses
   //
   N.wire.before(apiPath, function define_visible_statuses(env) {
     let statuses = N.models.market.ItemOffer.statuses;
 
-    env.data.items_visible_statuses = [ statuses.OPEN ];
+    env.data.items_visible_statuses = [ statuses.CLOSED ];
 
     if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
       env.data.items_visible_statuses.push(statuses.HB);
+    }
+
+    if (env.data.settings.market_mod_can_delete_items) {
+      env.data.items_visible_statuses.push(statuses.DELETED);
+    }
+
+    if (env.data.settings.market_mod_can_see_hard_deleted_items) {
+      env.data.items_visible_statuses.push(statuses.DELETED_HARD);
     }
   });
 
@@ -85,10 +81,9 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function fetch_and_sort_items(env) {
 
-    let items = await N.models.market.ItemOffer.find()
+    let items = await N.models.market.ItemWishArchived.find()
                           .where('_id').in(env.data.item_ids)
                           .where('st').in(env.data.items_visible_statuses)
-                          .where('section').equals(env.data.section._id)
                           .lean(true);
 
     env.data.items = [];
@@ -102,6 +97,17 @@ module.exports = function (N, apiPath) {
         env.data.items.push(item);
       }
     });
+  });
+
+
+  // Fetch sections where items are located in
+  //
+  N.wire.after(apiPath, async function fetch_sections(env) {
+    let sections = await N.models.market.Section.find()
+                             .where('_id').in(_.uniq(_.map(env.data.items, 'section').map(String)))
+                             .lean(true);
+
+    env.res.sections_by_id = _.keyBy(await sanitize_section(N, sections, env.user_info), '_id');
   });
 
 
@@ -136,21 +142,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch currency rates
-  //
-  N.wire.after(apiPath, async function fetch_currency_rates(env) {
-    let currencies = _.uniq(env.data.items.map(i => i.price && i.price.currency).filter(Boolean));
-
-    env.res.currency_rates = {};
-
-    for (let c of currencies) {
-      env.res.currency_rates[c] = await N.models.market.CurrencyRate.get(
-        c, env.data.settings.market_displayed_currency
-      );
-    }
-  });
-
-
   // Fetch locations
   //
   N.wire.after(apiPath, async function fetch_locations(env) {
@@ -160,7 +151,7 @@ module.exports = function (N, apiPath) {
                    await N.models.core.Location.info(locations, env.user_info.locale) :
                    [];
 
-    env.res.location_names = {};
+    env.res.location_names = env.res.location_names || {};
 
     for (let i = 0; i < locations.length; i++) {
       env.res.location_names[locations[i][0] + ':' + locations[i][1]] = resolved[i];
@@ -171,7 +162,6 @@ module.exports = function (N, apiPath) {
   // Sanitize and fill items
   //
   N.wire.after(apiPath, async function items_sanitize_and_fill(env) {
-    env.res.items   = await sanitize_item_offer(N, env.data.items, env.user_info);
-    env.res.section = await sanitize_section(N, env.data.section, env.user_info);
+    env.res.items = await sanitize_item_wish(N, env.data.items, env.user_info);
   });
 };

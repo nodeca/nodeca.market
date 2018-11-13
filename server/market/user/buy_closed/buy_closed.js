@@ -83,7 +83,7 @@ module.exports = function (N, apiPath) {
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.item_offer_archived_list', env);
+    await N.wire.emit('internal:market.item_offer_closed_list', env);
   });
 
 
@@ -101,39 +101,80 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Fetch number of actimembers, leaders, pending and blocked users;
+  // Fetch number of offers and wishes (both active and closed),
   // needed to display this information on tabs
   //
-  N.wire.before(apiPath, async function fetch_stats(env) {
-    if (!env.data.can_manage_users) return;
+  N.wire.after(apiPath, async function fetch_stats(env) {
+    let offer_statuses = N.models.market.ItemOffer.statuses;
+    let wish_statuses  = N.models.market.ItemWish.statuses;
+
+    let offer_visible_st_active  = [ offer_statuses.OPEN ];
+    let offer_visible_st_archive = [ offer_statuses.CLOSED ];
+    let wish_visible_st_active   = [ wish_statuses.OPEN ];
+    let wish_visible_st_archive  = [ wish_statuses.CLOSED ];
+
+    if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
+      offer_visible_st_active.push(offer_statuses.HB);
+      offer_visible_st_archive.push(offer_statuses.HB);
+      wish_visible_st_active.push(wish_statuses.HB);
+      wish_visible_st_archive.push(wish_statuses.HB);
+    }
+
+    if (env.data.settings.market_mod_can_delete_items) {
+      offer_visible_st_archive.push(offer_statuses.DELETED);
+      wish_visible_st_archive.push(wish_statuses.DELETED);
+    }
+
+    if (env.data.settings.market_mod_can_see_hard_deleted_items) {
+      offer_visible_st_archive.push(offer_statuses.DELETED_HARD);
+      wish_visible_st_archive.push(wish_statuses.DELETED_HARD);
+    }
 
     let [
-      members,
-      owners,
-      blocked,
-      pending_members,
-      pending_owners,
-      log_records
+      active_offers,
+      closed_offers,
+      active_wishes,
+      closed_wishes
     ] = await Promise.all([
-      N.models.clubs.Membership.count({ club: env.data.club._id }),
-      N.models.clubs.Membership.count({ club: env.data.club._id, is_owner: true }),
-      N.models.clubs.Blocked.count({ club: env.data.club._id }),
-      env.data.club.is_closed ?
-        N.models.clubs.MembershipPending.count({ club: env.data.club._id }) :
-        Promise.resolve(),
-      N.models.clubs.OwnershipPending.count({ club: env.data.club._id }),
-      env.data.can_see_log ?
-        N.models.clubs.ClubAuditLog.count({ club: env.data.club._id }) :
-        Promise.resolve()
+      Promise.all(
+        offer_visible_st_active.map(st =>
+          N.models.market.ItemOffer
+              .where('user').equals(env.data.user._id)
+              .where('st').equals(st)
+              .count()
+        )
+      ),
+      Promise.all(
+        offer_visible_st_archive.map(st =>
+          N.models.market.ItemOfferArchived
+              .where('user').equals(env.data.user._id)
+              .where('st').equals(st)
+              .count()
+        )
+      ),
+      Promise.all(
+        wish_visible_st_active.map(st =>
+          N.models.market.ItemWish
+              .where('user').equals(env.data.user._id)
+              .where('st').equals(st)
+              .count()
+        )
+      ),
+      Promise.all(
+        wish_visible_st_archive.map(st =>
+          N.models.market.ItemWishArchived
+              .where('user').equals(env.data.user._id)
+              .where('st').equals(st)
+              .count()
+        )
+      )
     ]);
 
     env.res.stats = {
-      members,
-      owners,
-      blocked,
-      pending_members,
-      pending_owners,
-      log_records
+      active_offers: _.sum(active_offers),
+      closed_offers: _.sum(closed_offers),
+      active_wishes: _.sum(active_wishes),
+      closed_wishes: _.sum(closed_wishes)
     };
   });
 
@@ -141,19 +182,7 @@ module.exports = function (N, apiPath) {
   // Fill pagination (progress)
   //
   N.wire.after(apiPath, async function fill_pagination(env) {
-    //
-    // Count total amount of visible items
-    //
-    let counters_by_status = await Promise.all(
-      env.data.items_visible_statuses.map(st =>
-        N.models.market.ItemOfferArchived
-            .where('user').equals(env.data.user._id)
-            .where('st').equals(st)
-            .count()
-      )
-    );
-
-    let total = _.sum(counters_by_status);
+    let total = env.res.stats.active_offers;
 
     //
     // Count an amount of visible items before the first displayed
