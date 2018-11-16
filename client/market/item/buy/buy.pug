@@ -19,9 +19,13 @@ article#content.market-item-buy(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-buy__m-bookmarked' : ''
 )
   -
-    var navbar_args = {
-      level_up: self.link_to('market.section.buy', { section_hid: self.section.hid, $query: { from: self.item.hid } })
-    };
+    var navbar_args = {};
+
+    if (isOpen) {
+      navbar_args.level_up = self.link_to('market.section.buy', { section_hid: self.section.hid, $query: { from: self.item.hid } });
+    } else {
+      navbar_args.level_up = self.link_to('market.user.buy_closed', { user_hid: user.hid, $query: { from: self.item.hid } });
+    }
 
   != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
 
@@ -60,6 +64,11 @@ article#content.market-item-buy(
                 data-user-ref='market_item_buy:'+self.section.hid+':'+self.item.hid
               )
                 = user.name
+          .market-item-buy__info-item
+            a.market-item-buy__section-link(
+              href=self.link_to('market.section.buy', { section_hid: self.section.hid })
+            )
+              = self.section.title
 
       != self.partial('@market.item.buy.blocks.toolbar_controls')
 
@@ -68,7 +77,7 @@ article#content.market-item-buy(
         each file in self.item.files
           li.market-item-buy__attach-item.thumb-grid__item
             .thumb-grid__item-inner
-              a.thumb(
+              a.thumb.thumb__m-market(
                 href=self.link_to('core.gridfs', { bucket: file })
                 data-toggle='lightbox'
                 data-type='image'

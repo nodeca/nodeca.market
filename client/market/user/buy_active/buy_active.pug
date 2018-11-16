@@ -1,5 +1,8 @@
+- self.users = self.users || {};
+- var user = self.users[self.user_id] || {};
+
 article#content.market-user.market-user__m-buy-active
-  - var navbar_args = { level_up: self.link_to('users.member', { user_hid: self.user_hid }) };
+  - var navbar_args = { level_up: self.link_to('market.index.buy') };
   != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
 
   nav.breadcrumbs-container
@@ -11,13 +14,32 @@ article#content.market-user.market-user__m-buy-active
     != self.partial('@market.blocks.drafts')
 
     header.page-head.market-user__head
-      h1.market-user__title.page-head__title(itemprop='name')= self.t('title')
+      .market-user__meta
+        h1.market-user__title.page-head__title(itemprop='name')= self.t('title')
+
+        .market-user__author
+          a.market-user__author-link._ucard-popover(
+            href=self.link_to('users.member', { user_hid: user.hid })
+            data-user-id=self.user_id
+          )
+            img.market-user__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+            = user.name
+
+      != self.partial('@market.user.blocks.toolbar_controls')
 
     != self.partial('@market.user.tabs', { active_tab: 'buy_active' })
 
-    if self.items && self.items.length
-      ul.market-user__item-list
-        != self.partial('@market.blocks.user_item_offer_list')
-    else
-      p.market-user__no-items
-        != self.t('no_items')
+    .market-user__active
+      if self.items_active && self.items_active.length
+        ul.market-user__item-list
+          != self.partial('@market.blocks.user_item_offer_list', { items: self.items_active })
+      else
+        p.market-user__no-items
+          != self.t('no_items')
+
+    if self.items_closed && self.items_closed.length
+      .market-user__closed
+        .market-user__closed-title= self.t('closed_items')
+
+        ul.market-user__item-list
+          != self.partial('@market.blocks.user_item_offer_list', { items: self.items_closed })

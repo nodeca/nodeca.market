@@ -35,7 +35,8 @@ module.exports = function (N, apiPath) {
   // Fetch and fill permissions
   //
   N.wire.before(apiPath, async function fetch_and_fill_permissions(env) {
-    env.data.settings = await env.extras.settings.fetch(setting_names);
+    env.data.settings = env.data.settings || {};
+    Object.assign(env.data.settings, await env.extras.settings.fetch(setting_names));
 
     if (env.session.currency) {
       // patch for guests who don't have user store
@@ -70,7 +71,6 @@ module.exports = function (N, apiPath) {
   // Fetch and sort items
   //
   N.wire.on(apiPath, async function fetch_and_sort_items(env) {
-
     let items = await N.models.market.ItemWish.find()
                           .where('_id').in(env.data.item_ids)
                           .where('st').in(env.data.items_visible_statuses)
@@ -97,7 +97,8 @@ module.exports = function (N, apiPath) {
                              .where('_id').in(_.uniq(_.map(env.data.items, 'section').map(String)))
                              .lean(true);
 
-    env.res.sections_by_id = _.keyBy(await sanitize_section(N, sections, env.user_info), '_id');
+    env.res.sections_by_id = env.res.sections_by_id || {};
+    Object.assign(env.res.sections_by_id, _.keyBy(await sanitize_section(N, sections, env.user_info), '_id'));
   });
 
 

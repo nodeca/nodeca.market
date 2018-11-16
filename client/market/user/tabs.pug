@@ -1,8 +1,10 @@
 - self.stats = self.stats || {};
+- self.users = self.users || {};
+- var user = self.users[self.user_id] || {};
 
 .market-user__tabs.nav.nav-tabs-underlined
   a.nav-link(
-    href=self.link_to('market.user.buy_active', { user_hid: self.user_hid })
+    href=self.link_to('market.user.buy_active', { user_hid: user.hid })
     class=self.active_tab === 'buy_active' ? 'active' : ''
   )
     = self.t('buy_active')
@@ -10,7 +12,7 @@
       = '(' + String(self.stats.active_offers) + ')'
 
   a.nav-link(
-    href=self.link_to('market.user.buy_closed', { user_hid: self.user_hid })
+    href=self.link_to('market.user.buy_closed', { user_hid: user.hid })
     class=self.active_tab === 'buy_closed' ? 'active' : ''
   )
     = self.t('buy_closed')
@@ -18,7 +20,7 @@
       = '(' + String(self.stats.closed_offers) + ')'
 
   a.nav-link(
-    href=self.link_to('market.user.wish_active', { user_hid: self.user_hid })
+    href=self.link_to('market.user.wish_active', { user_hid: user.hid })
     class=self.active_tab === 'wish_active' ? 'active' : ''
   )
     = self.t('wish_active')
@@ -26,7 +28,7 @@
       = '(' + String(self.stats.active_wishes) + ')'
 
   a.nav-link(
-    href=self.link_to('market.user.wish_closed', { user_hid: self.user_hid })
+    href=self.link_to('market.user.wish_closed', { user_hid: user.hid })
     class=self.active_tab === 'wish_closed' ? 'active' : ''
   )
     = self.t('wish_closed')

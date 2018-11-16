@@ -124,7 +124,7 @@ module.exports = function (N, apiPath) {
 
       if (user) {
         env.res.breadcrumbs.push({
-          text: env.t('breadcrumbs_archive', { nick: user.nick }),
+          text: user.nick,
           route: 'market.user.wish_closed',
           params: { user_hid: user.hid }
         });

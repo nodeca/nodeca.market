@@ -88,13 +88,13 @@ article#content.market-item-buy-edit
                 li.market-item-buy-edit__attach-item.thumb-grid__item
                   .thumb-grid__item-inner
                     //- Should 'click' file input in context of current action
-                    a.thumb(href='#', onClick='document.getElementById("market-edit-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
+                    a.thumb.thumb__m-market(href='#', onClick='document.getElementById("market-edit-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
                       .thumb__content.icon.icon-plus
 
                 <!-- ko foreach: offer.files -->
                   li.market-item-buy-edit__attach-item.thumb-grid__item(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }')
                     .thumb-grid__item-inner
-                      .thumb
+                      .thumb.thumb__m-market
                         img.thumb__image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
 
                         .market-item-buy-edit__attach-controls

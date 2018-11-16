@@ -13,8 +13,8 @@ market:
       sm:
         from: md
         #jpeg_quality: 75
-        max_width: 170
-        max_height: 150
+        max_width: 136
+        max_height: 120
         type: jpeg
 
     types:

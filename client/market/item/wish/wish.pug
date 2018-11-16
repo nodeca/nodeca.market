@@ -19,9 +19,13 @@ article#content.market-item-wish(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-wish__m-bookmarked' : ''
 )
   -
-    var navbar_args = {
-      level_up: self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.item.hid } })
-    };
+    var navbar_args = {};
+
+    if (isOpen) {
+      navbar_args.level_up = self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.item.hid } });
+    } else {
+      navbar_args.level_up = self.link_to('market.user.wish_closed', { user_hid: user.hid, $query: { from: self.item.hid } });
+    }
 
   != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
 
@@ -56,6 +60,11 @@ article#content.market-item-wish(
                 data-user-ref='market_item_wish:'+self.section.hid+':'+self.item.hid
               )
                 = user.name
+          .market-item-wish__info-item
+            a.market-item-wish__section-link(
+              href=self.link_to('market.section.wish', { section_hid: self.section.hid })
+            )
+              = self.section.title
 
       != self.partial('@market.item.wish.blocks.toolbar_controls')
 

@@ -1,0 +1,7 @@
+en-US:
+  currency: Currency
+  many_header: "With #{count} ((item|items)):"
+  many_unselect: Clear selection
+  many_delete: Delete
+  many_undelete: Undelete
+  many_move: Move

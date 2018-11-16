@@ -9,11 +9,15 @@ const _  = require('lodash');
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    user_hid: { type: 'integer', minimum: 1, required: true }
+    user_hid: { type: 'integer', minimum: 1, required: true },
+    $query:   { // from is used on client-side to highlight level-up
+      type: 'object',
+      properties: {
+        from: { type: 'string' }
+      },
+      additionalProperties: false
+    }
   });
-
-
-  let build_item_ids_by_range = require('./list/_build_item_ids_by_range')(N);
 
 
   // Fetch owner
@@ -35,24 +39,53 @@ module.exports = function (N, apiPath) {
   });
 
 
-  async function build_item_ids(env) {
-    env.data.select_start  = null;
-    env.data.select_before = 0;
+  async function build_active_item_ids(env) {
+    let entries = await N.models.market.ItemOffer.find()
+                            .where('user').equals(env.data.user._id)
+                            .where('st').in(env.data.items_visible_statuses)
+                            .sort('-_id')
+                            .select('_id')
+                            .lean(true);
 
-    // need to display all items, it's highly unlikely user will have this much
-    env.data.select_after  = 1000;
-
-    return build_item_ids_by_range(env);
+    env.data.item_ids = _.map(entries, '_id');
   }
 
 
-  // Subcall item list
+  // Subcall active item list
   //
-  N.wire.on(apiPath, async function subcall_item_list(env) {
-    env.data.build_item_ids = build_item_ids;
+  N.wire.on(apiPath, async function subcall_active_item_list(env) {
+    env.data.build_item_ids = build_active_item_ids;
+    env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
+
+    await N.wire.emit('internal:market.item_offer_active_list', env);
+
+    env.res.items_active = env.res.items;
+    env.data.items = env.res.items = [];
+  });
+
+
+  async function build_closed_item_ids(env) {
+    let entries = await N.models.market.ItemOfferArchived.find()
+                            .where('user').equals(env.data.user._id)
+                            .where('st').in(env.data.items_visible_statuses)
+                            .sort('-_id')
+                            .select('_id')
+                            .lean(true);
+
+    env.data.item_ids = _.map(entries, '_id');
+  }
+
+
+  // Subcall closed item list
+  //
+  N.wire.on(apiPath, async function subcall_closed_item_list(env) {
+    env.data.build_item_ids = build_closed_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
     await N.wire.emit('internal:market.item_offer_closed_list', env);
+
+    env.res.items_closed = env.res.items;
+    env.data.items = env.res.items = [];
   });
 
 
@@ -169,15 +202,19 @@ module.exports = function (N, apiPath) {
 
     env.res.head = env.res.head || {};
     env.res.head.title = env.t('title_with_user', { user: env.user_info.is_member ? user.name : user.nick });
-    env.res.user_hid = env.data.user.hid;
+    env.res.user_id = env.data.user._id;
+
+    env.data.users = env.data.users || [];
+    env.data.users.push(env.data.user._id);
   });
 
 
   // Fill breadcrumbs
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
-    await N.wire.emit('internal:users.breadcrumbs.fill_root', env);
-
-    env.res.breadcrumbs = env.data.breadcrumbs;
+    env.res.breadcrumbs = [ {
+      text: env.t('@common.menus.navbar.market'),
+      route: 'market.index.buy'
+    } ];
   });
 };

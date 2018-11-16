@@ -108,10 +108,8 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
         return N.io.rpc('market.item.buy.destroy', request);
       })
       .then(() =>
-        N.wire.emit('navigate.to', {
-          apiPath: 'market.section.buy',
-          params: { section_hid: N.runtime.page_data.section_hid }
-        })
+        // redirects to section (for open) or user item list (for closed)
+        N.wire.emit('navigate.to', $('.navbar__level-up').attr('href'))
       );
   });
 

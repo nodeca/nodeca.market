@@ -218,7 +218,10 @@ module.exports = function (N, apiPath) {
 
     env.res.head = env.res.head || {};
     env.res.head.title = env.t('title_with_user', { user: env.user_info.is_member ? user.name : user.nick });
-    env.res.user_hid = env.data.user.hid;
+    env.res.user_id = env.data.user._id;
+
+    env.data.users = env.data.users || [];
+    env.data.users.push(env.data.user._id);
 
     if (env.params.$query && env.params.$query.from) {
       env.res.head.robots = 'noindex,follow';
@@ -229,9 +232,10 @@ module.exports = function (N, apiPath) {
   // Fill breadcrumbs
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
-    await N.wire.emit('internal:users.breadcrumbs.fill_root', env);
-
-    env.res.breadcrumbs = env.data.breadcrumbs;
+    env.res.breadcrumbs = [ {
+      text: env.t('@common.menus.navbar.market'),
+      route: 'market.index.buy'
+    } ];
   });
 
 

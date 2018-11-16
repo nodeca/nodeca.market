@@ -1,5 +1,8 @@
+- self.users = self.users || {};
+- var user = self.users[self.user_id] || {};
+
 article#content.market-user.market-user__m-wish-closed
-  - var navbar_args = { level_up: self.link_to('users.member', { user_hid: self.user_hid }) };
+  - var navbar_args = { level_up: self.link_to('market.index.buy') };
   != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
 
   nav.breadcrumbs-container
@@ -11,40 +14,53 @@ article#content.market-user.market-user__m-wish-closed
     != self.partial('@market.blocks.drafts')
 
     header.page-head.market-user__head
-      h1.market-user__title.page-head__title(itemprop='name')= self.t('title')
+      .market-user__meta
+        h1.market-user__title.page-head__title(itemprop='name')= self.t('title')
+
+        .market-user__author
+          a.market-user__author-link._ucard-popover(
+            href=self.link_to('users.member', { user_hid: user.hid })
+            data-user-id=self.user_id
+          )
+            img.market-user__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
+            = user.name
+
+      != self.partial('@market.user.blocks.toolbar_controls')
 
     != self.partial('@market.user.tabs', { active_tab: 'wish_closed' })
 
-    if self.items && self.items.length
-      .market-user-wish__loading-prev.nojs-hide(
-        class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
-      )
-        span.icon.icon-loading-placeholder
+    .market-user__closed
+      if self.items && self.items.length
+        .market-user__loading-prev.nojs-hide(
+          class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
 
-      ul.market-user-wish__item-list._affix(
-        data-affix-top={
-          offset:     500,
-          wire_above: 'market.user.wish_closed:load_prev',
-          throttle:   100
-        }
-        data-affix-bottom={
-          offset:     500,
-          wire_below: 'market.user.wish_closed:load_next',
-          throttle:   100
-        }
-      )!= self.partial('@market.blocks.user_item_wish_list')
+        ul.market-user__item-list._affix(
+          data-affix-top={
+            offset:     500,
+            wire_above: 'market.user.wish_closed:load_prev',
+            throttle:   100
+          }
+          data-affix-bottom={
+            offset:     500,
+            wire_below: 'market.user.wish_closed:load_next',
+            throttle:   100
+          }
+        )!= self.partial('@market.blocks.user_item_wish_list')
 
-      .market-user-wish__loading-next.nojs-hide(
-        class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
-      )
-        span.icon.icon-loading-placeholder
+        .market-user__loading-next.nojs-hide(
+          class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
+        )
+          span.icon.icon-loading-placeholder
 
-      nav.pager.js-hide
-        if self.head.prev
-          a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
+        nav.pager.js-hide
+          if self.head.prev
+            a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
 
-        if self.head.next
-          a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
-    else
-      p.market-user-wish__no-items
-        != self.t('no_items')
+          if self.head.next
+            a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+
+      else
+        p.market-user__no-items
+          != self.t('no_items')

@@ -1,0 +1,14 @@
+@import "nodeca.core/client/common/_variables"
+
+thumbImageWidth  = '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
+thumbImageHeight = '$$ N.config.market.uploads.resize.sm.max_height || N.config.market.uploads.resize.sm.height $$'px
+
+.thumb__m-market
+  .thumb
+  &.thumb
+    width thumbImageWidth
+    height thumbImageHeight
+
+  .thumb__image
+    max-width thumbImageWidth
+    max-height thumbImageHeight

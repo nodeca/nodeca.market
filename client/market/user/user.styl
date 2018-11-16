@@ -1,0 +1,51 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-user__head
+  display flex
+
+.market-user__meta
+  flex 1 1 0%
+
+.market-user__author
+  font-size $font-size-xs
+  line-height 2rem
+
+.market-user__author-link
+  color $body-color-secondary
+
+.market-user__avatar
+  display inline-block
+  width 20px
+  height 20px
+  margin-right .5rem
+  border-radius 2px
+  box-shadow 0 0 1px $body-color-secondary
+
+.market-user__item-list
+  margin 0
+  padding 0
+  list-style none
+
+.market-user__loading-prev
+.market-user__loading-next
+  padding 2rem
+  font-size 4rem
+  line-height 1.1em
+  text-align center
+  background-color $body-bg-secondary
+  color $body-color-secondary + 50%
+  border-radius 4px
+  margin-bottom 2rem
+  margin-top 1rem
+  clear both
+
+.market-user__active
+.market-user__closed
+  margin-top 2rem
+
+.market-user__closed-title
+  font-size $font-size-base
+  line-height 1.25em
+  color $body-color-secondary - 10%
+  border-bottom 1px solid $decorator-color
+  padding-bottom .375rem
