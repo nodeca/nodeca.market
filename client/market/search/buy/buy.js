@@ -115,7 +115,7 @@ N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
 
     // Update progress bar
     //
-    let items         = document.getElementsByClassName('market-search-buy-item');
+    let items         = document.getElementsByClassName('market-list-item-offer');
     let itemThreshold = navbarHeight + TOP_OFFSET;
     let offset;
     let currentIdx;
@@ -193,13 +193,13 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       }
 
       pageState.bottom_marker += res.items.length;
-      pageState.first_offset  = res.pagination.chunk_offset - $('.market-search-buy-item').length;
+      pageState.first_offset  = res.pagination.chunk_offset - $('.market-list-item-offer').length;
       pageState.item_count    = res.pagination.total;
 
       let navigate_update_params;
 
       if (pageState.first_page_loaded) {
-        let $result = $(N.runtime.render('market.blocks.search_item_offer_list', res));
+        let $result = $(N.runtime.render('market.blocks.item_offer_list', res));
 
         navigate_update_params = {
           $:      $result,
@@ -220,9 +220,9 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       return N.wire.emit('navigate.update', navigate_update_params).then(() => {
         // Update selection state
         _.intersection(pageState.selected_items, _.map(res.items, '_id')).forEach(itemId => {
-          $(`.market-search-buy-item[data-item-id="${itemId}"]`)
-            .addClass('market-search-buy-item__m-selected')
-            .find('.market-search-buy-item__select-cb')
+          $(`.market-list-item-offer[data-item-id="${itemId}"]`)
+            .addClass('market-list-item-offer__m-selected')
+            .find('.market-list-item-offer__select-cb')
             .prop('checked', true);
         });
 
@@ -236,23 +236,6 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
     }).catch(err => {
       N.wire.emit('error', err);
     });
-  });
-
-
-  // When user clicks "create dialog" button in usercard popup,
-  // add title & link to editor.
-  //
-  N.wire.before('users.dialog.create:begin', function dialog_create_extend_market_items(params) {
-    if (!params || !params.ref) return; // no data to extend
-    if (!/^market_search_buy_item:/.test(params.ref)) return; // not our data
-
-    let [ , section_hid, item_hid ] = params.ref.split(':');
-    let title = $(`#item${item_hid} .market-search-buy-item__title-text`).text();
-    let href  = N.router.linkTo('market.item.buy', { section_hid, item_hid });
-
-    if (title && href) {
-      params.text = `Re: [${title}](${href})\n\n`;
-    }
   });
 });
 
@@ -319,9 +302,9 @@ N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_sel
       ids = ids || [];
       pageState.selected_items = ids;
       pageState.selected_items.forEach(itemId => {
-        $(`.market-search-buy-item[data-item-id="${itemId}"]`)
-          .addClass('market-search-buy-item__m-selected')
-          .find('.market-search-buy-item__select-cb')
+        $(`.market-list-item-offer[data-item-id="${itemId}"]`)
+          .addClass('market-list-item-offer__m-selected')
+          .find('.market-list-item-offer__select-cb')
           .prop('checked', true);
       });
 
@@ -347,7 +330,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
 
         // If many select started
         //
-        let $item = data.$this.closest('.market-search-buy-item');
+        let $item = data.$this.closest('.market-list-item-offer');
         let $start = $many_select_start;
         let itemsBetween;
 
@@ -356,10 +339,10 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
         // If current after `$many_select_start`
         if ($start.index() < $item.index()) {
           // Get items between start and current
-          itemsBetween = $start.nextUntil($item, '.market-search-buy-item');
+          itemsBetween = $start.nextUntil($item, '.market-list-item-offer');
         } else {
           // Between current and start (in reverse order)
-          itemsBetween = $item.nextUntil($start, '.market-search-buy-item');
+          itemsBetween = $item.nextUntil($start, '.market-list-item-offer');
         }
 
         itemsBetween.each(function () {
@@ -369,21 +352,21 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
             pageState.selected_items.push(id);
           }
 
-          $(this).find('.market-search-buy-item__select-cb').prop('checked', true);
-          $(this).addClass('market-search-buy-item__m-selected');
+          $(this).find('.market-list-item-offer__select-cb').prop('checked', true);
+          $(this).addClass('market-list-item-offer__m-selected');
         });
 
         pageState.selected_items.push(itemId);
-        $item.addClass('market-search-buy-item__m-selected');
+        $item.addClass('market-list-item-offer__m-selected');
 
 
       } else if (shift_key_pressed) {
         // If many select not started and shift key pressed
         //
-        let $item = data.$this.closest('.market-search-buy-item');
+        let $item = data.$this.closest('.market-list-item-offer');
 
         $many_select_start = $item;
-        $item.addClass('market-search-buy-item__m-selected');
+        $item.addClass('market-list-item-offer__m-selected');
         pageState.selected_items.push(itemId);
 
         N.wire.emit('notify.info', t('msg_multiselect'));
@@ -392,7 +375,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
       } else {
         // No many select
         //
-        data.$this.closest('.market-search-buy-item').addClass('market-search-buy-item__m-selected');
+        data.$this.closest('.market-list-item-offer').addClass('market-list-item-offer__m-selected');
         pageState.selected_items.push(itemId);
       }
 
@@ -400,7 +383,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
     } else if (!data.$this.is(':checked') && pageState.selected_items.indexOf(itemId) !== -1) {
       // Unselect
       //
-      data.$this.closest('.market-search-buy-item').removeClass('market-search-buy-item__m-selected');
+      data.$this.closest('.market-list-item-offer').removeClass('market-list-item-offer__m-selected');
       pageState.selected_items = _.without(pageState.selected_items, itemId);
     }
 
@@ -414,11 +397,11 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
   N.wire.on(module.apiPath + ':items_unselect', function market_items_unselect() {
     pageState.selected_items = [];
 
-    $('.market-search-buy-item__select-cb:checked').each(function () {
+    $('.market-list-item-offer__select-cb:checked').each(function () {
       $(this)
         .prop('checked', false)
-        .closest('.market-search-buy-item')
-        .removeClass('market-search-buy-item__m-selected');
+        .closest('.market-list-item-offer')
+        .removeClass('market-list-item-offer__m-selected');
     });
 
     save_selected_items();

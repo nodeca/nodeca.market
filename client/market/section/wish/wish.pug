@@ -73,7 +73,7 @@ article#content.market-section-wish(
             wire_below: 'market.section.wish:load_next',
             throttle:   100
           }
-        )!= self.partial('@market.blocks.section_item_wish_list')
+        )!= self.partial('@market.blocks.item_wish_list')
 
         .market-section-wish__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

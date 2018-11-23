@@ -1,0 +1,56 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-list-item-offer
+  display flex
+  margin-top 1rem
+
+.market-list-item-offer__photo
+  flex 0 0 '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
+
+.market-list-item-offer__info
+  margin-left 1rem
+  flex 1 1 auto
+
+.market-list-item-offer__title
+.market-list-item-offer__price
+  font-size $font-size-lg
+
+.market-list-item-offer__location-link
+.market-list-item-offer__user-link
+.market-list-item-offer__section-link
+  color $body-color-secondary
+
+.market-list-item-offer__ignored-mark
+  display none
+.market-list-item-offer__m-ignored
+  .market-list-item-offer__ignored-mark
+    display inline-block
+
+.market-list-item-offer__details
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-list-item-offer__details-item
+  display inline
+
+.market-list-item-offer__details-item + .market-list-item-offer__details-item
+  &:before
+    content ' | '
+
+.market-list-item-offer__icon
+  color $body-color-secondary
+
+@keyframes market-list-item-offer-flash-animation {
+  from  { background: $decorator-color;  }
+  to    { background: none; }
+}
+
+.market-list-item-offer__m-highlight
+  animation market-list-item-offer-flash-animation 1.5s
+  .market-list-item-offer__highlight-marker
+    display block
+
+.market-list-item-offer__m-selected
+  background-color #ffd

@@ -32,7 +32,7 @@ article#content.market-user.market-user__m-buy-active
     .market-user__active
       if self.items_active && self.items_active.length
         ul.market-user__item-list
-          != self.partial('@market.blocks.user_item_offer_list', { items: self.items_active })
+          != self.partial('@market.blocks.item_offer_list', { items: self.items_active, market_list_show_ignores: true, market_list_hide_user: true })
       else
         p.market-user__no-items
           != self.t('no_items')
@@ -42,4 +42,4 @@ article#content.market-user.market-user__m-buy-active
         .market-user__closed-title= self.t('closed_items')
 
         ul.market-user__item-list
-          != self.partial('@market.blocks.user_item_offer_list', { items: self.items_closed })
+          != self.partial('@market.blocks.item_offer_list', { items: self.items_closed, market_list_show_ignores: true, market_list_hide_user: true })

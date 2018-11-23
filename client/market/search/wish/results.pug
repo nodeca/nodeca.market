@@ -33,7 +33,7 @@
 
 if self.items && self.items.length
   ul.market-search-wish__item-list
-    != self.partial('@market.blocks.search_item_wish_list')
+    != self.partial('@market.blocks.item_wish_list')
 
   .market-search-wish__loading-next.nojs-hide(
     class=(self.reached_end ? 'd-none' : '')

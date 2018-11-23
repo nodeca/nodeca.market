@@ -1,0 +1,88 @@
+- self.users = self.users || {};
+- self.sections_by_id = self.sections_by_id || {};
+
+//- show many operations checkbox
+- var multiselect_allowed = false;
+
+each item in self.items
+  if (self.ignored_users[item.user] && !self.settings.market_show_ignored && !self.market_list_show_ignores)
+    //- skip entries created by ignored users
+
+  else
+    - var section = self.sections_by_id[item.section] || {};
+
+    li.market-list-item-offer(
+      id='item' + item.hid
+      class=(self.ignored_users[item.user] && !self.market_list_show_ignores) ? 'market-list-item-offer__m-ignored' : ''
+      data-item-id=item._id
+      data-item-hid=item.hid
+    )
+      a.market-list-item-offer__photo.thumb.thumb__m-market(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+        if item.files && item.files.length > 0
+          img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+        else
+          .thumb__content= self.t('no_photo')
+      .market-list-item-offer__info
+        .market-list-item-offer__title
+          a.market-list-item-offer__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+            = item.title
+          if !item.is_new
+            sub.market-list-item-offer__icon
+              = ' '
+              = self.t('used')
+
+        .market-list-item-offer__price
+          - var price = item.price || {};
+          = self.price(price.value, price.currency, self.settings.market_displayed_currency, self.currency_rates[price.currency])
+
+          if item.barter_info
+            = ' '
+            //- TODO: icon-exchange
+            span.market-list-item-offer__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+
+        .market-list-item-offer__location
+          if item.location
+            a.market-list-item-offer__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= item.location && item.location[1]
+              data-longitude= item.location && item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_names[item.location[0] + ':' + item.location[1]]
+                = self.location_names[item.location[0] + ':' + item.location[1]]
+
+          if item.delivery
+            = ' '
+            //- TODO: icon-delivery
+            span.market-list-item-offer__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
+
+        .market-list-item-offer__details
+          .market-list-item-offer__details-item!= self.timetag(item.ts, 'relative')
+
+          if !self.market_list_hide_user
+            .market-list-item-offer__details-item
+              - var user = self.users[item.user];
+              if user
+                a.market-list-item-offer__user-link._ucard-popover(
+                  href=self.link_to('users.member', { user_hid: user.hid })
+                  data-user-id=user._id
+                  data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
+                )
+                  span.market-list-item-offer__ignored-mark.icon.icon-ignore.icon-space-after
+                  = user.name
+
+          .market-list-item-offer__details-item
+            a.market-list-item-offer__section-link(
+              href=self.link_to('market.section.buy', { section_hid: section.hid })
+            )
+              = section.title
+
+      if multiselect_allowed
+        label.market-list-item-offer__select(title=self.t('multiselect_hint'))
+          input.market-list-item-offer__select-cb(
+            type='checkbox'
+            data-item-id=item._id
+            data-on-change='market.section.buy:item_check'
+          )

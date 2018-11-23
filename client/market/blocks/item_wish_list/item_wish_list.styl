@@ -1,0 +1,38 @@
+@import "nodeca.core/client/common/_variables"
+
+.market-list-item-wish
+  display flex
+  margin-top 1rem
+
+.market-list-item-wish__info
+  flex 1 1 auto
+
+.market-list-item-wish__title
+  font-size $font-size-lg
+
+.market-list-item-wish__location-link
+.market-list-item-wish__user-link
+.market-list-item-wish__section-link
+  color $body-color-secondary
+
+.market-list-item-wish__ignored-mark
+  display none
+.market-list-item-wish__m-ignored
+  .market-list-item-wish__ignored-mark
+    display inline-block
+
+.market-list-item-wish__details
+  color $body-color-secondary
+  margin 0
+  padding 0
+  list-style none
+
+.market-list-item-wish__details-item
+  display inline
+
+.market-list-item-wish__details-item + .market-list-item-wish__details-item
+  &:before
+    content ' | '
+
+.market-list-item-wish__m-selected
+  background-color #ffd

@@ -47,7 +47,7 @@ article#content.market-user.market-user__m-wish-closed
             wire_below: 'market.user.wish_closed:load_next',
             throttle:   100
           }
-        )!= self.partial('@market.blocks.user_item_wish_list')
+        )!= self.partial('@market.blocks.item_wish_list', { market_list_show_ignores: true, market_list_hide_user: true })
 
         .market-user__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

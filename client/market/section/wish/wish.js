@@ -67,7 +67,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
 
     if (el.length) {
       $window.scrollTop(el.offset().top - $('.navbar').height() - TOP_OFFSET);
-      el.addClass('market-section-wish-item__m-highlight');
+      el.addClass('market-list-item-wish__m-highlight');
       return;
     }
   }
@@ -105,7 +105,7 @@ N.wire.on('navigate.done:' + module.apiPath, function location_updater_init() {
   if ($('.market-section-wish__item-list').length === 0) return;
 
   locationScrollHandler = _.debounce(function update_location_on_scroll() {
-    let items         = document.getElementsByClassName('market-section-wish-item');
+    let items         = document.getElementsByClassName('market-list-item-wish');
     let itemThreshold = navbarHeight + TOP_OFFSET;
     let offset;
     let currentIdx;
@@ -194,7 +194,7 @@ N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
 
     // Update progress bar
     //
-    let items         = document.getElementsByClassName('market-section-wish-item');
+    let items         = document.getElementsByClassName('market-list-item-wish');
     let itemThreshold = navbarHeight + TOP_OFFSET;
     let offset;
     let currentIdx;
@@ -334,7 +334,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       let old_height = $('.market-section-wish__item-list').height();
 
       // render & inject item list
-      let $result = $(N.runtime.render('market.blocks.section_item_request_list', res));
+      let $result = $(N.runtime.render('market.blocks.item_wish_list', res));
 
       return N.wire.emit('navigate.update', {
         $:       $result,
@@ -346,16 +346,16 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
 
         // Update selection state
         _.intersection(pageState.selected_items, _.map(res.items, '_id')).forEach(itemId => {
-          $(`.market-section-wish-item[data-item-id="${itemId}"]`)
-            .addClass('market-section-wish-item__m-selected')
-            .find('.market-section-wish-item__select-cb')
+          $(`.market-list-item-wish[data-item-id="${itemId}"]`)
+            .addClass('market-list-item-wish__m-selected')
+            .find('.market-list-item-wish__select-cb')
             .prop('checked', true);
         });
 
         //
         // Limit total amount of posts in DOM
         //
-        let items = document.getElementsByClassName('market-section-wish-item');
+        let items = document.getElementsByClassName('market-list-item-wish');
         let cut_count = items.length - CUT_ITEMS_MIN;
 
         if (cut_count > CUT_ITEMS_MAX - CUT_ITEMS_MIN) {
@@ -369,7 +369,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
             $(item).nextAll().remove();
 
             // Update range for the next time we'll be doing prefetch
-            pageState.bottom_marker = $('.market-section-wish-item:last').data('item-id');
+            pageState.bottom_marker = $('.market-list-item-wish:last').data('item-id');
 
             pageState.reached_end = false;
             reset_loading_placeholders();
@@ -424,7 +424,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       if (res.items.length === 0) return;
 
       pageState.bottom_marker = res.items[res.items.length - 1]._id;
-      pageState.first_offset  = res.pagination.chunk_offset - $('.market-section-wish-item').length;
+      pageState.first_offset  = res.pagination.chunk_offset - $('.market-list-item-wish').length;
       pageState.item_count    = res.pagination.total;
 
       // update prev/next metadata
@@ -438,7 +438,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       }
 
       // render & inject item list
-      let $result = $(N.runtime.render('market.blocks.section_item_request_list', res));
+      let $result = $(N.runtime.render('market.blocks.item_wish_list', res));
 
       return N.wire.emit('navigate.update', {
         $:      $result,
@@ -447,16 +447,16 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
       }).then(() => {
         // Update selection state
         _.intersection(pageState.selected_items, _.map(res.items, '_id')).forEach(itemId => {
-          $(`.market-section-wish-item[data-item-id="${itemId}"]`)
-            .addClass('market-section-wish-item__m-selected')
-            .find('.market-section-wish-item__select-cb')
+          $(`.market-list-item-wish[data-item-id="${itemId}"]`)
+            .addClass('market-list-item-wish__m-selected')
+            .find('.market-list-item-wish__select-cb')
             .prop('checked', true);
         });
 
         //
         // Limit total amount of posts in DOM
         //
-        let items = document.getElementsByClassName('market-section-wish-item');
+        let items = document.getElementsByClassName('market-list-item-wish');
         let cut_count = items.length - CUT_ITEMS_MIN;
 
         if (cut_count > CUT_ITEMS_MAX - CUT_ITEMS_MIN) {
@@ -474,11 +474,11 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
             $(item).prevAll().remove();
 
             // Update range for the next time we'll be doing prefetch
-            pageState.top_marker = $('.market-section-wish-item:first').data('item-id');
+            pageState.top_marker = $('.market-list-item-wish:first').data('item-id');
 
             // update scroll so it would point at the same spot as before
             $window.scrollTop(old_scroll + $('.market-section-wish__item-list').height() - old_height);
-            pageState.first_offset += old_length - document.getElementsByClassName('market-section-wish-item').length;
+            pageState.first_offset += old_length - document.getElementsByClassName('market-list-item-wish').length;
 
             pageState.reached_start = false;
             reset_loading_placeholders();
@@ -534,23 +534,6 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
         }
       }
     });
-  });
-
-
-  // When user clicks "create dialog" button in usercard popup,
-  // add title & link to editor.
-  //
-  N.wire.before('users.dialog.create:begin', function dialog_create_extend_market_items(params) {
-    if (!params || !params.ref) return; // no data to extend
-    if (!/^market_section_wish_item:/.test(params.ref)) return; // not our data
-
-    let [ , section_hid, item_hid ] = params.ref.split(':');
-    let title = $(`#item${item_hid} .market-section-wish-item__title-text`).text();
-    let href  = N.router.linkTo('market.item.wish', { section_hid, item_hid });
-
-    if (title && href) {
-      params.text = `Re: [${title}](${href})\n\n`;
-    }
   });
 });
 
@@ -617,9 +600,9 @@ N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_sel
       ids = ids || [];
       pageState.selected_items = ids;
       pageState.selected_items.forEach(itemId => {
-        $(`.market-section-wish-item[data-item-id="${itemId}"]`)
-          .addClass('market-section-wish-item__m-selected')
-          .find('.market-section-wish-item__select-cb')
+        $(`.market-list-item-wish[data-item-id="${itemId}"]`)
+          .addClass('market-list-item-wish__m-selected')
+          .find('.market-list-item-wish__select-cb')
           .prop('checked', true);
       });
 
@@ -645,7 +628,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
 
         // If many select started
         //
-        let $item = data.$this.closest('.market-section-wish-item');
+        let $item = data.$this.closest('.market-list-item-wish');
         let $start = $many_select_start;
         let itemsBetween;
 
@@ -654,10 +637,10 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
         // If current after `$many_select_start`
         if ($start.index() < $item.index()) {
           // Get items between start and current
-          itemsBetween = $start.nextUntil($item, '.market-section-wish-item');
+          itemsBetween = $start.nextUntil($item, '.market-list-item-wish');
         } else {
           // Between current and start (in reverse order)
-          itemsBetween = $item.nextUntil($start, '.market-section-wish-item');
+          itemsBetween = $item.nextUntil($start, '.market-list-item-wish');
         }
 
         itemsBetween.each(function () {
@@ -667,21 +650,21 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
             pageState.selected_items.push(id);
           }
 
-          $(this).find('.market-section-wish-item__select-cb').prop('checked', true);
-          $(this).addClass('market-section-wish-item__m-selected');
+          $(this).find('.market-list-item-wish__select-cb').prop('checked', true);
+          $(this).addClass('market-list-item-wish__m-selected');
         });
 
         pageState.selected_items.push(itemId);
-        $item.addClass('market-section-wish-item__m-selected');
+        $item.addClass('market-list-item-wish__m-selected');
 
 
       } else if (shift_key_pressed) {
         // If many select not started and shift key pressed
         //
-        let $item = data.$this.closest('.market-section-wish-item');
+        let $item = data.$this.closest('.market-list-item-wish');
 
         $many_select_start = $item;
-        $item.addClass('market-section-wish-item__m-selected');
+        $item.addClass('market-list-item-wish__m-selected');
         pageState.selected_items.push(itemId);
 
         N.wire.emit('notify.info', t('msg_multiselect'));
@@ -690,7 +673,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
       } else {
         // No many select
         //
-        data.$this.closest('.market-section-wish-item').addClass('market-section-wish-item__m-selected');
+        data.$this.closest('.market-list-item-wish').addClass('market-list-item-wish__m-selected');
         pageState.selected_items.push(itemId);
       }
 
@@ -698,7 +681,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
     } else if (!data.$this.is(':checked') && pageState.selected_items.indexOf(itemId) !== -1) {
       // Unselect
       //
-      data.$this.closest('.market-section-wish-item').removeClass('market-section-wish-item__m-selected');
+      data.$this.closest('.market-list-item-wish').removeClass('market-list-item-wish__m-selected');
       pageState.selected_items = _.without(pageState.selected_items, itemId);
     }
 
@@ -712,11 +695,11 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
   N.wire.on(module.apiPath + ':items_unselect', function market_items_unselect() {
     pageState.selected_items = [];
 
-    $('.market-section-wish-item__select-cb:checked').each(function () {
+    $('.market-list-item-wish__select-cb:checked').each(function () {
       $(this)
         .prop('checked', false)
-        .closest('.market-section-wish-item')
-        .removeClass('market-section-wish-item__m-selected');
+        .closest('.market-list-item-wish')
+        .removeClass('market-list-item-wish__m-selected');
     });
 
     save_selected_items();

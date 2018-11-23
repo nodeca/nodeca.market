@@ -1,0 +1,65 @@
+- self.users = self.users || {};
+- self.sections_by_id = self.sections_by_id || {};
+
+//- show many operations checkbox
+- var multiselect_allowed = false;
+
+each item in self.items
+  if (self.ignored_users[item.user] && !self.settings.market_show_ignored && !self.market_list_show_ignores)
+    //- skip entries created by ignored users
+
+  else
+    - var section = self.sections_by_id[item.section] || {};
+
+    li.market-list-item-wish(
+      id='item' + item.hid
+      class=(self.ignored_users[item.user] && !self.market_list_show_ignores) ? 'market-list-item-wish__m-ignored' : ''
+      data-item-id=item._id
+      data-item-hid=item.hid
+    )
+      .market-list-item-wish__info
+        .market-list-item-wish__title
+          a.market-list-item-wish__title-text(href=self.link_to('market.item.wish', { section_hid: section.hid, item_hid: item.hid }))
+            = item.title
+
+        .market-list-item-wish__location
+          if item.location
+            a.market-list-item-wish__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= item.location && item.location[1]
+              data-longitude= item.location && item.location[0]
+            )
+              span.icon.icon-location.icon-space-after
+
+              if self.location_names[item.location[0] + ':' + item.location[1]]
+                = self.location_names[item.location[0] + ':' + item.location[1]]
+
+        .market-list-item-wish__details
+          .market-list-item-wish__details-item!= self.timetag(item.ts, 'relative')
+
+          if !self.market_list_hide_user
+            .market-list-item-wish__details-item
+              - var user = self.users[item.user];
+              if user
+                a.market-list-item-wish__user-link._ucard-popover(
+                  href=self.link_to('users.member', { user_hid: user.hid })
+                  data-user-id=user._id
+                  data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
+                )
+                  span.market-list-item-wish__ignored-mark.icon.icon-ignore.icon-space-after
+                  = user.name
+
+          .market-list-item-wish__details-item
+            a.market-list-item-wish__section-link(
+              href=self.link_to('market.section.wish', { section_hid: section.hid })
+            )
+              = section.title
+
+      if multiselect_allowed
+        label.market-list-item-wish__select(title=self.t('multiselect_hint'))
+          input.market-list-item-wish__select-cb(
+            type='checkbox'
+            data-item-id=item._id
+            data-on-change='market.section.wish:item_check'
+          )

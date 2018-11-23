@@ -33,7 +33,7 @@
 
 if self.items && self.items.length
   ul.market-search-buy__item-list
-    != self.partial('@market.blocks.search_item_offer_list')
+    != self.partial('@market.blocks.item_offer_list')
 
   .market-search-buy__loading-next.nojs-hide(
     class=(self.reached_end ? 'd-none' : '')
