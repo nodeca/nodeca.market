@@ -44,6 +44,9 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Build item ids based on page parameters (start and direction);
+  // direction is only used for no-javascript users and bots
+  //
   async function build_item_ids(env) {
     let prev = false, next = false, start = null;
 

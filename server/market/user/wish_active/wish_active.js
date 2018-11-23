@@ -39,6 +39,8 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Return all active item ids for this user
+  //
   async function build_active_item_ids(env) {
     let entries = await N.models.market.ItemWish.find()
                             .where('user').equals(env.data.user._id)
@@ -64,6 +66,8 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Return all closed item ids for this user
+  //
   async function build_closed_item_ids(env) {
     let entries = await N.models.market.ItemWishArchived.find()
                             .where('user').equals(env.data.user._id)

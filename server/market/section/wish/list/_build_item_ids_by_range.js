@@ -6,6 +6,7 @@
 //
 // - env.user_info.hb
 // - env.data.section
+// - env.data.section_ids
 // - env.data.select_before
 // - env.data.select_after
 // - env.data.select_start
@@ -36,7 +37,7 @@ module.exports = function (N) {
     let query = N.models.market.ItemWish.find();
 
     let entries = await query
-                          .where('section').equals(env.data.section._id)
+                          .where('section').in(env.data.section_ids)
                           .where('st').in(env.data.items_visible_statuses)
                           .where('_id').gt(env.data.select_start)
                           .sort('_id')
@@ -67,7 +68,7 @@ module.exports = function (N) {
     }
 
     let entries = await query
-                          .where('section').equals(env.data.section._id)
+                          .where('section').in(env.data.section_ids)
                           .where('st').in(env.data.items_visible_statuses)
                           .sort('-_id')
                           .select('_id')

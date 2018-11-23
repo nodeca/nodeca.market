@@ -32,6 +32,9 @@ module.exports = function (N, apiPath) {
     N.models.market.Section.findById(id).lean(true).exec(), { maxAge: 60000 });
 
 
+  // Build item ids based on page parameters (start and direction);
+  // direction is only used for no-javascript users and bots
+  //
   async function build_item_ids(env) {
     let prev = false, next = false, start = null;
 
@@ -44,7 +47,7 @@ module.exports = function (N, apiPath) {
       // get hid by id
       if (query.from && _.isInteger(+query.from)) {
         let item = await N.models.market.ItemOffer.findOne()
-                              .where('section').equals(env.data.section._id)
+                              .where('section').in(env.data.section_ids)
                               .where('hid').equals(+query.from)
                               .where('st').in(env.data.items_visible_statuses)
                               .select('_id')
@@ -77,6 +80,21 @@ module.exports = function (N, apiPath) {
     if (!env.data.section) return;
 
     env.res.section = await sanitize_section(N, env.data.section, env.user_info);
+  });
+
+
+  // Get all subsections to search items in
+  //
+  N.wire.before(apiPath, async function fetch_subsections(env) {
+    let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
+
+    children = children.filter(s => !s.is_linked);
+
+    let section_ids = [ env.data.section._id ];
+
+    if (children.length > 0) section_ids = section_ids.concat(_.map(children, '_id'));
+
+    env.data.section_ids = section_ids;
   });
 
 
@@ -118,15 +136,17 @@ module.exports = function (N, apiPath) {
     // Count total amount of visible items
     //
     let counters_by_status = await Promise.all(
-      env.data.items_visible_statuses.map(st =>
-        N.models.market.ItemOffer
-            .where('section').equals(env.data.section._id)
-            .where('st').equals(st)
-            .count()
-      )
+      env.data.items_visible_statuses.map(st => Promise.all(
+        env.data.section_ids.map(section_id =>
+          N.models.market.ItemOffer
+              .where('section').equals(section_id)
+              .where('st').equals(st)
+              .count()
+        )
+      ))
     );
 
-    let total = _.sum(counters_by_status);
+    let total = _.sum(_.flatten(counters_by_status));
 
     //
     // Count an amount of visible items before the first displayed
@@ -135,16 +155,18 @@ module.exports = function (N, apiPath) {
 
     if (env.data.items.length) {
       let counters_by_status = await Promise.all(
-        env.data.items_visible_statuses.map(st =>
-          N.models.market.ItemOffer
-              .where('section').equals(env.data.section._id)
-              .where('st').equals(st)
-              .where('_id').gt(env.data.items[0]._id)
-              .count()
-        )
+        env.data.items_visible_statuses.map(st => Promise.all(
+          env.data.section_ids.map(section_id =>
+            N.models.market.ItemOffer
+                .where('section').equals(section_id)
+                .where('st').equals(st)
+                .where('_id').gt(env.data.items[0]._id)
+                .count()
+          )
+        ))
       );
 
-      offset = _.sum(counters_by_status);
+      offset = _.sum(_.flatten(counters_by_status));
     }
 
     env.res.pagination = {
@@ -220,7 +242,7 @@ module.exports = function (N, apiPath) {
       let last_item_id = env.data.items[0]._id;
 
       let item = await N.models.market.ItemOffer.findOne()
-                           .where('section').equals(env.data.section._id)
+                           .where('section').in(env.data.section_ids)
                            .where('_id').lt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('_id')
@@ -246,7 +268,7 @@ module.exports = function (N, apiPath) {
       let last_item_id = env.data.items[0]._id;
 
       let item = await N.models.market.ItemOffer.findOne()
-                           .where('section').equals(env.data.section._id)
+                           .where('section').in(env.data.section_ids)
                            .where('_id').gt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('_id')
@@ -270,7 +292,7 @@ module.exports = function (N, apiPath) {
     //
     if (env.data.items.length > 0) {
       let item = await N.models.market.ItemOffer.findOne()
-                           .where('section').equals(env.data.section._id)
+                           .where('section').in(env.data.section_ids)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('hid -_id')
                            .sort('_id')

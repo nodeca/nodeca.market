@@ -32,6 +32,21 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Get all subsections to search items in
+  //
+  N.wire.before(apiPath, async function fetch_subsections(env) {
+    let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
+
+    children = children.filter(s => !s.is_linked);
+
+    let section_ids = [ env.data.section._id ];
+
+    if (children.length > 0) section_ids = section_ids.concat(_.map(children, '_id'));
+
+    env.data.section_ids = section_ids;
+  });
+
+
   // Subcall item list
   //
   N.wire.on(apiPath, async function subcall_item_list(env) {
@@ -57,7 +72,7 @@ module.exports = function (N, apiPath) {
       let last_item_id = env.data.items[0]._id;
 
       let item = await N.models.market.ItemWish.findOne()
-                           .where('section').equals(env.data.section._id)
+                           .where('section').in(env.data.section_ids)
                            .where('_id').lt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('_id')
@@ -83,7 +98,7 @@ module.exports = function (N, apiPath) {
       let last_item_id = env.data.items[0]._id;
 
       let item = await N.models.market.ItemWish.findOne()
-                           .where('section').equals(env.data.section._id)
+                           .where('section').in(env.data.section_ids)
                            .where('_id').gt(last_item_id)
                            .where('st').in(env.data.items_visible_statuses)
                            .select('_id')
@@ -111,15 +126,17 @@ module.exports = function (N, apiPath) {
     // Count total amount of visible items
     //
     let counters_by_status = await Promise.all(
-      env.data.items_visible_statuses.map(st =>
-        N.models.market.ItemWish
-            .where('section').equals(env.data.section._id)
-            .where('st').equals(st)
-            .count()
-      )
+      env.data.items_visible_statuses.map(st => Promise.all(
+        env.data.section_ids.map(section_id =>
+          N.models.market.ItemWish
+              .where('section').equals(section_id)
+              .where('st').equals(st)
+              .count()
+        )
+      ))
     );
 
-    let total = _.sum(counters_by_status);
+    let total = _.sum(_.flatten(counters_by_status));
 
     //
     // Count an amount of visible items before the first displayed
@@ -128,16 +145,18 @@ module.exports = function (N, apiPath) {
 
     if (env.data.items.length) {
       let counters_by_status = await Promise.all(
-        env.data.items_visible_statuses.map(st =>
-          N.models.market.ItemWish
-              .where('section').equals(env.data.section._id)
-              .where('st').equals(st)
-              .where('_id').gt(env.data.items[0]._id)
-              .count()
-        )
+        env.data.items_visible_statuses.map(st => Promise.all(
+          env.data.section_ids.map(section_id =>
+            N.models.market.ItemWish
+                .where('section').equals(section_id)
+                .where('st').equals(st)
+                .where('_id').gt(env.data.items[0]._id)
+                .count()
+          )
+        ))
       );
 
-      offset = _.sum(counters_by_status);
+      offset = _.sum(_.flatten(counters_by_status));
     }
 
     env.res.pagination = {
