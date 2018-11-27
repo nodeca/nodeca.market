@@ -21,6 +21,25 @@ module.exports = function (N, apiPath) {
   let build_item_ids = require('./_build_item_ids_by_range')(N);
 
 
+  // Fetch owner
+  //
+  N.wire.before(apiPath, function fetch_user_by_hid(env) {
+    return N.wire.emit('internal:users.fetch_user_by_hid', env);
+  });
+
+
+  // Forbid access to pages owned by bots
+  //
+  N.wire.before(apiPath, async function bot_member_pages_forbid_access(env) {
+    let is_bot = await N.settings.get('is_bot', {
+      user_id: env.data.user._id,
+      usergroup_ids: env.data.user.usergroups
+    }, {});
+
+    if (is_bot) throw N.io.NOT_FOUND;
+  });
+
+
   // Subcall item list
   //
   N.wire.on(apiPath, async function subcall_item_list(env) {
@@ -30,7 +49,7 @@ module.exports = function (N, apiPath) {
     env.data.build_item_ids = build_item_ids;
     env.data.items_per_page = await env.extras.settings.fetch('market_items_per_page');
 
-    await N.wire.emit('internal:market.item_offer_list_archived', env);
+    await N.wire.emit('internal:market.item_offer_closed_list', env);
   });
 
 

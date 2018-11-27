@@ -185,7 +185,7 @@ module.exports = function (N, apiPath) {
   // Fill pagination (progress)
   //
   N.wire.after(apiPath, async function fill_pagination(env) {
-    let total = env.res.stats.active_wishes;
+    let total = env.res.stats.closed_wishes;
 
     //
     // Count an amount of visible items before the first displayed

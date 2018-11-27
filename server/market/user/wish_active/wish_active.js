@@ -3,7 +3,8 @@
 
 'use strict';
 
-const _  = require('lodash');
+const _        = require('lodash');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 
 module.exports = function (N, apiPath) {
@@ -69,12 +70,23 @@ module.exports = function (N, apiPath) {
   // Return all closed item ids for this user
   //
   async function build_closed_item_ids(env) {
-    let entries = await N.models.market.ItemWishArchived.find()
-                            .where('user').equals(env.data.user._id)
-                            .where('st').in(env.data.items_visible_statuses)
-                            .sort('-_id')
-                            .select('_id')
-                            .lean(true);
+    let query = N.models.market.ItemWishArchived.find()
+                    .where('user').equals(env.data.user._id)
+                    .where('st').in(env.data.items_visible_statuses)
+                    .sort('-_id')
+                    .select('_id');
+
+    let market_items_expire = await N.settings.get('market_items_expire');
+
+    // limit results to last 2 months
+    if (market_items_expire <= 0) {
+      query = query.where('_id').lt(new ObjectId(Date.now() - 2 * market_items_expire * 24 * 60 * 60)).lean(true);
+    }
+
+    // limit results to one page
+    query = query.limit(env.data.items_per_page);
+
+    let entries = await query.lean(true);
 
     env.data.item_ids = _.map(entries, '_id');
   }
@@ -196,6 +208,8 @@ module.exports = function (N, apiPath) {
       per_page:     env.data.items_per_page,
       chunk_offset: offset
     };
+
+    env.res.last_item_hid = env.res.items_active ? env.res.items_active[env.res.items_active.length - 1].hid : 0;
   });
 
 
@@ -210,6 +224,10 @@ module.exports = function (N, apiPath) {
 
     env.data.users = env.data.users || [];
     env.data.users.push(env.data.user._id);
+
+    if (env.params.$query && env.params.$query.from) {
+      env.res.head.robots = 'noindex,follow';
+    }
   });
 
 

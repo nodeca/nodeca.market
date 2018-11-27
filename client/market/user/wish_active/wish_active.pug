@@ -1,9 +1,29 @@
+- self.add_raw_data('pagination', self.pagination)
+
 - self.users = self.users || {};
 - var user = self.users[self.user_id] || {};
 
-article#content.market-user.market-user__m-wish-active
-  - var navbar_args = { level_up: self.link_to('market.index.buy') };
-  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
+article#content.market-user.market-user__m-wish-active(
+  data-keymap= {
+    'home': 'market.user.wish_active:nav_to_start',
+    'end':  'market.user.wish_active:nav_to_end'
+  }
+)
+  -
+    var navbar_args = {
+      title:    self.t('title_with_user', { user: user.nick }),
+      level_up: self.link_to('market.index.buy'),
+      toolbar:  'market.user.blocks.toolbar_controls',
+      progress: {
+        link_top:    self.link_to('market.user.wish_active', { user_hid: user.hid }),
+        link_bottom: self.link_to('market.user.wish_active', { user_hid: user.hid, $query: { from: self.last_item_hid } }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      }
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

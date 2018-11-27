@@ -1,5 +1,6 @@
 en-US:
   title: Market items
+  title_with_user: "Market - #{user}"
 
   no_items: This user doesn't have closed wishes.
 
