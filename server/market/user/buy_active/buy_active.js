@@ -80,7 +80,9 @@ module.exports = function (N, apiPath) {
 
     // limit results to last 2 months
     if (market_items_expire <= 0) {
-      query = query.where('_id').lt(new ObjectId(Date.now() - 2 * market_items_expire * 24 * 60 * 60)).lean(true);
+      let cutoff = Date.now() - 2 * market_items_expire * 24 * 60 * 60 * 1000;
+
+      query = query.where('_id').lt(new ObjectId(cutoff / 1000)).lean(true);
     }
 
     // limit results to one page
@@ -209,7 +211,9 @@ module.exports = function (N, apiPath) {
       chunk_offset: offset
     };
 
-    env.res.last_item_hid = env.res.items_active ? env.res.items_active[env.res.items_active.length - 1].hid : 0;
+    env.res.last_item_hid = env.res.items_active && env.res.items_active.length ?
+                            env.res.items_active[env.res.items_active.length - 1].hid :
+                            0;
   });
 
 
