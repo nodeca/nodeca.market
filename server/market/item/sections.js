@@ -1,13 +1,16 @@
 // Tree of visible market sections
 //
+// Used to display move item dialogs in:
+//  - client/market/blocks/item_move_many_dlg
+//  - client/market/item/buy/item_move_dlg
+//  - client/market/item/wish/item_move_dlg
+//
 'use strict';
 
 
 module.exports = function (N, apiPath) {
 
-  N.validate(apiPath, {
-    section_hid: { type: 'integer', required: true }
-  });
+  N.validate(apiPath, {});
 
 
   // Check permissions

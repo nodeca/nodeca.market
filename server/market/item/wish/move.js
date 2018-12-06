@@ -6,18 +6,23 @@
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    section_hid_from: { type: 'integer', required: true },
-    section_hid_to:   { type: 'integer', required: true },
-    item_id:          { format: 'mongo', required: true }
+    section_hid_to: { type: 'integer', required: true },
+    item_id:        { format: 'mongo', required: true }
   });
 
 
-  // Fetch sections
+  // Check permissions
   //
-  N.wire.before(apiPath, async function fetch_sections(env) {
-    env.data.section_from = await N.models.market.Section.findOne({ hid: env.params.section_hid_from }).lean(true);
-    if (!env.data.section_from) throw N.io.NOT_FOUND;
+  N.wire.before(apiPath, async function check_permissions(env) {
+    let market_mod_can_move_items = await env.extras.settings.fetch('market_mod_can_move_items');
 
+    if (!market_mod_can_move_items) throw N.io.FORBIDDEN;
+  });
+
+
+  // Fetch destination section, check that it's not a category
+  //
+  N.wire.before(apiPath, async function fetch_section(env) {
     env.data.section_to = await N.models.market.Section.findOne({ hid: env.params.section_hid_to }).lean(true);
     if (!env.data.section_to) throw N.io.NOT_FOUND;
 
@@ -61,11 +66,7 @@ module.exports = function (N, apiPath) {
   // Move topic
   //
   N.wire.on(apiPath, async function move_topic(env) {
-    // if moving to the same section, report success and do nothing
-    env.data.is_move_valid = String(env.data.item.section) === String(env.data.section_from._id) &&
-                             String(env.data.item.section) !== String(env.data.section_to._id);
-
-    if (!env.data.is_move_valid) return;
+    if (String(env.data.item.section) === String(env.data.section_to._id)) return;
 
     if (env.data.item_is_archived) {
       await N.models.market.ItemWishArchived.update(
@@ -84,7 +85,7 @@ module.exports = function (N, apiPath) {
   // Schedule search index update
   //
   N.wire.after(apiPath, async function add_search_index(env) {
-    if (!env.data.is_move_valid) return;
+    if (String(env.data.item.section) === String(env.data.section_to._id)) return;
 
     await N.queue.market_item_wishes_search_update_by_ids([ env.data.item._id ]).postpone();
   });
@@ -93,9 +94,9 @@ module.exports = function (N, apiPath) {
   // Update sections counters
   //
   N.wire.after(apiPath, async function update_sections(env) {
-    if (!env.data.is_move_valid) return;
+    if (String(env.data.item.section) === String(env.data.section_to._id)) return;
 
-    await N.models.market.Section.updateCache(env.data.section_from._id);
+    await N.models.market.Section.updateCache(env.data.item.section);
     await N.models.market.Section.updateCache(env.data.section_to._id);
   });
 

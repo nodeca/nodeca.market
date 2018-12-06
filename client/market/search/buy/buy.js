@@ -22,6 +22,7 @@ const bag = require('bagjs')({ prefix: 'nodeca' });
 //                         (Number, rounded to either 100 or 200)
 //   - sort:               sort type (`rel`, `date` or `price`)
 //
+// - active:             true if we're on this page, false otherwise
 // - first_offset:       offset of the first item in the DOM
 // - current_offset:     offset of the current item (first in the viewport)
 // - reached_end:        true if no more pages exist below last loaded one
@@ -63,6 +64,7 @@ function reset_loading_placeholders() {
 N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   let pagination = N.runtime.page_data.pagination;
 
+  pageState.active             = true;
   pageState.search             = N.runtime.page_data.search;
   pageState.first_offset       = pagination.chunk_offset;
   pageState.current_offset     = -1;
@@ -75,6 +77,16 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   pageState.selected_items     = [];
 
   $window.scrollTop(0);
+});
+
+
+// Mark that user left the page
+//
+// Maybe it's better to set pageState = null to free memory? But it requires
+// a lot of work to make sure there are any delayed/debounced calls to it.
+//
+N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
+  pageState.active = false;
 });
 
 
@@ -314,13 +326,17 @@ N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_sel
 });
 
 
+
 // Init handlers
 //
 N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_init() {
 
   // Update array of selected items on selection change
   //
-  N.wire.on(module.apiPath + ':item_check', function market_item_select(data) {
+  N.wire.on('market.blocks.item_offer_list:item_check', function market_item_select(data) {
+    // this handler is supposed to fire on multiple pages, make sure we got the right one
+    if (!pageState.active) return;
+
     let itemId = data.$this.data('item-id');
 
     if (data.$this.is(':checked') && pageState.selected_items.indexOf(itemId) === -1) {
@@ -394,7 +410,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
 
   // Unselect all items
   //
-  N.wire.on(module.apiPath + ':items_unselect', function market_items_unselect() {
+  N.wire.on(module.apiPath + ':items_unselect', function unselect_many() {
     pageState.selected_items = [];
 
     $('.market-list-item-offer__select-cb:checked').each(function () {
@@ -406,6 +422,78 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
 
     save_selected_items();
     return updateToolbar();
+  });
+
+
+  // Delete items
+  //
+  N.wire.on(module.apiPath + ':delete_many', function delete_many() {
+    let params = {
+      canDeleteHard: N.runtime.page_data.settings.market_mod_can_hard_delete_items
+    };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('market.blocks.item_delete_many_dlg', params))
+      .then(() => {
+        let request = {
+          item_ids: pageState.selected_items,
+          method: params.method
+        };
+
+        if (params.reason) request.reason = params.reason;
+
+        return N.io.rpc('market.item.buy.many.destroy_many', request);
+      })
+      .then(() => {
+        pageState.selected_items = [];
+        save_selected_items_immediate();
+
+        return N.wire.emit('notify.info', t('many_items_deleted'));
+      })
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
+  // Close items
+  //
+  N.wire.on(module.apiPath + ':close_many', function close_many() {
+    let request = {
+      item_ids: pageState.selected_items
+    };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('common.blocks.confirm', t('many_close_confirm')))
+      .then(() => N.io.rpc('market.item.buy.many.close_many', request))
+      .then(() => {
+        pageState.selected_items = [];
+        save_selected_items_immediate();
+      })
+      .then(() => N.wire.emit('notify.info', t('many_items_closed')))
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
+  // Move items
+  //
+  N.wire.on(module.apiPath + ':move_many', function move_many() {
+    let params = {};
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('market.blocks.item_move_many_dlg', params))
+      .then(() => {
+        let request = {
+          section_hid_to: params.section_hid_to,
+          item_ids: pageState.selected_items
+        };
+
+        return N.io.rpc('market.item.buy.many.move_many', request);
+      })
+      .then(() => {
+        pageState.selected_items = [];
+        save_selected_items_immediate();
+      })
+      .then(() => N.wire.emit('notify.info', t('many_items_moved')))
+      .then(() => N.wire.emit('navigate.reload'));
   });
 });
 

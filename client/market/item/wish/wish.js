@@ -47,7 +47,6 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       .then(() => N.wire.emit('market.item.wish.item_move_dlg', params))
       .then(() => {
         let request = {
-          section_hid_from: params.section_hid_from,
           section_hid_to: params.section_hid_to,
           item_id
         };

@@ -26,6 +26,8 @@ let setting_names = [
   'market_can_create_items',
   'market_displayed_currency',
   'market_items_per_page',
+  'market_mod_can_delete_items',
+  'market_mod_can_move_items',
   'market_show_ignored'
 ];
 

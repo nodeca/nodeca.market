@@ -1,0 +1,32 @@
+mixin sections_tree(sections, deepness)
+  each section in sections
+
+    - var prefix = Array(deepness).join('\u2003\u2003');
+
+    option.market-item-move-many__section(
+      class=self.section_hid_from === section.hid ? 'market-item-move-many-section__m-current' : ''
+      disabled=section.is_category
+      value=section.is_category ? null : section.hid
+      selected=(self.section_hid_from === section.hid)
+    )=prefix + section.title
+
+    if section.children && section.children.length
+      +sections_tree(section.children, deepness + 1)
+
+.modal.fade(tabindex='-1' role='dialog' aria-hidden='true')
+  .modal-dialog(role='document')
+    .modal-content
+      form(novalidate, data-on-submit=self.apiPath + ':submit')
+        .modal-header
+          h4.modal-title=self.t('title')
+          button.close(type='button' tabindex='-1' data-dismiss='modal') &times;
+        .modal-body
+          label= self.t('section_input_name')
+          select.form-control.custom-select(name='section_hid' tabindex='1' required)
+            if !self.section_hid_from
+              //- placeholder
+              option(disabled, hidden, selected)
+            +sections_tree(self.sections, 1)
+        .modal-footer
+          button.btn.btn-secondary(type='button' tabindex='4' data-dismiss='modal')=self.t('cancel')
+          button.btn.btn-danger(type='submit' tabindex='5')=self.t('ok')

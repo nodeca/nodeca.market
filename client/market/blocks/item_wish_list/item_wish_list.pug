@@ -2,7 +2,7 @@
 - self.sections_by_id = self.sections_by_id || {};
 
 //- show many operations checkbox
-- var multiselect_allowed = false;
+- var multiselect_allowed = self.settings.market_mod_can_delete_items || self.settings.market_mod_can_move_items;
 
 each item in self.items
   if (self.ignored_users[item.user] && !self.settings.market_show_ignored && !self.market_list_show_ignores)
@@ -61,5 +61,5 @@ each item in self.items
           input.market-list-item-wish__select-cb(
             type='checkbox'
             data-item-id=item._id
-            data-on-change='market.section.wish:item_check'
+            data-on-change='market.blocks.item_wish_list:item_check'
           )

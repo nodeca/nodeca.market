@@ -30,7 +30,7 @@ module.exports = function (N) {
                             .lean(true);
 
     // preserve inline link exactly as it was (keep hash tags, etc.)
-    data.html = render(N, 'common.blocks.markup.market_item_buy_link', {
+    data.html = render(N, 'common.blocks.markup.market_item_offer_link', {
       href: data.url,
       item,
       section

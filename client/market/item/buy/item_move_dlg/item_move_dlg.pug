@@ -6,7 +6,7 @@ mixin sections_tree(sections, deepness)
     option.market-item-buy-move__section(
       class=self.section_hid_from === section.hid ? 'market-item-buy-move-section__m-current' : ''
       disabled=section.is_category
-      value=section.hid
+      value=section.is_category ? null : section.hid
       selected=(self.section_hid_from === section.hid)
     )=prefix + section.title
 
@@ -16,13 +16,13 @@ mixin sections_tree(sections, deepness)
 .modal.fade(tabindex='-1' role='dialog' aria-hidden='true')
   .modal-dialog(role='document')
     .modal-content
-      form(data-on-submit=self.apiPath + ':submit')
+      form(novalidate, data-on-submit=self.apiPath + ':submit')
         .modal-header
           h4.modal-title=self.t('title')
           button.close(type='button' tabindex='-1' data-dismiss='modal') &times;
         .modal-body
           label= self.t('section_input_name')
-          select.form-control.custom-select(name='section_hid' tabindex='1')
+          select.form-control.custom-select(name='section_hid' tabindex='1' required)
             +sections_tree(self.sections, 1)
         .modal-footer
           button.btn.btn-secondary(type='button' tabindex='4' data-dismiss='modal')=self.t('cancel')

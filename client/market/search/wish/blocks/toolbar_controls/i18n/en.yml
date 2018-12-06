@@ -4,5 +4,5 @@ en-US:
   many_header: "With #{count} ((item|items)):"
   many_unselect: Clear selection
   many_delete: Delete
-  many_undelete: Undelete
+  many_close: Close
   many_move: Move

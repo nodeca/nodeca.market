@@ -1,3 +1,4 @@
+- self.add_raw_data('settings', self.settings)
 - self.add_raw_data('pagination', self.pagination)
 
 - self.users = self.users || {};
@@ -16,7 +17,7 @@ article#content.market-user.market-user__m-buy-closed(
     var navbar_args = {
       title:    self.t('title_with_user', { user: user.nick }),
       level_up: self.link_to('market.index.buy'),
-      toolbar:  'market.user.blocks.toolbar_controls',
+      toolbar:  'market.user.buy_closed.blocks.toolbar_controls',
       progress: {
         link_top:    self.link_to('market.user.buy_closed', { user_hid: user.hid }),
         link_bottom: self.link_to('market.user.buy_closed', { user_hid: user.hid, $query: { from: self.last_item_hid } }),
@@ -48,7 +49,7 @@ article#content.market-user.market-user__m-buy-closed(
             img.market-user__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
             = user.name
 
-      != self.partial('@market.user.blocks.toolbar_controls')
+      != self.partial('@market.user.buy_closed.blocks.toolbar_controls')
 
     != self.partial('@market.user.tabs', { active_tab: 'buy_closed' })
 

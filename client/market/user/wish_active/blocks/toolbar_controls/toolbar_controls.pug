@@ -4,7 +4,7 @@
 
 - items.push('currency')
 
-- var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
+- var show_menu = items.length > 0;
 
 
 if self.selected_cnt
@@ -12,9 +12,13 @@ if self.selected_cnt
     - items.push('divider')
   - items.push('many_header')
   - items.push('many_unselect')
-  - items.push('many_delete')
-  - items.push('many_undelete')
-  - items.push('many_move')
+  if self.settings.market_mod_can_delete_items
+    - items.push('many_delete')
+    - items.push('many_undelete')
+  if self.settings.market_mod_can_move_items
+    - items.push('many_open')
+    - items.push('many_close')
+    - items.push('many_move')
 
 //- If last item is header - remove it
 if items.length > 0 && items[items.length - 1] === 'header'
@@ -53,20 +57,35 @@ if items.length > 0 && items[items.length - 1] === 'header'
             when 'many_unselect'
               button.dropdown-item(
                 type='button'
-                data-on-click='market.section.buy:items_unselect'
+                data-on-click='market.user.wish_active:items_unselect'
               )=self.t('many_unselect')
 
             when 'many_delete'
               button.dropdown-item(
                 type='button'
+                data-on-click='market.user.wish_active:delete_many'
               )= self.t('many_delete')
 
             when 'many_undelete'
               button.dropdown-item(
                 type='button'
+                data-on-click='market.user.wish_active:undelete_many'
               )= self.t('many_undelete')
+
+            when 'many_close'
+              button.dropdown-item(
+                type='button'
+                data-on-click='market.user.wish_active:close_many'
+              )= self.t('many_close')
+
+            when 'many_open'
+              button.dropdown-item(
+                type='button'
+                data-on-click='market.user.wish_active:open_many'
+              )= self.t('many_open')
 
             when 'many_move'
               button.dropdown-item(
                 type='button'
+                data-on-click='market.user.wish_active:move_many'
               )= self.t('many_move')

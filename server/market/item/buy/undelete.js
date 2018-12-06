@@ -88,8 +88,6 @@ module.exports = function (N, apiPath) {
 
     Object.assign(update, item.prev_st);
 
-    await N.models.market.ItemOffer.update({ _id: item._id }, update);
-
     /* eslint-disable no-lonely-if */
     if (item.prev_st.st === statuses.OPEN || item.prev_st.ste === statuses.OPEN) {
       // item is open, so it should be in active collection now
