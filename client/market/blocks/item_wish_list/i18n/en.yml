@@ -1,2 +1,9 @@
 en-US:
+  del_reason: "(#{text})"
+  del_by: "Deleted by:"
+  closed: Closed item
+  hellbanned: Hellbanned
+  ignored: Author ignored
+  deleted: Deleted item
+  bookmarked: You bookmarked this item
   multiselect_hint: Click with shift to start range selection

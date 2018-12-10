@@ -110,6 +110,7 @@ module.exports = function (N, apiPath) {
       }
 
       let update = {
+        $set: {},
         $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
       };
 
@@ -123,7 +124,7 @@ module.exports = function (N, apiPath) {
         }
       }
 
-      Object.assign(update, item.prev_st);
+      Object.assign(update.$set, item.prev_st);
 
       /* eslint-disable no-lonely-if */
       if (item.prev_st.st === statuses.OPEN || item.prev_st.ste === statuses.OPEN) {

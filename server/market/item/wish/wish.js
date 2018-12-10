@@ -83,6 +83,7 @@ module.exports = function (N, apiPath) {
     env.data.users = env.data.users || [];
 
     if (env.data.item.user) env.data.users.push(env.data.item.user);
+    if (env.data.item.del_by) env.data.users.push(env.data.item.del_by);
 
     if (env.data.item.import_users) {
       env.data.users = env.data.users.concat(env.data.item.import_users);

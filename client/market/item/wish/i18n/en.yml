@@ -10,6 +10,9 @@ en-US:
   open_item_done: Item opened
   close_item_done: Item closed
 
+  del_reason: "(#{text})"
+  del_by: "Deleted by:"
+
   edit: Edit item
   views: Views
   report: Report to moderator

@@ -27,6 +27,7 @@ let setting_names = [
   'market_displayed_currency',
   'market_items_per_page',
   'market_mod_can_delete_items',
+  'market_mod_can_hard_delete_items',
   'market_mod_can_move_items',
   'market_show_ignored'
 ];
@@ -53,7 +54,7 @@ module.exports = function (N, apiPath) {
   // active collection can have only OPEN and HB statuses
   //
   N.wire.before(apiPath, function define_visible_statuses(env) {
-    let statuses = N.models.market.ItemOffer.statuses;
+    let statuses = N.models.market.ItemWish.statuses;
 
     env.data.items_visible_statuses = [ statuses.OPEN ];
 
@@ -104,13 +105,29 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fetch and fill bookmarks
+  //
+  N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
+    let bookmarks = await N.models.market.ItemWishBookmark.find()
+                              .where('user').equals(env.user_info.user_id)
+                              .where('item').in(env.data.item_ids)
+                              .select('item')
+                              .lean(true);
+
+    if (!bookmarks.length) return;
+
+    env.res.own_bookmarks = _.map(bookmarks, 'item');
+  });
+
+
   // Collect users
   //
   N.wire.after(apiPath, function collect_users(env) {
     env.data.users = env.data.users || [];
 
     env.data.items.forEach(function (item) {
-      env.data.users.push(item.user);
+      if (item.user)   env.data.users.push(item.user);
+      if (item.del_by) env.data.users.push(item.del_by);
     });
   });
 

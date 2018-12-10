@@ -66,6 +66,16 @@ article#content.market-item-wish(
             )
               = self.section.title
 
+          if self.item.del_by
+            - var delUser = self.users[self.item.del_by] || {}
+            p.page-head__descr.market-item-buy__meta-deleted
+              = self.t('del_by')
+              = ' '
+              a(href=self.link_to('users.member', { user_hid: delUser.hid }))= delUser.name
+              if self.item.del_reason
+                = ' '
+                = self.t('del_reason', { text: self.item.del_reason })
+
       != self.partial('@market.item.wish.blocks.toolbar_controls')
 
     .market-item-wish__description.markup!= self.item.html

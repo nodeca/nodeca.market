@@ -112,14 +112,16 @@ module.exports = function (N, apiPath) {
       }
 
       let update = {
-        st: env.params.method === 'hard' ? statuses.DELETED_HARD : statuses.DELETED,
-        $unset: { ste: 1 },
-        prev_st: _.pick(item, [ 'st', 'ste' ]),
-        del_by: env.user_info.user_id
+        $set: {
+          st: env.params.method === 'hard' ? statuses.DELETED_HARD : statuses.DELETED,
+          prev_st: _.pick(item, [ 'st', 'ste' ]),
+          del_by: env.user_info.user_id
+        },
+        $unset: { ste: 1 }
       };
 
       if (env.params.reason) {
-        update.del_reason = env.params.reason;
+        update.$set.del_reason = env.params.reason;
       }
 
       // move item to archive if it wasn't there already, update otherwise

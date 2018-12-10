@@ -1,5 +1,7 @@
+- var itemStatuses = '$$ JSON.stringify(N.models.market.ItemOffer.statuses) $$'
 - self.users = self.users || {};
 - self.sections_by_id = self.sections_by_id || {};
+- self.own_bookmarks = self.own_bookmarks || [];
 
 //- show many operations checkbox
 - var multiselect_allowed = self.settings.market_mod_can_delete_items || self.settings.market_mod_can_move_items;
@@ -13,17 +15,26 @@ each item in self.items
 
     li.market-list-item-offer(
       id='item' + item.hid
-      class=(self.ignored_users[item.user] && !self.market_list_show_ignores) ? 'market-list-item-offer__m-ignored' : ''
+      class=(item.st === itemStatuses.HB) ? 'market-list-item-offer__m-hellbanned' : ''
+      class=([ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1) ? 'market-list-item-offer__m-closed' : ''
+      class=(item.st === itemStatuses.DELETED) ? 'market-list-item-offer__m-deleted' : ''
+      class=(item.st === itemStatuses.DELETED_HARD) ? 'market-list-item-offer__m-deleted-hard' : ''
+      class=(self.own_bookmarks.indexOf(item._id) !== -1) ? 'market-list-item-offer__m-bookmarked' : ''
+      class=self.ignored_users[item.user] ? 'market-list-item-offer__m-ignored' : ''
       data-item-id=item._id
       data-item-hid=item.hid
     )
-      a.market-list-item-offer__photo.thumb.thumb__m-market(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
-        if item.files && item.files.length > 0
-          img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
-        else
-          .thumb__content= self.t('no_photo')
+      .market-list-item-offer__aside
+        a.market-list-item-offer__photo.thumb.thumb__m-market(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+          if item.files && item.files.length > 0
+            img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+          else
+            .thumb__content= self.t('no_photo')
+
       .market-list-item-offer__info
         .market-list-item-offer__title
+          span.market-list-item-offer__bookmarked-marker.icon.icon-bookmark.icon-space-after(title=self.t('bookmarked'))
+          span.market-list-item-offer__deleted-marker.icon.icon-x.icon-dimmed.icon-space-after(title=self.t('deleted'))
           a.market-list-item-offer__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
             = item.title
           if !item.is_new
@@ -69,15 +80,33 @@ each item in self.items
                   href=self.link_to('users.member', { user_hid: user.hid })
                   data-user-id=user._id
                   data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
-                )
-                  span.market-list-item-offer__ignored-mark.icon.icon-ignore.icon-space-after
-                  = user.name
+                )= user.name
 
           .market-list-item-offer__details-item
             a.market-list-item-offer__section-link(
               href=self.link_to('market.section.buy', { section_hid: section.hid })
             )
               = section.title
+
+        .market-list-item-offer__meta-ignored.icon.icon-ignore.icon-space-after
+          = self.t('ignored')
+        .market-list-item-offer__meta-hellbanned
+          = self.t('hellbanned')
+
+        if item.del_by
+          - var delUser = self.users[item.del_by] || {}
+          .market-list-item-offer__meta-deleted
+            = self.t('del_by')
+            = ' '
+            a.market-list-item-offer__meta-del-by._ucard-popover(
+              href=self.link_to('users.member', { user_hid: delUser.hid })
+              data-user-id=delUser._id
+              data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
+            )= delUser.name
+
+            if item.del_reason
+              = ' '
+              = self.t('del_reason', { text: item.del_reason })
 
       if multiselect_allowed
         label.market-list-item-offer__select(title=self.t('multiselect_hint'))

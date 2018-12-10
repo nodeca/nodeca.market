@@ -2,7 +2,8 @@
 
 .market-list-item-wish
   display flex
-  margin-top 1rem
+  margin-top 0.5rem
+  padding 0.25rem 0.5rem 0.25rem 0.5rem
 
 .market-list-item-wish__info
   flex 1 1 auto
@@ -14,12 +15,6 @@
 .market-list-item-wish__user-link
 .market-list-item-wish__section-link
   color $body-color-secondary
-
-.market-list-item-wish__ignored-mark
-  display none
-.market-list-item-wish__m-ignored
-  .market-list-item-wish__ignored-mark
-    display inline-block
 
 .market-list-item-wish__details
   color $body-color-secondary
@@ -33,6 +28,81 @@
 .market-list-item-wish__details-item + .market-list-item-wish__details-item
   &:before
     content ' | '
+
+.market-list-item-wish__meta-del-by
+  color $body-color-secondary
+
+.market-list-item-wish__meta-deleted
+.market-list-item-wish__meta-hellbanned
+.market-list-item-wish__meta-ignored
+  color $body-color-secondary
+  shortable()
+
+.market-list-item-wish__meta-hellbanned
+.market-list-item-wish__meta-ignored
+  display none
+
+.market-list-item-wish__bookmarked-marker
+  color $brand-success
+  display none
+
+.market-list-item-wish__deleted-marker
+  display none
+
+.market-list-item-wish__m-bookmarked
+  .market-list-item-wish__bookmarked-marker
+    display inline-block
+
+// only hide ignored and hb items on section and search pages,
+// show them items on user pages as regular
+.market-section-wish__item-list
+.market-search-wish__item-list
+  .market-list-item-wish__m-ignored
+    .market-list-item-wish__meta-ignored
+      display block
+
+  .market-list-item-wish__m-hellbanned
+    .market-list-item-wish__meta-hellbanned
+      display block
+
+.market-list-item-wish__m-deleted
+.market-list-item-wish__m-deleted-hard
+  .market-list-item-wish__deleted-marker
+    display inline-block
+
+// only hide ignored and hb items on section and search pages,
+// show them items on user pages as regular
+.market-section-wish__item-list
+.market-search-wish__item-list
+  .market-list-item-wish__m-ignored
+  .market-list-item-wish__m-hellbanned
+    background-color $deleted-bg
+    opacity 0.7
+    &:hover
+      opacity 1
+    .market-list-item-wish__location
+    .market-list-item-wish__details
+      display none
+
+.market-list-item-wish__m-deleted
+.market-list-item-wish__m-deleted-hard
+  background-color $deleted-bg
+  opacity 0.7
+  &:hover
+    opacity 1
+  .market-list-item-wish__location
+  .market-list-item-wish__details
+    display none
+
+@keyframes market-list-item-wish-flash-animation {
+  from  { background: $decorator-color;  }
+  to    { background: none; }
+}
+
+.market-list-item-wish__m-highlight
+  animation market-list-item-wish-flash-animation 1.5s
+  .market-list-item-wish__highlight-marker
+    display block
 
 .market-list-item-wish__m-selected
   background-color #ffd

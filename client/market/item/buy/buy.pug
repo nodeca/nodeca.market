@@ -70,6 +70,16 @@ article#content.market-item-buy(
             )
               = self.section.title
 
+          if self.item.del_by
+            - var delUser = self.users[self.item.del_by] || {}
+            p.page-head__descr.market-item-buy__meta-deleted
+              = self.t('del_by')
+              = ' '
+              a(href=self.link_to('users.member', { user_hid: delUser.hid }))= delUser.name
+              if self.item.del_reason
+                = ' '
+                = self.t('del_reason', { text: self.item.del_reason })
+
       != self.partial('@market.item.buy.blocks.toolbar_controls')
 
     if self.item.files && self.item.files.length > 0
