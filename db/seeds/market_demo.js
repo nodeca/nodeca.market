@@ -138,6 +138,7 @@ async function createItemOffer(section, user, isClosed = false) {
 
   let currency = charlatan.Helpers.sample(Object.keys(config.market.currencies));
   let rate = await models.market.CurrencyRate.get(currency);
+  let files = [ await createRandomPhoto() ];
 
   let item = new (isClosed ? models.market.ItemOfferArchived : models.market.ItemOffer)({
     _id:         new ObjectId(Math.round(ts / 1000)),
@@ -153,7 +154,7 @@ async function createItemOffer(section, user, isClosed = false) {
     },
     base_currency_price: price * rate,
 
-    barter_info: charlatan.Helpers.rand(3) ? null : charlatan.Lorem.sentence().slice(0, -1),
+    barter_info: charlatan.Helpers.rand(3) ? '' : charlatan.Lorem.sentence().slice(0, -1),
     delivery:    charlatan.Helpers.sample([ true, false, false ]),
     is_new:      charlatan.Helpers.sample([ true, true, false ]),
 
@@ -161,7 +162,8 @@ async function createItemOffer(section, user, isClosed = false) {
     section,
     user,
 
-    files: [ await createRandomPhoto() ],
+    files:       files,
+    all_files:   files
 
     // don't property randomize this to avoid needless requests
     // to geolocation services

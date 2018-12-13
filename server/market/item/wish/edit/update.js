@@ -17,7 +17,8 @@ module.exports = function (N, apiPath) {
     item_id:        { format: 'mongo', required: true },
     title:          { type: 'string',  required: true },
     section:        { format: 'mongo', required: true },
-    description:    { type: 'string',  required: true }
+    description:    { type: 'string',  required: true },
+    as_moderator:   { type: 'boolean', required: true }
   });
 
 
@@ -69,11 +70,18 @@ module.exports = function (N, apiPath) {
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
-    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+    let settings = await env.extras.settings.fetch([
+      'market_can_create_items',
+      'market_mod_can_edit_items'
+    ]);
 
-    if (!can_create_items) throw N.io.FORBIDDEN;
+    // Permit editing as moderator
+    if (settings.market_mod_can_edit_items && env.params.as_moderator) return;
 
-    if (String(env.user_info.user_id) !== String(env.data.item.user)) {
+    // Permit editing as topic owner
+    if (!settings.can_create_items) throw N.io.FORBIDDEN;
+
+    if (env.user_info.user_id !== String(env.data.item.user)) {
       throw N.io.FORBIDDEN;
     }
   });
@@ -153,7 +161,11 @@ module.exports = function (N, apiPath) {
     item.params = env.data.parse_options;
     item.section = env.data.section._id;
 
-    item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
+    // only update location if user edits his own item,
+    // do not update it for moderator actions
+    if (!env.params.as_moderator) {
+      item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
+    }
 
     env.data.new_item = await item.save();
   });

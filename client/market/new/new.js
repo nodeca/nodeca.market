@@ -41,7 +41,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     type:           ko.observable(view.offerTypes[0].value),
     title:          ko.observable(''),
     price_value:    ko.observable(''),
-    price_currency: ko.observable(),
+    price_currency: ko.observable(''),
     section:        ko.observable(''),
     description:    ko.observable(''),
     files:          ko.observableArray(),

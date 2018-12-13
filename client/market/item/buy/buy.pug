@@ -83,7 +83,7 @@ article#content.market-item-buy(
       != self.partial('@market.item.buy.blocks.toolbar_controls')
 
     if self.item.files && self.item.files.length > 0
-      ul.market-item-buy__attach-list.thumb-grid.thumb-grid__m-fluid
+      ul.market-item-buy__attach-list.thumb-grid.thumb-grid__m-market
         each file in self.item.files
           li.market-item-buy__attach-item.thumb-grid__item
             .thumb-grid__item-inner

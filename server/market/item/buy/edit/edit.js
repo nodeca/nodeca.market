@@ -53,11 +53,18 @@ module.exports = function (N, apiPath) {
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
-    let can_create_items = await env.extras.settings.fetch('market_can_create_items');
+    let settings = await env.extras.settings.fetch([
+      'market_can_create_items',
+      'market_mod_can_edit_items'
+    ]);
 
-    if (!can_create_items) throw N.io.FORBIDDEN;
+    // Permit editing as moderator
+    if (settings.market_mod_can_edit_items) return;
 
-    if (String(env.user_info.user_id) !== String(env.data.item.user)) {
+    // Permit editing as topic owner
+    if (!settings.can_create_items) throw N.io.FORBIDDEN;
+
+    if (env.user_info.user_id !== String(env.data.item.user)) {
       throw N.io.FORBIDDEN;
     }
   });
@@ -115,6 +122,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+      'market_can_create_items',
       'market_items_min_images',
       'market_items_max_images'
     ]));

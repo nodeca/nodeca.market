@@ -1,8 +1,20 @@
+// Market uses smaller image sizes with different cropping,
+// so trying to extend default thumb grid to account for this
+
 @import "nodeca.core/client/common/_variables"
 
 thumbImageWidth  = '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
 thumbImageHeight = '$$ N.config.market.uploads.resize.sm.max_height || N.config.market.uploads.resize.sm.height $$'px
+gridSpace        = 10px
 
+.thumb-grid__m-market
+  display flex
+  flex-wrap wrap
+
+  .thumb-grid__item
+    flex 0 0 thumbImageWidth + gridSpace
+
+.thumb-grid__m-market
 .thumb__m-market
   .thumb
   &.thumb

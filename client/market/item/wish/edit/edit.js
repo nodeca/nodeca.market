@@ -26,9 +26,9 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   view.router = N.router;
 
   view.offer = {
-    title:          ko.observable(item.title),
-    section:        ko.observable(item.section),
-    description:    ko.observable(item.md)
+    title:          ko.observable(item.title || ''),
+    section:        ko.observable(item.section || ''),
+    description:    ko.observable(item.md || '')
   };
 
   view.showPreview  = ko.observable(false);
@@ -85,11 +85,16 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.showErrors(false);
     view.isSubmitting(true);
 
+    let canEditAsUser = N.runtime.is_member &&
+                        item.user === N.runtime.user_id &&
+                        N.runtime.settings.market_can_create_items;
+
     let params = {
       item_id:        item._id,
       title:          view.offer.title(),
       section:        view.offer.section(),
-      description:    view.offer.description()
+      description:    view.offer.description(),
+      as_moderator:   !canEditAsUser
     };
 
     Promise.resolve()

@@ -31,15 +31,15 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   view.router = N.router;
 
   view.offer = {
-    title:          ko.observable(item.title),
-    price_value:    ko.observable(item.price.value),
-    price_currency: ko.observable(item.price.currency),
-    section:        ko.observable(item.section),
-    description:    ko.observable(item.md),
+    title:          ko.observable(item.title || ''),
+    price_value:    ko.observable(item.price.value || ''),
+    price_currency: ko.observable(item.price.currency || ''),
+    section:        ko.observable(item.section || ''),
+    description:    ko.observable(item.md || ''),
     files:          ko.observableArray(item.files),
-    barter_info:    ko.observable(item.barter_info),
-    delivery:       ko.observable(item.delivery),
-    is_new:         ko.observable(item.is_new)
+    barter_info:    ko.observable(item.barter_info || ''),
+    delivery:       ko.observable(item.delivery || false),
+    is_new:         ko.observable(item.is_new || false)
   };
 
   // force price to be numeric (better to do with extenders, but subscription is easier to do)
@@ -191,6 +191,10 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.showErrors(false);
     view.isSubmitting(true);
 
+    let canEditAsUser = N.runtime.is_member &&
+                        item.user === N.runtime.user_id &&
+                        N.runtime.settings.market_can_create_items;
+
     let params = {
       item_id:        item._id,
       title:          view.offer.title(),
@@ -201,7 +205,8 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
       files:          view.offer.files(),
       barter_info:    view.offer.barter_info(),
       delivery:       view.offer.delivery(),
-      is_new:         view.offer.is_new()
+      is_new:         view.offer.is_new(),
+      as_moderator:   !canEditAsUser
     };
 
     Promise.resolve()
