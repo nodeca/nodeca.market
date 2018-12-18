@@ -103,13 +103,32 @@ module.exports = function (N, apiPath) {
       update = { st: statuses.CLOSED };
     }
 
+    let new_item = Object.assign({}, env.data.item, update);
+
     // move item to archive if it wasn't there already, update otherwise
     if (env.data.item_is_archived) {
       await N.models.market.ItemOfferArchived.update({ _id: item._id }, update);
     } else {
       await N.models.market.ItemOffer.remove({ _id: item._id });
-      await N.models.market.ItemOfferArchived.create(Object.assign({}, env.data.item, update));
+      await N.models.market.ItemOfferArchived.create(new_item);
     }
+
+    env.data.new_item = new_item;
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.market.ItemOfferHistory.add(
+      env.data.item,
+      env.data.new_item,
+      {
+        user: env.user_info.user_id,
+        role: N.models.market.ItemOfferHistory.roles[env.params.as_moderator ? 'MODERATOR' : 'USER'],
+        ip:   env.req.ip
+      }
+    );
   });
 
 
@@ -125,6 +144,4 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function update_section(env) {
     await N.models.market.Section.updateCache(env.data.item.section);
   });
-
-  // TODO: log moderator actions
 };

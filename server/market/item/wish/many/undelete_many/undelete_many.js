@@ -89,6 +89,9 @@ module.exports = function (N, apiPath) {
   // Restore items
   //
   N.wire.on(apiPath, async function restore_items(env) {
+    env.data.changed_items_old = [];
+    env.data.changed_items_new = [];
+
     env.data.items_to_update = new Set();
     env.data.sections_to_update = new Set();
 
@@ -114,26 +117,33 @@ module.exports = function (N, apiPath) {
         $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
       };
 
+      let prev_st = Object.assign({}, item.prev_st);
+
       if (settings.market_items_expire > 0 &&
           item.ts < Date.now() - settings.market_items_expire * 24 * 60 * 60 * 1000) {
         // undeleting previously open, but old item: should close automatically
-        if (item.prev_st.st === statuses.HB && item.prev_st.ste === statuses.OPEN) {
-          item.prev_st.ste = statuses.CLOSED;
-        } else if (item.prev_st.st === statuses.OPEN) {
-          item.prev_st.st = statuses.CLOSED;
+        if (prev_st.st === statuses.HB && prev_st.ste === statuses.OPEN) {
+          prev_st.ste = statuses.CLOSED;
+        } else if (prev_st.st === statuses.OPEN) {
+          prev_st.st = statuses.CLOSED;
         }
       }
 
-      Object.assign(update.$set, item.prev_st);
+      Object.assign(update.$set, prev_st);
+
+      let new_item = mongo_apply(item, update);
+
+      env.data.changed_items_old.push(item);
+      env.data.changed_items_new.push(new_item);
 
       /* eslint-disable no-lonely-if */
-      if (item.prev_st.st === statuses.OPEN || item.prev_st.ste === statuses.OPEN) {
+      if (new_item.st === statuses.OPEN || new_item.ste === statuses.OPEN) {
         // item is open, so it should be in active collection now
         if (!env.data.item_is_archived[item._id]) {
           bulk_active.find({ _id: item._id }).updateOne(update);
         } else {
           bulk_archived.find({ _id: item._id }).removeOne();
-          bulk_active.insert(mongo_apply(item, update));
+          bulk_active.insert(new_item);
           env.data.sections_to_update.add(String(item.section));
         }
       } else {
@@ -142,7 +152,7 @@ module.exports = function (N, apiPath) {
           bulk_archived.find({ _id: item._id }).updateOne(update);
         } else {
           bulk_active.find({ _id: item._id }).removeOne();
-          bulk_archived.insert(mongo_apply(item, update));
+          bulk_archived.insert(new_item);
           env.data.sections_to_update.add(String(item.section));
         }
       }
@@ -156,6 +166,21 @@ module.exports = function (N, apiPath) {
 
     if (bulk_archived.length > 0) await bulk_archived.execute();
     if (bulk_active.length > 0) await bulk_active.execute();
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.market.ItemWishHistory.add(
+      env.data.changed_items_old,
+      env.data.changed_items_new,
+      {
+        user: env.user_info.user_id,
+        role: N.models.market.ItemWishHistory.roles.MODERATOR,
+        ip:   env.req.ip
+      }
+    );
   });
 
 

@@ -1,9 +1,9 @@
 @import "nodeca.core/client/common/_variables"
 
-.market-item-buy-history-dlg__entry
+.market-item-buy-history-entry
   margin-bottom 2rem
 
-.market-item-buy-history-dlg__meta
+.market-item-buy-history-entry__meta
   display flex
   padding .375rem .75rem
   margin-bottom .5rem
@@ -12,38 +12,46 @@
   border-radius 3px
   line-height 1.1em
 
-.market-item-buy-history-dlg__meta-author
+.market-item-buy-history-entry__role-task
+.market-item-buy-history-entry__role-moderator
+  font-weight bold
+  margin-right .375rem
+
+.market-item-buy-history-entry__meta-author
   flex 1 1 0%
 
-.market-item-buy-history-dlg__meta-author-link
+.market-item-buy-history-entry__meta-author-link
   color inherit
 
-.market-item-buy-history-dlg__meta-ts
+.market-item-buy-history-entry__meta-ts
   white-space nowrap
   font-size $font-size-xs
   align-self flex-end
   padding-left 1rem
 
-.market-item-buy-history-dlg__title
+.market-item-buy-history-entry__title
   font-size $font-size-lg
   margin-bottom .5rem
 
-.market-item-buy-history-dlg__diff
+.market-item-buy-history-entry__diff
   margin-bottom .5rem
 
-.market-item-buy-history-dlg__details
+.market-item-buy-history-entry__actions
+  color $body-color-secondary
+
+.market-item-buy-history-entry__details
   display table
 
-.market-item-buy-history-dlg__details-item
+.market-item-buy-history-entry__details-item
   display table-row
 
-.market-item-buy-history-dlg__details-key
+.market-item-buy-history-entry__details-key
   display table-cell
   color $body-color-secondary
   text-align right
   vertical-align middle
-  padding-right 0.5rem
+  padding-right .5rem
 
-.market-item-buy-history-dlg__details-value
+.market-item-buy-history-entry__details-value
   display table-cell
   vertical-align middle

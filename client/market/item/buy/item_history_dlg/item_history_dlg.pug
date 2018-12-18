@@ -1,3 +1,5 @@
+- var roles = '$$ JSON.stringify(N.models.market.ItemOfferHistory.roles) $$'
+
 .modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
   .modal-dialog.modal-lg
     .modal-content
@@ -8,54 +10,81 @@
         each entry in self.entries.reverse()
           - var user = self.users[entry.user];
 
-          .market-item-buy-history-dlg__entry
-            .market-item-buy-history-dlg__meta
-              .market-item-buy-history-dlg__meta-author
+          .market-item-buy-history-entry(
+            class=entry.role === roles.USER ? 'market-item-buy-history-entry__m-user' : ''
+            class=entry.role === roles.MODERATOR ? 'market-item-buy-history-entry__m-moderator' : ''
+            class=entry.role === roles.TASK ? 'market-item-buy-history-entry__m-task' : ''
+          )
+            .market-item-buy-history-entry__meta
+              .market-item-buy-history-entry__meta-author
+                if entry.role === roles.TASK
+                  span.market-item-buy-history-entry__role-task(
+                    title=self.t('role_task')
+                  )= '*'
+                if entry.role === roles.MODERATOR
+                  span.market-item-buy-history-entry__role-moderator(
+                    title=self.t('role_moderator')
+                  )= '!'
                 if user
-                  a.market-item-buy-history-dlg__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                  a.market-item-buy-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
                     = user.nick
-              .market-item-buy-history-dlg__meta-ts!= self.timetag(entry.ts, 'relative')
+              .market-item-buy-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
 
             if entry.title_diff
-              .market-item-buy-history-dlg__title
+              .market-item-buy-history-entry__title
                 != entry.title_diff
 
             if entry.text_diff
-              .market-item-buy-history-dlg__diff
+              .market-item-buy-history-entry__diff
                 != entry.text_diff
 
-            .market-item-buy-history-dlg__details
-              each kv in entry.attr_diffs
-                - var key = kv[0], value = kv[1], new_value = kv[2];
-                .market-item-buy-history-dlg__details-item
-                  .market-item-buy-history-dlg__details-key= self.t(key)
-                  .market-item-buy-history-dlg__details-value
+            if entry.actions && entry.actions.length > 0
+              .market-item-buy-history-entry__actions
+                each d in entry.actions
+                  - var key = d[0], value = d[1], new_value = d[2];
+                  .market-item-buy-history-entry__action-item
                     case key
-                      when 'section'
+                      when 'move'
                         .diff-line
-                          - var section = self.sections[value] || {};
-                          a(href=self.link_to('market.section.buy', { section_hid: section.hid }))= section.title
-                      when 'location'
-                        .diff-line
-                          if value
-                            a(
-                              href= '#'
-                              data-on-click= 'common.blocks.location_show_dlg'
-                              data-latitude= value && value[1]
-                              data-longitude= value && value[0]
-                            )
-                              span.icon.icon-location.icon-space-after
-
-                              if self.location_names[value[0] + ':' + value[1]]
-                                = self.location_names[value[0] + ':' + value[1]]
+                          - var old_section = self.sections[value] || {};
+                          - var old_link = self.link_to('market.section.buy', { section_hid: old_section.hid });
+                          - var new_section = self.sections[new_value] || {};
+                          - var new_link = self.link_to('market.section.buy', { section_hid: new_section.hid });
+                          != self.t('action_move', { old_title: old_section.title, old_link: old_link, new_title: new_section.title, new_link: new_link })
+                      when 'delete'
+                        .diff-line= self.t('action_' + key, { reason: value })
                       default
-                        if new_value
-                          if new_value !== value
-                            .diff-line
-                              del= value
-                              = ' '
-                              ins= new_value
+                        .diff-line= self.t('action_' + key)
+
+            if entry.attr_diffs && entry.attr_diffs.length > 0
+              .market-item-buy-history-entry__details
+                each d in entry.attr_diffs
+                  - var key = d[0], value = d[1], new_value = d[2];
+                  .market-item-buy-history-entry__details-item
+                    .market-item-buy-history-entry__details-key= self.t(key)
+                    .market-item-buy-history-entry__details-value
+                      case key
+                        when 'location'
+                          .diff-line
+                            if value
+                              a(
+                                href= '#'
+                                data-on-click= 'common.blocks.location_show_entry'
+                                data-latitude= value && value[1]
+                                data-longitude= value && value[0]
+                              )
+                                span.icon.icon-location.icon-space-after
+
+                                if self.location_names[value[0] + ':' + value[1]]
+                                  = self.location_names[value[0] + ':' + value[1]]
+                        default
+                          if new_value
+                            if new_value !== value
+                              .diff-line
+                                del= value
+                                = ' '
+                                ins= new_value
+                            else
+                              .diff-line= value
                           else
-                            .diff-line= value
-                        else
-                          != value
+                            != value

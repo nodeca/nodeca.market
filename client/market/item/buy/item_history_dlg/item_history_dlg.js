@@ -3,7 +3,9 @@
 'use strict';
 
 
+const _            = require('lodash');
 const price_format = require('nodeca.market/lib/app/price_format');
+const itemStatuses = '$$ JSON.stringify(N.models.market.ItemOffer.statuses) $$';
 
 let $dialog;
 
@@ -60,7 +62,7 @@ function get_price(post) {
 //
 // Output: array of diff descriptions (user, timestamp, html diff)
 //
-function build_diff(history) {
+function build_diff(meta, history) {
   const { diff, diff_line } = require('nodeca.core/client/vendor/diff/diff');
 
   let result = [];
@@ -68,9 +70,26 @@ function build_diff(history) {
   let initial_src = get_source(history[0]);
   let text_diff = diff(initial_src, initial_src);
   let title_diff = diff_line(history[0].title, history[0].title);
+  let actions = [];
   let attr_diffs = [];
 
-  attr_diffs.push([ 'section', history[0].section ]);
+  let new_statuses = [
+    history[0].st,
+    history[0].ste,
+    history[0].prev_st && history[0].prev_st.st,
+    history[0].prev_st && history[0].prev_st.ste
+  ].filter(st => !_.isNil(st));
+
+  // item deleted immediately after creation
+  if (new_statuses.includes(itemStatuses.DELETED) || new_statuses.includes(itemStatuses.DELETED_HARD)) {
+    actions.push([ 'delete', history[0].del_reason ]);
+  }
+
+  // item closed immediately after creation
+  if (new_statuses.includes(itemStatuses.CLOSED)) {
+    actions.push([ 'close' ]);
+  }
+
   attr_diffs.push([ 'price', get_price(history[0]), get_price(history[0]) ]);
   attr_diffs.push([ 'location', history[0].location ]);
   attr_diffs.push([ 'delivery', get_delivery(history[0]), get_delivery(history[0]) ]);
@@ -79,10 +98,12 @@ function build_diff(history) {
 
   // Get first version for this post (no actual diff)
   result.push({
-    user:       history[0].user,
-    ts:         history[0].ts,
+    user:       meta[0].user,
+    ts:         meta[0].ts,
+    role:       meta[0].role,
     text_diff,
     title_diff,
+    actions,
     attr_diffs
   });
 
@@ -105,11 +126,57 @@ function build_diff(history) {
       text_diff = diff(old_src, new_src);
     }
 
+    let actions = [];
     let attr_diffs = [];
 
     if (old_post.section !== new_post.section) {
-      // just display new value, no actual diff
-      attr_diffs.push([ 'section', new_post.section ]);
+      actions.push([ 'move', old_post.section, new_post.section ]);
+    }
+
+    let old_statuses = [
+      old_post.st,
+      old_post.ste,
+      old_post.prev_st && old_post.prev_st.st,
+      old_post.prev_st && old_post.prev_st.ste
+    ].filter(st => !_.isNil(st));
+
+    let new_statuses = [
+      new_post.st,
+      new_post.ste,
+      new_post.prev_st && new_post.prev_st.st,
+      new_post.prev_st && new_post.prev_st.ste
+    ].filter(st => !_.isNil(st));
+
+    // guess action based on status change
+    /* eslint-disable max-depth */
+    if (!_.isEqual(old_statuses, new_statuses)) {
+      // item deleted
+      if (!old_statuses.includes(itemStatuses.DELETED) && !old_statuses.includes(itemStatuses.DELETED_HARD)) {
+        if (new_statuses.includes(itemStatuses.DELETED) || new_statuses.includes(itemStatuses.DELETED_HARD)) {
+          actions.push([ 'delete', new_post.del_reason ]);
+        }
+      }
+
+      // item undeleted
+      if (old_statuses.includes(itemStatuses.DELETED) || old_statuses.includes(itemStatuses.DELETED_HARD)) {
+        if (!new_statuses.includes(itemStatuses.DELETED) && !new_statuses.includes(itemStatuses.DELETED_HARD)) {
+          actions.push([ 'undelete' ]);
+        }
+      }
+
+      // item closed
+      if (!old_statuses.includes(itemStatuses.CLOSED)) {
+        if (new_statuses.includes(itemStatuses.CLOSED)) {
+          actions.push([ 'close' ]);
+        }
+      }
+
+      // item opened
+      if (old_statuses.includes(itemStatuses.CLOSED)) {
+        if (!new_statuses.includes(itemStatuses.CLOSED)) {
+          actions.push([ 'open' ]);
+        }
+      }
     }
 
     let old_price = get_price(old_post);
@@ -143,10 +210,12 @@ function build_diff(history) {
     }
 
     result.push({
-      user:       new_post.user,
-      ts:         new_post.ts,
+      user:       meta[revision + 1].user,
+      ts:         meta[revision + 1].ts,
+      role:       meta[revision + 1].role,
       text_diff,
       title_diff,
+      actions,
       attr_diffs
     });
   }
@@ -158,7 +227,7 @@ function build_diff(history) {
 // Init dialog
 //
 N.wire.on(module.apiPath, function show_post_history_dlg(params) {
-  params.entries = build_diff(params.history);
+  params.entries = build_diff(params.history_meta, params.history_data);
 
   $dialog = $(N.runtime.render(module.apiPath, params));
   $('body').append($dialog);

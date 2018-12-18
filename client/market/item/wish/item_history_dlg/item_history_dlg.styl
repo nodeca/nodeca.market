@@ -1,9 +1,9 @@
 @import "nodeca.core/client/common/_variables"
 
-.market-item-wish-history-dlg__entry
+.market-item-wish-history-entry
   margin-bottom 2rem
 
-.market-item-wish-history-dlg__meta
+.market-item-wish-history-entry__meta
   display flex
   padding .375rem .75rem
   margin-bottom .5rem
@@ -12,38 +12,46 @@
   border-radius 3px
   line-height 1.1em
 
-.market-item-wish-history-dlg__meta-author
+.market-item-wish-history-entry__role-task
+.market-item-wish-history-entry__role-moderator
+  font-weight bold
+  margin-right .375rem
+
+.market-item-wish-history-entry__meta-author
   flex 1 1 0%
 
-.market-item-wish-history-dlg__meta-author-link
+.market-item-wish-history-entry__meta-author-link
   color inherit
 
-.market-item-wish-history-dlg__meta-ts
+.market-item-wish-history-entry__meta-ts
   white-space nowrap
   font-size $font-size-xs
   align-self flex-end
   padding-left 1rem
 
-.market-item-wish-history-dlg__title
+.market-item-wish-history-entry__title
   font-size $font-size-lg
   margin-bottom .5rem
 
-.market-item-wish-history-dlg__diff
+.market-item-wish-history-entry__diff
   margin-bottom .5rem
 
-.market-item-wish-history-dlg__details
+.market-item-wish-history-entry__actions
+  color $body-color-secondary
+
+.market-item-wish-history-entry__details
   display table
 
-.market-item-wish-history-dlg__details-item
+.market-item-wish-history-entry__details-item
   display table-row
 
-.market-item-wish-history-dlg__details-key
+.market-item-wish-history-entry__details-key
   display table-cell
   color $body-color-secondary
   text-align right
   vertical-align middle
-  padding-right 0.5rem
+  padding-right .5rem
 
-.market-item-wish-history-dlg__details-value
+.market-item-wish-history-entry__details-value
   display table-cell
   vertical-align middle

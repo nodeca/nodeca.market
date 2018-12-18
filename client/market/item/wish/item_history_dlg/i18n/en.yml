@@ -1,4 +1,11 @@
 en-US:
   title: History
+  role_task: This action was performed automatically
+  role_moderator: This action was performed by a moderator
   section: 'Section:'
   location: 'Location:'
+  action_move: 'Item moved from <a href="#{old_link}">#{old_title}</a> to <a href="#{new_link}">#{new_title}</a>'
+  action_open: Item opened
+  action_close: Item closed
+  action_delete: 'Item deleted (#{reason})'
+  action_undelete: Item restored

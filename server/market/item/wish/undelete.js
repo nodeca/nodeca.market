@@ -4,6 +4,30 @@
 'use strict';
 
 
+// apply $set and $unset operations on an object
+function mongo_apply(object, ops) {
+  let result = Object.assign({}, object);
+
+  for (let [ k, v ]  of Object.entries(ops)) {
+    if (k === '$set') {
+      Object.assign(result, v);
+      continue;
+    }
+
+    if (k === '$unset') {
+      for (let delete_key of Object.keys(v)) {
+        delete result[delete_key];
+      }
+      continue;
+    }
+
+    result[k] = v;
+  }
+
+  return result;
+}
+
+
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -77,25 +101,29 @@ module.exports = function (N, apiPath) {
       $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
     };
 
+    let prev_st = Object.assign({}, item.prev_st);
+
     if (market_items_expire > 0 && item.ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
       // undeleting previously open, but old item: should close automatically
-      if (item.prev_st.st === statuses.HB && item.prev_st.ste === statuses.OPEN) {
-        item.prev_st.ste = statuses.CLOSED;
-      } else if (item.prev_st.st === statuses.OPEN) {
-        item.prev_st.st = statuses.CLOSED;
+      if (prev_st.st === statuses.HB && prev_st.ste === statuses.OPEN) {
+        prev_st.ste = statuses.CLOSED;
+      } else if (prev_st.st === statuses.OPEN) {
+        prev_st.st = statuses.CLOSED;
       }
     }
 
-    Object.assign(update, item.prev_st);
+    Object.assign(update, prev_st);
+
+    let new_item = mongo_apply(env.data.item, update);
 
     /* eslint-disable no-lonely-if */
-    if (item.prev_st.st === statuses.OPEN || item.prev_st.ste === statuses.OPEN) {
+    if (new_item.st === statuses.OPEN || new_item.ste === statuses.OPEN) {
       // item is open, so it should be in active collection now
       if (!env.data.item_is_archived) {
         await N.models.market.ItemWish.update({ _id: item._id }, update);
       } else {
         await N.models.market.ItemWishArchived.remove({ _id: item._id });
-        await N.models.market.ItemWish.create(Object.assign({}, env.data.item, update));
+        await N.models.market.ItemWish.create(new_item);
       }
     } else {
       // item should remain archived
@@ -103,9 +131,26 @@ module.exports = function (N, apiPath) {
         await N.models.market.ItemWishArchived.update({ _id: item._id }, update);
       } else {
         await N.models.market.ItemWish.remove({ _id: item._id });
-        await N.models.market.ItemWishArchived.create(Object.assign({}, env.data.item, update));
+        await N.models.market.ItemWishArchived.create(new_item);
       }
     }
+
+    env.data.new_item = new_item;
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.market.ItemWishHistory.add(
+      env.data.item,
+      env.data.new_item,
+      {
+        user: env.user_info.user_id,
+        role: N.models.market.ItemWishHistory.roles.MODERATOR,
+        ip:   env.req.ip
+      }
+    );
   });
 
 
@@ -121,6 +166,4 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function update_section(env) {
     await N.models.market.Section.updateCache(env.data.item.section);
   });
-
-  // TODO: log moderator actions
 };

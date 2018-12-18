@@ -72,6 +72,9 @@ module.exports = function (N, apiPath) {
   // Move items
   //
   N.wire.on(apiPath, async function move_items(env) {
+    env.data.changed_items_old = [];
+    env.data.changed_items_new = [];
+
     env.data.items_to_update = new Set();
     env.data.sections_to_update = new Set();
 
@@ -80,6 +83,9 @@ module.exports = function (N, apiPath) {
 
     for (let item of env.data.items) {
       if (String(item.section) === String(env.data.section_to)) continue;
+
+      env.data.changed_items_old.push(item);
+      env.data.changed_items_new.push(Object.assign({}, item, { section: env.data.section_to._id }));
 
       if (env.data.item_is_archived[item._id]) {
         bulk_archived.find({ _id: item._id }).updateOne({
@@ -102,6 +108,21 @@ module.exports = function (N, apiPath) {
 
     if (bulk_archived.length > 0) await bulk_archived.execute();
     if (bulk_active.length > 0) await bulk_active.execute();
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.market.ItemWishHistory.add(
+      env.data.changed_items_old,
+      env.data.changed_items_new,
+      {
+        user: env.user_info.user_id,
+        role: N.models.market.ItemWishHistory.roles.MODERATOR,
+        ip:   env.req.ip
+      }
+    );
   });
 
 

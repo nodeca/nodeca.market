@@ -79,6 +79,23 @@ module.exports = function (N, apiPath) {
         { $set: { section: env.data.section_to._id } }
       );
     }
+
+    env.data.new_item = Object.assign({}, env.data.item, { section: env.data.section_to._id });
+  });
+
+
+  // Save old version in history
+  //
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.market.ItemOfferHistory.add(
+      env.data.item,
+      env.data.new_item,
+      {
+        user: env.user_info.user_id,
+        role: N.models.market.ItemOfferHistory.roles.MODERATOR,
+        ip:   env.req.ip
+      }
+    );
   });
 
 
@@ -99,6 +116,4 @@ module.exports = function (N, apiPath) {
     await N.models.market.Section.updateCache(env.data.item.section);
     await N.models.market.Section.updateCache(env.data.section_to._id);
   });
-
-  // TODO: log moderator actions
 };

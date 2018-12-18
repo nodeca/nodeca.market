@@ -7,10 +7,6 @@
 const _         = require('lodash');
 const charcount = require('charcount');
 
-// If same user edits the same post within 5 minutes, all changes
-// made within that period will be squashed into one diff.
-const HISTORY_GRACE_PERIOD = 5 * 60 * 1000;
-
 
 module.exports = function (N, apiPath) {
 
@@ -253,87 +249,15 @@ module.exports = function (N, apiPath) {
 
   // Save old version in history
   //
-  N.wire.after(apiPath, async function save_history(env) {
-    let orig_item = env.data.item;
-    let new_item  = env.data.new_item;
-
-    let last_record = await N.models.market.ItemOfferHistory.findOne()
-                                .where('item').equals(orig_item._id)
-                                .sort('-_id')
-                                .lean(true);
-
-    let last_update_time = last_record ? last_record.ts   : orig_item.ts;
-    let last_update_user = last_record ? last_record.user : orig_item.user;
-    let now = new Date();
-
-    // if the same user edits the same post within grace period, history won't be changed
-    if (!(last_update_time > now - HISTORY_GRACE_PERIOD &&
-          last_update_time < now &&
-          String(last_update_user) === String(env.user_info.user_id))) {
-
-      /* eslint-disable no-undefined */
-      last_record = await new N.models.market.ItemOfferHistory({
-        item:        orig_item._id,
-        user:        env.user_info.user_id,
-        section:     orig_item.section,
-        title:       orig_item.title,
-        price:       orig_item.price,
-        md:          orig_item.md,
-        barter_info: orig_item.barter_info,
-        delivery:    orig_item.delivery,
-        is_new:      orig_item.is_new,
-        location:    orig_item.location,
-        files:       orig_item.files,
-        params_ref:  orig_item.params_ref,
-        ip:          env.req.ip
-      }).save();
-    }
-
-    // if the next history entry would be the same as the last one
-    // (e.g. user saves post without changes or reverts change within 5 min),
-    // remove redundant history entry
-    if (last_record) {
-      let last_item_str = JSON.stringify({
-        item:        last_record.item,
-        user:        last_record.user,
-        section:     last_record.section,
-        title:       last_record.title,
-        price:       last_record.price,
-        md:          last_record.md,
-        barter_info: last_record.barter_info,
-        delivery:    last_record.delivery,
-        is_new:      last_record.is_new,
-        location:    last_record.location,
-        files:       last_record.files,
-        params_ref:  last_record.params_ref
-      });
-
-      let next_item_str = JSON.stringify({
-        item:        new_item._id,
-        user:        env.user_info.user_id,
-        section:     new_item.section,
-        title:       new_item.title,
-        price:       new_item.price,
-        md:          new_item.md,
-        barter_info: new_item.barter_info,
-        delivery:    new_item.delivery,
-        is_new:      new_item.is_new,
-        location:    new_item.location,
-        files:       new_item.files,
-        params_ref:  new_item.params_ref
-      });
-
-      if (last_item_str === next_item_str) {
-        await N.models.market.ItemOfferHistory.remove({ _id: last_record._id });
+  N.wire.after(apiPath, function save_history(env) {
+    return N.models.market.ItemOfferHistory.add(
+      env.data.item,
+      env.data.new_item,
+      {
+        user: env.user_info.user_id,
+        role: N.models.market.ItemOfferHistory.roles[env.params.as_moderator ? 'MODERATOR' : 'USER'],
+        ip:   env.req.ip
       }
-    }
-
-    await N.models.market.ItemOffer.update(
-      { _id: orig_item._id },
-      { $set: {
-        last_edit_ts: new Date(),
-        edit_count: await N.models.market.ItemOfferHistory.count({ item: orig_item._id })
-      } }
     );
   });
 

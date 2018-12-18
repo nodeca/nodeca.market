@@ -162,8 +162,8 @@ async function createItemOffer(section, user, isClosed = false) {
     section,
     user,
 
-    files:       files,
-    all_files:   files
+    files,
+    all_files:   files,
 
     // don't property randomize this to avoid needless requests
     // to geolocation services
