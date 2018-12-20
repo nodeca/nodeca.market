@@ -61,8 +61,8 @@ module.exports = function (N, apiPath) {
     // Permit editing as moderator
     if (settings.market_mod_can_edit_items) return;
 
-    // Permit editing as topic owner
-    if (!settings.can_create_items) throw N.io.FORBIDDEN;
+    // Permit editing as item owner
+    if (!settings.market_can_create_items) throw N.io.FORBIDDEN;
 
     if (env.user_info.user_id !== String(env.data.item.user)) {
       throw N.io.FORBIDDEN;

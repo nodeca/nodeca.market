@@ -87,7 +87,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
     let canEditAsUser = N.runtime.is_member &&
                         item.user === N.runtime.user_id &&
-                        N.runtime.settings.market_can_create_items;
+                        N.runtime.page_data.settings.market_can_create_items;
 
     let params = {
       item_id:        item._id,
