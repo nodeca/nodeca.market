@@ -65,25 +65,25 @@ router:
           type: integer
 
     market.user.buy_active:
-      "/member{user_hid}/market":
+      "/market/member{user_hid}":
         user_hid:
           match: /\d+/
           type: 'integer'
 
     market.user.buy_closed:
-      "/member{user_hid}/market/closed":
+      "/market/member{user_hid}/closed":
         user_hid:
           match: /\d+/
           type: 'integer'
 
     market.user.wish_active:
-      "/member{user_hid}/market/wish":
+      "/market/member{user_hid}/wish":
         user_hid:
           match: /\d+/
           type: 'integer'
 
     market.user.wish_closed:
-      "/member{user_hid}/market/wish/closed":
+      "/market/member{user_hid}/wish/closed":
         user_hid:
           match: /\d+/
           type: 'integer'
