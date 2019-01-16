@@ -117,8 +117,10 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, function save_history(env) {
     return N.models.market.ItemOfferHistory.add(
-      env.data.item,
-      env.data.new_item,
+      {
+        old_item: env.data.item,
+        new_item: env.data.new_item
+      },
       {
         user: env.user_info.user_id,
         role: N.models.market.ItemOfferHistory.roles.MODERATOR,

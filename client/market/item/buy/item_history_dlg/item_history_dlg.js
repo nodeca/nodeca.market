@@ -3,7 +3,6 @@
 'use strict';
 
 
-const _            = require('lodash');
 const price_format = require('nodeca.market/lib/app/price_format');
 const itemStatuses = '$$ JSON.stringify(N.models.market.ItemOffer.statuses) $$';
 
@@ -37,6 +36,85 @@ function get_source(post) {
   return result;
 }
 
+
+function has_status(status_set, st) {
+  return status_set.st === st || status_set.ste === st;
+}
+
+
+// Detect changes in topic statuses
+//
+// Input:
+//  - old_topic - topic object before changes
+//  - new_topic - topic object after changes
+//
+// Output: an array of actions that turn old_topic into new_topic
+//
+// Example: if old_topic={st:OPEN}, new_topic={st:CLOSED}
+// means user has closed this topic
+//
+// Because subsequent changes are merged, it may output multiple actions,
+// e.g. if old_topic={st:OPEN}, new_topic={st:PINNED,ste:CLOSED},
+// actions should be pin and close
+//
+// If either old or new state is deleted, we also need to check prev_st
+// for that state to account for merges, e.g.
+// old_topic={st:OPEN}, new_topic={st:DELETED,prev_st:{st:CLOSED}} means
+// that topic was first closed than deleted
+//
+// In some cases only prev_st may be changed, e.g.
+// old_topic={st:DELETED,prev_st:{st:OPEN}}, new_topic={st:DELETED,prev_st:{st:CLOSED}},
+// so we assume that user restored, closed, then deleted topic
+//
+// It is also possible that st, ste and prev_st are all the same,
+// but del_reason is changed (so topic was restored then deleted with a different reason).
+//
+function get_status_actions(new_item, old_item = {}) {
+  let old_st = { st: old_item.st, ste: old_item.ste };
+  let new_st = { st: new_item.st, ste: new_item.ste };
+  let old_is_deleted = false;
+  let new_is_deleted = false;
+  let result = [];
+
+  if (has_status(old_st, itemStatuses.DELETED) || has_status(old_st, itemStatuses.DELETED_HARD)) {
+    old_st = old_item.prev_st;
+    old_is_deleted = true;
+  }
+
+  if (has_status(new_st, itemStatuses.DELETED) || has_status(new_st, itemStatuses.DELETED_HARD)) {
+    new_st = new_item.prev_st;
+    new_is_deleted = true;
+  }
+
+  if (!has_status(old_st, itemStatuses.CLOSED) && has_status(new_st, itemStatuses.CLOSED)) {
+    result.push([ 'close' ]);
+  }
+
+  if (has_status(old_st, itemStatuses.CLOSED) && !has_status(new_st, itemStatuses.CLOSED)) {
+    result.push([ 'open' ]);
+  }
+
+  if (old_is_deleted || new_is_deleted) {
+    if (old_item.st !== new_item.st || old_item.del_reason !== new_item.del_reason || result.length > 0) {
+      if (old_is_deleted) {
+        result.unshift([ 'undelete' ]);
+      }
+
+      if (new_is_deleted) {
+        /* eslint-disable max-depth */
+        if (new_item.st === itemStatuses.DELETED_HARD) {
+          result.push([ 'hard_delete', new_item.del_reason ]);
+        } else {
+          result.push([ 'delete', new_item.del_reason ]);
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+
 function get_condition(post) {
   return post.is_new ? t('condition_new') : t('condition_used');
 }
@@ -62,45 +140,36 @@ function get_price(post) {
 //
 // Output: array of diff descriptions (user, timestamp, html diff)
 //
-function build_diff(meta, history) {
+function build_diff(history) {
   const { diff, diff_line } = require('nodeca.core/client/vendor/diff/diff');
 
   let result = [];
 
-  let initial_src = get_source(history[0]);
+  let initial_src = get_source(history[0].item);
   let text_diff = diff(initial_src, initial_src);
-  let title_diff = diff_line(history[0].title, history[0].title);
+  let title_diff = diff_line(history[0].item.title, history[0].item.title);
+
+  //
+  // Detect changes in topic or post statuses squashed with first changeset
+  // (e.g. topic deleted by author immediately after it's created)
+  //
   let actions = [];
+
+  actions = actions.concat(get_status_actions(history[0].item));
+
   let attr_diffs = [];
 
-  let new_statuses = [
-    history[0].st,
-    history[0].ste,
-    history[0].prev_st && history[0].prev_st.st,
-    history[0].prev_st && history[0].prev_st.ste
-  ].filter(st => !_.isNil(st));
-
-  // item deleted immediately after creation
-  if (new_statuses.includes(itemStatuses.DELETED) || new_statuses.includes(itemStatuses.DELETED_HARD)) {
-    actions.push([ 'delete', history[0].del_reason ]);
-  }
-
-  // item closed immediately after creation
-  if (new_statuses.includes(itemStatuses.CLOSED)) {
-    actions.push([ 'close' ]);
-  }
-
-  attr_diffs.push([ 'price', get_price(history[0]), get_price(history[0]) ]);
-  attr_diffs.push([ 'location', history[0].location ]);
-  attr_diffs.push([ 'delivery', get_delivery(history[0]), get_delivery(history[0]) ]);
-  attr_diffs.push([ 'barter_info', diff_line(history[0].barter_info, history[0].barter_info) ]);
-  attr_diffs.push([ 'condition', get_condition(history[0]), get_condition(history[0]) ]);
+  attr_diffs.push([ 'price', get_price(history[0].item), get_price(history[0].item) ]);
+  attr_diffs.push([ 'location', history[0].item.location ]);
+  attr_diffs.push([ 'delivery', get_delivery(history[0].item), get_delivery(history[0].item) ]);
+  attr_diffs.push([ 'barter_info', diff_line(history[0].item.barter_info, history[0].item.barter_info) ]);
+  attr_diffs.push([ 'condition', get_condition(history[0].item), get_condition(history[0].item) ]);
 
   // Get first version for this post (no actual diff)
   result.push({
-    user:       meta[0].user,
-    ts:         meta[0].ts,
-    role:       meta[0].role,
+    user:       history[0].meta.user,
+    ts:         history[0].meta.ts,
+    role:       history[0].meta.role,
     text_diff,
     title_diff,
     actions,
@@ -108,18 +177,16 @@ function build_diff(meta, history) {
   });
 
   for (let revision = 0; revision < history.length - 1; revision++) {
-    let old_post = history[revision];
-    let new_post = history[revision + 1];
+    let old_revision = history[revision];
+    let new_revision = history[revision + 1];
     let title_diff;
 
-    if (typeof old_post.title !== 'undefined' || typeof new_post.title !== 'undefined') {
-      if (old_post.title !== new_post.title) {
-        title_diff = diff_line(old_post.title, new_post.title);
-      }
+    if (old_revision.item.title !== new_revision.item.title) {
+      title_diff = diff_line(old_revision.item.title, new_revision.item.title);
     }
 
-    let old_src = get_source(old_post);
-    let new_src = get_source(new_post);
+    let old_src = get_source(old_revision.item);
+    let new_src = get_source(new_revision.item);
     let text_diff;
 
     if (old_src !== new_src) {
@@ -127,92 +194,49 @@ function build_diff(meta, history) {
     }
 
     let actions = [];
+
+    if (old_revision.item.section !== new_revision.item.section) {
+      actions.push([ 'move', old_revision.item.section, new_revision.item.section ]);
+    }
+
+    actions = actions.concat(get_status_actions(new_revision.item, old_revision.item));
+
     let attr_diffs = [];
 
-    if (old_post.section !== new_post.section) {
-      actions.push([ 'move', old_post.section, new_post.section ]);
-    }
-
-    let old_statuses = [
-      old_post.st,
-      old_post.ste,
-      old_post.prev_st && old_post.prev_st.st,
-      old_post.prev_st && old_post.prev_st.ste
-    ].filter(st => !_.isNil(st));
-
-    let new_statuses = [
-      new_post.st,
-      new_post.ste,
-      new_post.prev_st && new_post.prev_st.st,
-      new_post.prev_st && new_post.prev_st.ste
-    ].filter(st => !_.isNil(st));
-
-    // guess action based on status change
-    /* eslint-disable max-depth */
-    if (!_.isEqual(old_statuses, new_statuses)) {
-      // item deleted
-      if (!old_statuses.includes(itemStatuses.DELETED) && !old_statuses.includes(itemStatuses.DELETED_HARD)) {
-        if (new_statuses.includes(itemStatuses.DELETED) || new_statuses.includes(itemStatuses.DELETED_HARD)) {
-          actions.push([ 'delete', new_post.del_reason ]);
-        }
-      }
-
-      // item undeleted
-      if (old_statuses.includes(itemStatuses.DELETED) || old_statuses.includes(itemStatuses.DELETED_HARD)) {
-        if (!new_statuses.includes(itemStatuses.DELETED) && !new_statuses.includes(itemStatuses.DELETED_HARD)) {
-          actions.push([ 'undelete' ]);
-        }
-      }
-
-      // item closed
-      if (!old_statuses.includes(itemStatuses.CLOSED)) {
-        if (new_statuses.includes(itemStatuses.CLOSED)) {
-          actions.push([ 'close' ]);
-        }
-      }
-
-      // item opened
-      if (old_statuses.includes(itemStatuses.CLOSED)) {
-        if (!new_statuses.includes(itemStatuses.CLOSED)) {
-          actions.push([ 'open' ]);
-        }
-      }
-    }
-
-    let old_price = get_price(old_post);
-    let new_price = get_price(new_post);
+    let old_price = get_price(old_revision.item);
+    let new_price = get_price(new_revision.item);
 
     if (old_price !== new_price) {
       attr_diffs.push([ 'price', old_price, new_price ]);
     }
 
-    if (JSON.stringify(old_post.location) !== JSON.stringify(new_post.location)) {
+    if (JSON.stringify(old_revision.item.location) !== JSON.stringify(new_revision.item.location)) {
       // just display new value, no actual diff
-      attr_diffs.push([ 'location', new_post.location ]);
+      attr_diffs.push([ 'location', new_revision.item.location ]);
     }
 
-    let old_delivery = get_delivery(old_post);
-    let new_delivery = get_delivery(new_post);
+    let old_delivery = get_delivery(old_revision.item);
+    let new_delivery = get_delivery(new_revision.item);
 
     if (old_delivery !== new_delivery) {
       attr_diffs.push([ 'delivery', old_delivery, new_delivery ]);
     }
 
-    if (old_post.barter_info !== new_post.barter_info) {
-      attr_diffs.push([ 'barter_info', diff_line(old_post.barter_info, new_post.barter_info) ]);
+    if (old_revision.item.barter_info !== new_revision.item.barter_info) {
+      attr_diffs.push([ 'barter_info', diff_line(old_revision.item.barter_info, new_revision.item.barter_info) ]);
     }
 
-    let old_condition = get_condition(old_post);
-    let new_condition = get_condition(new_post);
+    let old_condition = get_condition(old_revision.item);
+    let new_condition = get_condition(new_revision.item);
 
     if (old_condition !== new_condition) {
       attr_diffs.push([ 'condition', old_condition, new_condition ]);
     }
 
     result.push({
-      user:       meta[revision + 1].user,
-      ts:         meta[revision + 1].ts,
-      role:       meta[revision + 1].role,
+      user:       new_revision.meta.user,
+      ts:         new_revision.meta.ts,
+      role:       new_revision.meta.role,
       text_diff,
       title_diff,
       actions,
@@ -226,8 +250,8 @@ function build_diff(meta, history) {
 
 // Init dialog
 //
-N.wire.on(module.apiPath, function show_post_history_dlg(params) {
-  params.entries = build_diff(params.history_meta, params.history_data);
+N.wire.on(module.apiPath, function show_item_history_dlg(params) {
+  params.entries = build_diff(params.history);
 
   $dialog = $(N.runtime.render(module.apiPath, params));
   $('body').append($dialog);

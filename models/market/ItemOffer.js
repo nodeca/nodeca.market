@@ -125,17 +125,20 @@ module.exports = function (N, collectionName) {
   });
 
 
-  // Remove empty "imports" and "import_users" fields
+  // Remove empty fields
   //
   ItemOffer.pre('save', function () {
+    /*eslint-disable no-undefined*/
     if (this.imports && this.imports.length === 0) {
-      /*eslint-disable no-undefined*/
       this.imports = undefined;
     }
 
     if (this.import_users && this.import_users.length === 0) {
-      /*eslint-disable no-undefined*/
       this.import_users = undefined;
+    }
+
+    if (this.location && this.location.length === 0) {
+      this.location = undefined;
     }
   });
 

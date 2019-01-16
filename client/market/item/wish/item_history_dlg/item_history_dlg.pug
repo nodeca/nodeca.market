@@ -17,14 +17,12 @@
           )
             .market-item-wish-history-entry__meta
               .market-item-wish-history-entry__meta-author
-                if entry.role === roles.TASK
-                  span.market-item-wish-history-entry__role-task(
-                    title=self.t('role_task')
-                  )= '*'
-                if entry.role === roles.MODERATOR
-                  span.market-item-wish-history-entry__role-moderator(
-                    title=self.t('role_moderator')
-                  )= '!'
+                span.market-item-wish-history-entry__icon-task(
+                  title=self.t('role_task')
+                )= '*'
+                span.market-item-wish-history-entry__icon-moderator(
+                  title=self.t('role_moderator')
+                )= '*'
                 if user
                   a.market-item-wish-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
                     = user.nick
@@ -52,7 +50,11 @@
                           - var new_link = self.link_to('market.section.wish', { section_hid: new_section.hid });
                           != self.t('action_move', { old_title: old_section.title, old_link: old_link, new_title: new_section.title, new_link: new_link })
                       when 'delete'
-                        .diff-line= self.t('action_' + key, { reason: value })
+                      when 'hard_delete'
+                        .diff-line
+                          = self.t('action_' + key)
+                          if value
+                            = ' ' + self.t('del_reason', { text: value })
                       default
                         .diff-line= self.t('action_' + key)
 

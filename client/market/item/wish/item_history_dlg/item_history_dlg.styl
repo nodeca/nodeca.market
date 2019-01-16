@@ -1,6 +1,7 @@
 @import "nodeca.core/client/common/_variables"
 
 .market-item-wish-history-entry
+  overflow-wrap break-word
   margin-bottom 2rem
 
 .market-item-wish-history-entry__meta
@@ -12,10 +13,16 @@
   border-radius 3px
   line-height 1.1em
 
-.market-item-wish-history-entry__role-task
-.market-item-wish-history-entry__role-moderator
+.market-item-wish-history-entry__icon-task
+.market-item-wish-history-entry__icon-moderator
   font-weight bold
+  color #c97971
   margin-right .375rem
+  display none
+
+.market-item-wish-history-entry__m-task .market-item-wish-history-entry__icon-task
+.market-item-wish-history-entry__m-moderator .market-item-wish-history-entry__icon-moderator
+  display inline
 
 .market-item-wish-history-entry__meta-author
   flex 1 1 0%

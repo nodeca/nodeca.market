@@ -2,7 +2,6 @@ en-US:
   title: History
   role_task: This action was performed automatically
   role_moderator: This action was performed by a moderator
-  section: 'Section:'
   price: 'Price:'
   location: 'Location:'
   delivery: 'Delivery:'
@@ -12,8 +11,10 @@ en-US:
   condition: 'Condition:'
   condition_new: 'new'
   condition_used: 'used'
-  action_move: 'Item moved from <a href="#{old_link}">#{old_title}</a> to <a href="#{new_link}">#{new_title}</a>'
+  action_move: 'Item moved from <a href="#{old_link}" target="_blank">#{old_title}</a> to <a href="#{new_link}" target="_blank">#{new_title}</a>'
   action_open: Item opened
   action_close: Item closed
-  action_delete: 'Item deleted (#{reason})'
+  action_delete: Item deleted
+  action_hard_delete: Item hard deleted
   action_undelete: Item restored
+  del_reason: "(#{text})"
