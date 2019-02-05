@@ -72,7 +72,7 @@ module.exports = function (N, collectionName) {
     let response = await got('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', {
       headers: { 'User-Agent': userAgent },
       timeout: 30000,
-      retries: 1
+      retry:   1
     });
 
     let tree = cheerio(response.body, { xmlMode: true });
