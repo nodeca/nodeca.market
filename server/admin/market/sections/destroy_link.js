@@ -11,7 +11,7 @@ module.exports = function (N, apiPath) {
   });
 
   N.wire.on(apiPath, async function link_destroy(env) {
-    await N.models.market.Section.update(
+    await N.models.market.Section.updateOne(
              { _id: env.params.parent },
              { $pull: { links: env.params.section } }
            );

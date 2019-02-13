@@ -17,7 +17,7 @@ module.exports = function (N, apiPath) {
   // Remove old link
   //
   N.wire.on(apiPath, function remove_old_link(env) {
-    return N.models.market.Section.update(
+    return N.models.market.Section.updateOne(
              { _id: env.params.previous_parent },
              { $pull: { links: env.params._id } }
            );

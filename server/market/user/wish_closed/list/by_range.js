@@ -123,7 +123,7 @@ module.exports = function (N, apiPath) {
         N.models.market.ItemWishArchived
             .where('user').equals(env.data.user._id)
             .where('st').equals(st)
-            .count()
+            .countDocuments()
       )
     );
 
@@ -141,7 +141,7 @@ module.exports = function (N, apiPath) {
               .where('user').equals(env.data.user._id)
               .where('st').equals(st)
               .where('_id').gt(env.data.items[0]._id)
-              .count()
+              .countDocuments()
         )
       );
 

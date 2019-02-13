@@ -107,9 +107,9 @@ module.exports = function (N, apiPath) {
 
     // move item to archive if it wasn't there already, update otherwise
     if (env.data.item_is_archived) {
-      await N.models.market.ItemOfferArchived.update({ _id: item._id }, update);
+      await N.models.market.ItemOfferArchived.updateOne({ _id: item._id }, update);
     } else {
-      await N.models.market.ItemOffer.remove({ _id: item._id });
+      await N.models.market.ItemOffer.deleteOne({ _id: item._id });
       await N.models.market.ItemOfferArchived.create(new_item);
     }
 

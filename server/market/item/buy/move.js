@@ -69,12 +69,12 @@ module.exports = function (N, apiPath) {
     if (String(env.data.item.section) === String(env.data.section_to._id)) return;
 
     if (env.data.item_is_archived) {
-      await N.models.market.ItemOfferArchived.update(
+      await N.models.market.ItemOfferArchived.updateOne(
         { _id: env.data.item._id },
         { $set: { section: env.data.section_to._id } }
       );
     } else {
-      await N.models.market.ItemOffer.update(
+      await N.models.market.ItemOffer.updateOne(
         { _id: env.data.item._id },
         { $set: { section: env.data.section_to._id } }
       );

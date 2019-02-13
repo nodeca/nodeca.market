@@ -56,7 +56,7 @@ module.exports = function (N, apiPath) {
 
     // If `env.params.remove` - remove bookmark
     if (env.params.remove) {
-      await N.models.market.ItemOfferBookmark.remove(
+      await N.models.market.ItemOfferBookmark.deleteOne(
         { user: env.user_info.user_id, item: env.data.item._id }
       );
       return;
@@ -77,16 +77,16 @@ module.exports = function (N, apiPath) {
   // Update item, fill count
   //
   N.wire.after(apiPath, async function update_item(env) {
-    let count = await N.models.market.ItemOfferBookmark.count({ item: env.data.item._id });
+    let count = await N.models.market.ItemOfferBookmark.countDocuments({ item: env.data.item._id });
 
     env.res.count = count;
 
-    await N.models.market.ItemOffer.update(
+    await N.models.market.ItemOffer.updateOne(
       { _id: env.data.item._id },
       { bookmarks: count }
     );
 
-    await N.models.market.ItemOfferArchived.update(
+    await N.models.market.ItemOfferArchived.updateOne(
       { _id: env.data.item._id },
       { bookmarks: count }
     );

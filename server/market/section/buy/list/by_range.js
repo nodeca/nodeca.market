@@ -131,7 +131,7 @@ module.exports = function (N, apiPath) {
           N.models.market.ItemOffer
               .where('section').equals(section_id)
               .where('st').equals(st)
-              .count()
+              .countDocuments()
         )
       ))
     );
@@ -151,7 +151,7 @@ module.exports = function (N, apiPath) {
                 .where('section').equals(section_id)
                 .where('st').equals(st)
                 .where('_id').gt(env.data.items[0]._id)
-                .count()
+                .countDocuments()
           )
         ))
       );

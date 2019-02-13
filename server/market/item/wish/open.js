@@ -119,9 +119,9 @@ module.exports = function (N, apiPath) {
 
     // move item to active collection if it wasn't there already, update otherwise
     if (!env.data.item_is_archived) {
-      await N.models.market.ItemWish.update({ _id: item._id }, update);
+      await N.models.market.ItemWish.updateOne({ _id: item._id }, update);
     } else {
-      await N.models.market.ItemWishArchived.remove({ _id: item._id });
+      await N.models.market.ItemWishArchived.deleteOne({ _id: item._id });
       await N.models.market.ItemWish.create(new_item);
     }
 

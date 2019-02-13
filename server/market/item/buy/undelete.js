@@ -120,17 +120,17 @@ module.exports = function (N, apiPath) {
     if (new_item.st === statuses.OPEN || new_item.ste === statuses.OPEN) {
       // item is open, so it should be in active collection now
       if (!env.data.item_is_archived) {
-        await N.models.market.ItemOffer.update({ _id: item._id }, update);
+        await N.models.market.ItemOffer.updateOne({ _id: item._id }, update);
       } else {
-        await N.models.market.ItemOfferArchived.remove({ _id: item._id });
+        await N.models.market.ItemOfferArchived.deleteOne({ _id: item._id });
         await N.models.market.ItemOffer.create(new_item);
       }
     } else {
       // item should remain archived
       if (env.data.item_is_archived) {
-        await N.models.market.ItemOfferArchived.update({ _id: item._id }, update);
+        await N.models.market.ItemOfferArchived.updateOne({ _id: item._id }, update);
       } else {
-        await N.models.market.ItemOffer.remove({ _id: item._id });
+        await N.models.market.ItemOffer.deleteOne({ _id: item._id });
         await N.models.market.ItemOfferArchived.create(new_item);
       }
     }

@@ -161,7 +161,7 @@ module.exports = function (N, apiPath) {
           N.models.market.ItemOffer
               .where('user').equals(env.data.user._id)
               .where('st').equals(st)
-              .count()
+              .countDocuments()
         )
       ),
       Promise.all(
@@ -169,7 +169,7 @@ module.exports = function (N, apiPath) {
           N.models.market.ItemOfferArchived
               .where('user').equals(env.data.user._id)
               .where('st').equals(st)
-              .count()
+              .countDocuments()
         )
       ),
       Promise.all(
@@ -177,7 +177,7 @@ module.exports = function (N, apiPath) {
           N.models.market.ItemWish
               .where('user').equals(env.data.user._id)
               .where('st').equals(st)
-              .count()
+              .countDocuments()
         )
       ),
       Promise.all(
@@ -185,7 +185,7 @@ module.exports = function (N, apiPath) {
           N.models.market.ItemWishArchived
               .where('user').equals(env.data.user._id)
               .where('st').equals(st)
-              .count()
+              .countDocuments()
         )
       )
     ]);

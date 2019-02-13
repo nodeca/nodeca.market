@@ -10,7 +10,7 @@ module.exports = function (N, apiPath) {
   });
 
   N.wire.on(apiPath, async function section_link_create(env) {
-    await N.models.market.Section.update(
+    await N.models.market.Section.updateOne(
              { _id: env.params.parent },
              { $push: { links: env.params.section } }
            );

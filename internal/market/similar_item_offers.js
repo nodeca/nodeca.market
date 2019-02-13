@@ -84,7 +84,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function write_cache(locals) {
     if (locals.cached) return;
 
-    await N.models.market.ItemOfferSimilarCache.update({
+    await N.models.market.ItemOfferSimilarCache.updateOne({
       item: locals.item_id
     }, {
       $set: {

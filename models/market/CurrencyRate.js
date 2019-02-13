@@ -90,7 +90,7 @@ module.exports = function (N, collectionName) {
       if (!Number.isFinite(rates[c])) throw new Error('Unable to parse currency rates');
     }
 
-    await N.models.market.CurrencyRate.update({}, { ts: new Date(), date, rates }, { upsert: true });
+    await N.models.market.CurrencyRate.updateOne({}, { ts: new Date(), date, rates }, { upsert: true });
   };
 
 
