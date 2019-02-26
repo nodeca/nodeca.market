@@ -235,6 +235,50 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Add "responses" block for author
+  //
+  N.wire.after(apiPath, async function fill_item_responses(env) {
+    if (env.user_info.user_id !== String(env.data.item.user)) return;
+    if (!(await env.extras.settings.fetch('can_use_dialogs'))) return;
+
+    let refs = await N.models.market.ItemDialogRef.find()
+                         .where('item').equals(env.data.item._id)
+                         .lean(true);
+
+    if (!refs.length) return;
+
+    let messages = await N.models.users.DlgMessage.find()
+                             .where('_id').in(_.map(refs, 'message'))
+                             .where('exists').equals(true)
+                             .sort('_id')
+                             .lean(true);
+
+    let dialogs = await N.models.users.Dialog.find()
+                            .where('user').equals(env.user_info.user_id)
+                            .where('exists').equals(true)
+                            .where('_id').in(_.map(messages, 'parent'))
+                            .lean(true);
+
+    let dialogs_by_id = _.keyBy(dialogs, '_id');
+
+    env.data.users = env.data.users || [];
+    env.res.responses = [];
+
+    for (let msg of messages) {
+      // dialog is not used, we just check that it exists
+      if (!dialogs_by_id[msg.parent]) continue;
+
+      env.data.users.push(msg.user);
+
+      env.res.responses.push({
+        user:    msg.user,
+        dialog:  msg.parent,
+        message: msg._id
+      });
+    }
+  });
+
+
   // Add "similar items" block
   //
   N.wire.after(apiPath, async function fill_similar_items(env) {

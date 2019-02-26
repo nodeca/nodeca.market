@@ -68,7 +68,7 @@ article#content.market-item-wish(
 
           if self.item.del_by
             - var delUser = self.users[self.item.del_by] || {}
-            p.page-head__descr.market-item-buy__meta-deleted
+            p.page-head__descr.market-item-wish__meta-deleted
               = self.t('del_by')
               = ' '
               a(href=self.link_to('users.member', { user_hid: delUser.hid }))= delUser.name
@@ -156,9 +156,23 @@ article#content.market-item-wish(
         )
           = self.item.views
 
-    .market-item-wish__responses
+    .market-item-wish-responses
       if user && user._id === self.runtime.user_id
-        = self.t('no_responses')
+        if self.responses && self.responses.length > 0
+          .market-item-wish-responses__header= self.t('responded')
+
+          ul.market-item-wish-responses__item-list
+            each response in self.responses
+              li.market-item-wish-response
+                - var from = self.users[response.user] || {};
+                a.market-item-wish-response__link(
+                  href=self.link_to('users.dialog', { dialog_id: response.dialog, message_id: response.message })
+                )
+                  img.market-item-wish-response__avatar(alt=from.name)&attributes(self.avatar(from, 'sm'))
+                  = from.name
+
+        else
+          p.market-item-wish-responses__m-empty= self.t('no_responses')
 
       else if self.runtime.is_member
         button.btn.btn-secondary.market-item-wish__contact(
@@ -166,6 +180,7 @@ article#content.market-item-wish(
           data-to-nick=user.nick
           data-to-hid=user.hid
           data-ref='market_item_wish:'+self.section.hid+':'+self.item.hid
+          data-item-id=self.item._id
         )= self.t('contact')
 
     if self.similar_items && self.similar_items.length > 0

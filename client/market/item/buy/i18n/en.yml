@@ -8,6 +8,7 @@ en-US:
   condition: 'Condition:'
   condition_new: 'new'
   condition_used: 'used'
+  responded: 'Responded:'
   no_responses: Nobody responded to your offer yet.
   contact: Contact seller
   similar_items: 'Similar items:'

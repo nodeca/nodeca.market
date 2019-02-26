@@ -186,9 +186,23 @@ article#content.market-item-buy(
         )
           = self.item.views
 
-    .market-item-buy__responses
+    .market-item-buy-responses
       if user && user._id === self.runtime.user_id
-        = self.t('no_responses')
+        if self.responses && self.responses.length > 0
+          .market-item-buy-responses__header= self.t('responded')
+
+          ul.market-item-buy-responses__item-list
+            each response in self.responses
+              li.market-item-buy-response
+                - var from = self.users[response.user] || {};
+                a.market-item-buy-response__link(
+                  href=self.link_to('users.dialog', { dialog_id: response.dialog, message_id: response.message })
+                )
+                  img.market-item-buy-response__avatar(alt=from.name)&attributes(self.avatar(from, 'sm'))
+                  = from.name
+
+        else
+          p.market-item-buy-responses__m-empty= self.t('no_responses')
 
       else if self.runtime.is_member
         button.btn.btn-secondary.market-item-buy__contact(
@@ -196,6 +210,7 @@ article#content.market-item-buy(
           data-to-nick=user.nick
           data-to-hid=user.hid
           data-ref='market_item_buy:'+self.section.hid+':'+self.item.hid
+          data-item-id=self.item._id
         )= self.t('contact')
 
     if self.similar_items && self.similar_items.length > 0

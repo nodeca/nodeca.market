@@ -164,7 +164,10 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     return N.wire.emit('users.dialog.create:begin', {
       nick: data.$this.data('to-nick'),
       hid: data.$this.data('to-hid'),
-      ref: data.$this.data('ref')
+      ref: data.$this.data('ref'),
+
+      // add tag if user clicks on "contact" button (but not from usercard)
+      meta: { market_item_ref: data.$this.data('item-id') }
     });
   });
 

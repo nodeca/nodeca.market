@@ -1,6 +1,7 @@
 en-US:
   closed: Item closed
   location: 'Location:'
+  responded: 'Responded:'
   no_responses: Nobody responded to your offer yet.
   contact: Contact buyer
   similar_items: 'Similar items:'
