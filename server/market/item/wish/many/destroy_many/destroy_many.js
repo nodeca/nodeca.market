@@ -99,8 +99,7 @@ module.exports = function (N, apiPath) {
   // Delete items
   //
   N.wire.on(apiPath, async function delete_items(env) {
-    env.data.changed_items_old = [];
-    env.data.changed_items_new = [];
+    env.data.changes = [];
 
     env.data.items_to_update = new Set();
     env.data.sections_to_update = new Set();
@@ -129,8 +128,10 @@ module.exports = function (N, apiPath) {
 
       let new_item = mongo_apply(item, update);
 
-      env.data.changed_items_old.push(item);
-      env.data.changed_items_new.push(new_item);
+      env.data.changes.push({
+        old_item: item,
+        new_item
+      });
 
       // move item to archive if it wasn't there already, update otherwise
       if (env.data.item_is_archived[item._id]) {
@@ -157,8 +158,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, function save_history(env) {
     return N.models.market.ItemWishHistory.add(
-      env.data.changed_items_old,
-      env.data.changed_items_new,
+      env.data.changes,
       {
         user: env.user_info.user_id,
         role: N.models.market.ItemWishHistory.roles.MODERATOR,

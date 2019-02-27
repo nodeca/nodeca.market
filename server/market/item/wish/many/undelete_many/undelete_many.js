@@ -89,8 +89,7 @@ module.exports = function (N, apiPath) {
   // Restore items
   //
   N.wire.on(apiPath, async function restore_items(env) {
-    env.data.changed_items_old = [];
-    env.data.changed_items_new = [];
+    env.data.changes = [];
 
     env.data.items_to_update = new Set();
     env.data.sections_to_update = new Set();
@@ -133,8 +132,10 @@ module.exports = function (N, apiPath) {
 
       let new_item = mongo_apply(item, update);
 
-      env.data.changed_items_old.push(item);
-      env.data.changed_items_new.push(new_item);
+      env.data.changes.push({
+        old_item: item,
+        new_item
+      });
 
       /* eslint-disable no-lonely-if */
       if (new_item.st === statuses.OPEN || new_item.ste === statuses.OPEN) {
@@ -173,8 +174,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, function save_history(env) {
     return N.models.market.ItemWishHistory.add(
-      env.data.changed_items_old,
-      env.data.changed_items_new,
+      env.data.changes,
       {
         user: env.user_info.user_id,
         role: N.models.market.ItemWishHistory.roles.MODERATOR,
