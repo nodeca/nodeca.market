@@ -52,7 +52,6 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   function updatePreview() {
     N.parser.md2html({
       text: view.offer.description(),
-      attachments: [],
       options: N.runtime.page_data.parse_options,
       rpc_cache
     })

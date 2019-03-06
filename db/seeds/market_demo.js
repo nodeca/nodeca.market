@@ -112,7 +112,6 @@ async function createItemOffer(section, user, isClosed = false) {
 
   let result = await parser.md2html({
     text: md,
-    attachments: [],
     options
   });
 
@@ -196,7 +195,6 @@ async function createItemWish(section, user, isClosed = false) {
 
   let result = await parser.md2html({
     text: md,
-    attachments: [],
     options
   });
 

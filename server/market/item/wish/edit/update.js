@@ -114,7 +114,6 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, async function parse_text(env) {
     env.data.parse_result = await N.parser.md2html({
       text: env.params.description,
-      attachments: [],
       options: env.data.parse_options,
       user_info: env.user_info
     });
