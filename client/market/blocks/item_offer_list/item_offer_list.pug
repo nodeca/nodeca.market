@@ -48,8 +48,7 @@ each item in self.items
 
           if item.barter_info
             = ' '
-            //- TODO: icon-exchange
-            span.market-list-item-offer__icon.icon.icon-track-normal(title=self.t('icon_exchange'))
+            span.market-list-item-offer__icon.icon.icon-interchange(title=self.t('icon_exchange'))
 
         .market-list-item-offer__location
           if item.location
@@ -66,8 +65,7 @@ each item in self.items
 
           if item.delivery
             = ' '
-            //- TODO: icon-delivery
-            span.market-list-item-offer__icon.icon.icon-track-tracking(title=self.t('icon_delivery'))
+            span.market-list-item-offer__icon.icon.icon-delivery(title=self.t('icon_delivery'))
 
         .market-list-item-offer__details
           .market-list-item-offer__details-item!= self.timetag(item.ts, 'relative')
