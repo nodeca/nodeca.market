@@ -216,7 +216,6 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fetch_settings(env) {
     env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
       'can_report_abuse',
-      'can_see_history',
       'can_see_ip',
       'market_can_create_items',
       'market_displayed_currency',
