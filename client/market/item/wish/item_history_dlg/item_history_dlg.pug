@@ -16,17 +16,16 @@
             class=entry.role === roles.TASK ? 'market-item-wish-history-entry__m-task' : ''
           )
             .market-item-wish-history-entry__meta
-              .market-item-wish-history-entry__meta-author
-                span.market-item-wish-history-entry__icon-task(
-                  title=self.t('role_task')
-                )= '*'
-                span.market-item-wish-history-entry__icon-moderator(
-                  title=self.t('role_moderator')
-                )= '*'
-                if user
-                  a.market-item-wish-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
-                    = user.nick
-              .market-item-wish-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
+              span.market-item-wish-history-entry__meta-ts!= self.timetag(entry.ts, 'relative')
+              if user
+                a.market-item-wish-history-entry__meta-author-link(href=self.link_to('users.member', { user_hid: user.hid }))
+                  = user.nick
+              span.market-item-wish-history-entry__icon-task(
+                title=self.t('role_task')
+              )= '*'
+              span.market-item-wish-history-entry__icon-moderator(
+                title=self.t('role_moderator')
+              )= '*'
 
             if entry.title_diff
               .market-item-wish-history-entry__title
