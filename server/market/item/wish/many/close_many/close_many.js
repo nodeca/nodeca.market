@@ -122,7 +122,7 @@ module.exports = function (N, apiPath) {
         env.data.sections_to_update.add(String(env.data.section_to));
       }
 
-      env.data.sections_to_update.add(String(item.section));
+      env.data.items_to_update.add(String(item._id));
     }
 
     if (bulk_archived.length === 0 && bulk_active.length === 0) {
@@ -161,5 +161,16 @@ module.exports = function (N, apiPath) {
     for (let section_id of env.data.sections_to_update) {
       await N.models.market.Section.updateCache(section_id);
     }
+  });
+
+
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    let users = _.map(env.data.items.filter(item => env.data.items_to_update.has(String(item._id))), 'user');
+    users = _.uniq(users.map(String));
+
+    await N.models.market.UserItemWishCount.recount(users);
+    await N.models.market.UserItemWishArchivedCount.recount(users);
   });
 };

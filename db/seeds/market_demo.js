@@ -3,6 +3,7 @@
 'use strict';
 
 
+const _           = require('lodash');
 const charlatan   = require('charlatan');
 const glob        = require('glob').sync;
 const ObjectId    = require('mongoose').Types.ObjectId;
@@ -354,6 +355,14 @@ async function createClosedItems(user) {
 }
 
 
+async function updateUserCounters() {
+  await models.market.UserItemOfferCount.recount(_.map(users, '_id'));
+  await models.market.UserItemOfferArchivedCount.recount(_.map(users, '_id'));
+  await models.market.UserItemWishCount.recount(_.map(users, '_id'));
+  await models.market.UserItemWishArchivedCount.recount(_.map(users, '_id'));
+}
+
+
 module.exports = async function (N) {
   config      = N.config;
   models      = N.models;
@@ -382,4 +391,5 @@ module.exports = async function (N) {
   for (let section of sections) models.market.Section.updateCache(section._id);
 
   await removeTmpPhotos();
+  await updateUserCounters();
 };

@@ -160,6 +160,15 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    await N.models.market.UserItemWishCount.inc(env.user_info.user_id, {
+      is_hb: env.user_info.hb
+    });
+  });
+
+
   // Add redirect info
   //
   N.wire.after(apiPath, function redirect_info(env) {

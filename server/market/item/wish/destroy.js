@@ -142,4 +142,12 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function update_section(env) {
     await N.models.market.Section.updateCache(env.data.item.section);
   });
+
+
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    await N.models.market.UserItemWishCount.recount(env.data.item.user);
+    await N.models.market.UserItemWishArchivedCount.recount(env.data.item.user);
+  });
 };

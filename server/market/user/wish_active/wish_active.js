@@ -125,76 +125,23 @@ module.exports = function (N, apiPath) {
   // needed to display this information on tabs
   //
   N.wire.after(apiPath, async function fetch_stats(env) {
-    let offer_statuses = N.models.market.ItemOffer.statuses;
-    let wish_statuses  = N.models.market.ItemWish.statuses;
-
-    let offer_visible_st_active  = [ offer_statuses.OPEN ];
-    let offer_visible_st_archive = [ offer_statuses.CLOSED ];
-    let wish_visible_st_active   = [ wish_statuses.OPEN ];
-    let wish_visible_st_archive  = [ wish_statuses.CLOSED ];
-
-    if (env.data.settings.can_see_hellbanned || env.user_info.hb) {
-      offer_visible_st_active.push(offer_statuses.HB);
-      offer_visible_st_archive.push(offer_statuses.HB);
-      wish_visible_st_active.push(wish_statuses.HB);
-      wish_visible_st_archive.push(wish_statuses.HB);
-    }
-
-    if (env.data.settings.market_mod_can_delete_items) {
-      offer_visible_st_archive.push(offer_statuses.DELETED);
-      wish_visible_st_archive.push(wish_statuses.DELETED);
-    }
-
-    if (env.data.settings.market_mod_can_see_hard_deleted_items) {
-      offer_visible_st_archive.push(offer_statuses.DELETED_HARD);
-      wish_visible_st_archive.push(wish_statuses.DELETED_HARD);
-    }
-
     let [
       active_offers,
       closed_offers,
       active_wishes,
       closed_wishes
     ] = await Promise.all([
-      Promise.all(
-        offer_visible_st_active.map(st =>
-          N.models.market.ItemOffer
-              .where('user').equals(env.data.user._id)
-              .where('st').equals(st)
-              .countDocuments()
-        )
-      ),
-      Promise.all(
-        offer_visible_st_archive.map(st =>
-          N.models.market.ItemOfferArchived
-              .where('user').equals(env.data.user._id)
-              .where('st').equals(st)
-              .countDocuments()
-        )
-      ),
-      Promise.all(
-        wish_visible_st_active.map(st =>
-          N.models.market.ItemWish
-              .where('user').equals(env.data.user._id)
-              .where('st').equals(st)
-              .countDocuments()
-        )
-      ),
-      Promise.all(
-        wish_visible_st_archive.map(st =>
-          N.models.market.ItemWishArchived
-              .where('user').equals(env.data.user._id)
-              .where('st').equals(st)
-              .countDocuments()
-        )
-      )
+      N.models.market.UserItemOfferCount.get(env.data.user._id, env.user_info),
+      N.models.market.UserItemOfferArchivedCount.get(env.data.user._id, env.user_info),
+      N.models.market.UserItemWishCount.get(env.data.user._id, env.user_info),
+      N.models.market.UserItemWishArchivedCount.get(env.data.user._id, env.user_info)
     ]);
 
     env.res.stats = {
-      active_offers: _.sum(active_offers),
-      closed_offers: _.sum(closed_offers),
-      active_wishes: _.sum(active_wishes),
-      closed_wishes: _.sum(closed_wishes)
+      active_offers,
+      closed_offers,
+      active_wishes,
+      closed_wishes
     };
   });
 

@@ -172,4 +172,15 @@ module.exports = function (N, apiPath) {
       await N.models.market.Section.updateCache(section_id);
     }
   });
+
+
+  // Update user counters
+  //
+  N.wire.after(apiPath, async function update_user(env) {
+    let users = _.map(env.data.items.filter(item => env.data.items_to_update.has(String(item._id))), 'user');
+    users = _.uniq(users.map(String));
+
+    await N.models.market.UserItemWishCount.recount(users);
+    await N.models.market.UserItemWishArchivedCount.recount(users);
+  });
 };
