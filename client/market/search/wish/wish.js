@@ -250,6 +250,12 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
 //
 
 function updateToolbar() {
+  $('.market-search-wish__toolbar-controls')
+    .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
+      section:      N.runtime.page_data.section,
+      settings:     N.runtime.page_data.settings,
+      selected_cnt: pageState.selected_items.length
+    }));
 }
 
 
