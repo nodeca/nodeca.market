@@ -8,6 +8,7 @@ i18n:
           market_editor: Editor
 
         category_names:
+          market: Market
           market_common: Common
           market_item: Item
           market_items_markup: Market items markup
