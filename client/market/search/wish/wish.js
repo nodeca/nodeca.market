@@ -3,6 +3,7 @@
 
 const _   = require('lodash');
 const bag = require('bagjs')({ prefix: 'nodeca' });
+const ScrollableList = require('nodeca.core/lib/app/scrollable_list');
 
 
 // Page state
@@ -16,38 +17,49 @@ const bag = require('bagjs')({ prefix: 'nodeca' });
 //   - sort:               sort type (`rel` or `date`)
 //
 // - active:             true if we're on this page, false otherwise
-// - first_offset:       offset of the first item in the DOM
 // - current_offset:     offset of the current item (first in the viewport)
-// - reached_end:        true if no more pages exist below last loaded one
-// - next_loading_start: time when current xhr request for the next page is started
 // - item_count:         total amount of items
 // - per_page:           amount of items loaded on each request (for prefetch)
-// - bottom_marker:      last item id (for prefetch)
-// - first_page_loaded:  true if results block (section stats + first N results) has been loaded
 // - selected_items:     array of selected items
 //
 let pageState = {};
+let scrollable_list;
 
 let $window = $(window);
 
-// height of a space between text content of a post and the next post header
-const TOP_OFFSET = 48;
 
-const navbarHeight = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
+function load(start, direction) {
+  if (direction !== 'bottom') return null;
+
+  return N.io.rpc('market.search.wish.results',
+    Object.assign({}, pageState.search, { skip: start, limit: pageState.per_page })
+  ).then(res => {
+    pageState.item_count = res.pagination.total;
+
+    return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+      max: pageState.item_count
+    }).then(() => {
+      res.index_offset = res.pagination.chunk_offset;
+
+      return {
+        $html: $(N.runtime.render('market.blocks.item_wish_list', res)),
+        locals: res,
+        offset: res.pagination.chunk_offset,
+        reached_end: res.items.length !== pageState.per_page
+      };
+    });
+  }).catch(err => {
+    // Section deleted, refreshing the page so user can see the error
+    if (err.code === N.io.NOT_FOUND) return N.wire.emit('navigate.reload');
+    throw err;
+  });
+}
 
 
-// Show/hide loading placeholders when new items are fetched,
-// adjust scroll when adding/removing top placeholder
-//
-function reset_loading_placeholders() {
-  let next = $('.market-search-wish__loading-next');
-
-  // if last item is loaded, hide bottom placeholder
-  if (pageState.reached_end) {
-    next.addClass('d-none');
-  } else {
-    next.removeClass('d-none');
-  }
+function on_list_scroll(item, index/*, item_offset*/) {
+  N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+    current: index + 1 // `+1` because offset is zero based
+  }).catch(err => N.wire.emit('error', err));
 }
 
 
@@ -59,27 +71,61 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
   pageState.active             = true;
   pageState.search             = N.runtime.page_data.search;
-  pageState.first_offset       = pagination.chunk_offset;
   pageState.current_offset     = -1;
   pageState.item_count         = pagination.total;
   pageState.per_page           = pagination.per_page;
-  pageState.reached_end        = false;
-  pageState.next_loading_start = 0;
-  pageState.bottom_marker      = 0;
-  pageState.first_page_loaded  = false;
   pageState.selected_items     = [];
 
+  let navbar_height = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
+
+  // account for some spacing between posts
+  navbar_height += 48;
+
   $window.scrollTop(0);
+
+  N.io.rpc('market.search.wish.results',
+    Object.assign({}, pageState.search, { skip: 0, limit: pageState.per_page })
+  ).then(res => {
+    pageState.item_count = res.pagination.total;
+
+    return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+      max: pageState.item_count
+    }).then(() => {
+      res.index_offset = res.pagination.chunk_offset; // always 0 here
+
+      // render & inject item list
+      let $html = $(N.runtime.render('market.search.wish.results', res));
+
+      return N.wire.emit('navigate.update', {
+        $: $html,
+        locals: res,
+        $replace: $('.market-search-wish__results')
+      }).then(() => {
+        scrollable_list = new ScrollableList({
+          N,
+          list_selector:               '.market-search-wish__item-list',
+          item_selector:               '.market-list-item-wish',
+          placeholder_bottom_selector: '.market-search-wish__loading-next',
+          get_content_id:              item => $(item).data('item-index'),
+          load,
+          reached_top:                 res.pagination.chunk_offset === 0,
+          reached_bottom:              res.items.length !== pageState.per_page,
+          index_offset:                res.pagination.chunk_offset,
+          navbar_height,
+          on_list_scroll
+        });
+      });
+    });
+  }).catch(err => {
+    N.wire.emit('error', err);
+  });
 });
 
 
-// Mark that user left the page
-//
-// Maybe it's better to set pageState = null to free memory? But it requires
-// a lot of work to make sure there are any delayed/debounced calls to it.
-//
 N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
-  pageState.active = false;
+  if (scrollable_list) scrollable_list.destroy();
+  scrollable_list = null;
+  pageState = {};
 });
 
 
@@ -94,154 +140,6 @@ N.wire.on('navigate.done:' + module.apiPath, function search_form_init() {
 //
 N.wire.before('market.blocks.search_form_wish:search', function inject_sort(data) {
   data.fields.sort = $('.market-search-wish__select-order').val();
-});
-
-
-/////////////////////////////////////////////////////////////////////
-// When user scrolls the page:
-//
-//  1. update progress bar
-//  2. show/hide navbar
-//
-let progressScrollHandler = null;
-
-
-N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
-  progressScrollHandler = _.debounce(function update_progress_on_scroll() {
-    // If we scroll below page head, show the secondary navbar
-    //
-    let head = document.getElementsByClassName('page-head');
-
-    if (head.length && head[0].getBoundingClientRect().bottom > navbarHeight) {
-      $('.navbar').removeClass('navbar__m-secondary');
-    } else {
-      $('.navbar').addClass('navbar__m-secondary');
-    }
-
-    // Update progress bar
-    //
-    let items         = document.getElementsByClassName('market-list-item-wish');
-    let itemThreshold = navbarHeight + TOP_OFFSET;
-    let offset;
-    let currentIdx;
-
-    // Get offset of the first item in the viewport
-    //
-    currentIdx = _.sortedIndexBy(items, null, e => {
-      if (!e) { return itemThreshold; }
-      return e.getBoundingClientRect().top;
-    }) - 1;
-
-    offset = currentIdx + pageState.first_offset;
-
-    N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
-      current: offset + 1 // `+1` because offset is zero based
-    }).catch(err => N.wire.emit('error', err));
-  }, 100, { maxWait: 100 });
-
-  // avoid executing it on first tick because of initial scrollTop()
-  setTimeout(() => {
-    $window.on('scroll', progressScrollHandler);
-  });
-
-  // execute it once on page load
-  progressScrollHandler();
-});
-
-
-N.wire.on('navigate.exit:' + module.apiPath, function progress_updater_teardown() {
-  if (!progressScrollHandler) return;
-  progressScrollHandler.cancel();
-  $window.off('scroll', progressScrollHandler);
-  progressScrollHandler = null;
-});
-
-
-// Init handlers
-//
-N.wire.once('navigate.done:' + module.apiPath, function market_section_init_handlers() {
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Whenever we are close to beginning/end of item list, check if we can
-  // load more pages from the server
-  //
-
-  // A delay after failed xhr request (delay between successful requests
-  // is set with affix `throttle` argument)
-  //
-  // For example, suppose user continuously scrolls. If server is up, each
-  // subsequent request will be sent each 100 ms. If server goes down, the
-  // interval between request initiations goes up to 2000 ms.
-  //
-  const LOAD_AFTER_ERROR = 2000;
-
-  N.wire.on(module.apiPath + ':load_next', function load_next_page() {
-    if (pageState.reached_end) return;
-
-    let now = Date.now();
-
-    // `next_loading_start` is the last request start time, which is reset to 0 on success
-    //
-    // Thus, successful requests can restart immediately, but failed ones
-    // will have to wait `LOAD_AFTER_ERROR` ms.
-    //
-    if (Math.abs(pageState.next_loading_start - now) < LOAD_AFTER_ERROR) return;
-
-    pageState.next_loading_start = now;
-
-    N.io.rpc('market.search.wish.results',
-      Object.assign({}, pageState.search, { skip: pageState.bottom_marker, limit: pageState.per_page })
-    ).then(res => {
-      if (res.reached_end) {
-        pageState.reached_end = true;
-        reset_loading_placeholders();
-      }
-
-      pageState.bottom_marker += res.items.length;
-      pageState.first_offset  = res.pagination.chunk_offset - $('.market-list-item-wish').length;
-      pageState.item_count    = res.pagination.total;
-
-      let navigate_update_params;
-
-      if (pageState.first_page_loaded) {
-        let $result = $(N.runtime.render('market.blocks.item_wish_list', res));
-
-        navigate_update_params = {
-          $:      $result,
-          locals: res,
-          $after: $('.market-search-wish__item-list > :last')
-        };
-      } else {
-        let $result = $(N.runtime.render('market.search.wish.results', res));
-
-        navigate_update_params = {
-          $:        $result,
-          locals:   res,
-          $replace: $('.market-search-wish__results')
-        };
-        pageState.first_page_loaded = true;
-      }
-
-      return N.wire.emit('navigate.update', navigate_update_params).then(() => {
-        // Update selection state
-        _.intersection(pageState.selected_items, _.map(res.items, '_id')).forEach(itemId => {
-          $(`.market-list-item-wish[data-item-id="${itemId}"]`)
-            .addClass('market-list-item-wish__m-selected')
-            .find('.market-list-item-wish__select-cb')
-            .prop('checked', true);
-        });
-
-        // reset lock
-        pageState.next_loading_start = 0;
-
-        return N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
-          max: pageState.item_count
-        });
-      });
-    }).catch(err => {
-      N.wire.emit('error', err);
-    });
-  });
 });
 
 
@@ -297,6 +195,21 @@ function save_selected_items_immediate() {
 }
 const save_selected_items = _.debounce(save_selected_items_immediate, 500);
 
+function update_selection_state(container) {
+  pageState.selected_items.forEach(itemId => {
+    let s = `.market-list-item-wish[data-item-id="${itemId}"]`;
+    container.find(s).addBack(s)
+      .addClass('market-list-item-wish__m-selected')
+      .find('.market-list-item-wish__select-cb')
+      .prop('checked', true);
+  });
+}
+
+N.wire.on('navigate.update', function update_selected_items(data) {
+  if (!pageState.active) return; // not on this page
+  update_selection_state(data.$);
+});
+
 
 // Load previously selected items
 //
@@ -312,12 +225,7 @@ N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_sel
     .then(ids => {
       ids = ids || [];
       pageState.selected_items = ids;
-      pageState.selected_items.forEach(itemId => {
-        $(`.market-list-item-wish[data-item-id="${itemId}"]`)
-          .addClass('market-list-item-wish__m-selected')
-          .find('.market-list-item-wish__select-cb')
-          .prop('checked', true);
-      });
+      update_selection_state($(document));
 
       return ids.length ? updateToolbar() : null;
     })

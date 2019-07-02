@@ -34,12 +34,6 @@ article#content.market-search-buy
 
     != self.partial('@market.blocks.search_form_buy')
 
-    .market-search-buy__results._affix(
-      data-affix-bottom={
-        offset:     500,
-        wire_below: 'market.search.buy:load_next',
-        throttle:   100
-      }
-    )
+    .market-search-buy__results
       .market-search-buy__loading-next.nojs-hide
         span.icon.icon-loading-placeholder

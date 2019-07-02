@@ -8,8 +8,6 @@ article#content.market-section-wish(
     'end':  'market.section.wish:nav_to_end'
   }
   data-last-item-hid= self.last_item_hid
-  data-top-marker=    self.items && self.items.length > 0 ? self.items[0]._id : null
-  data-bottom-marker= self.items && self.items.length > 0 ? self.items[self.items.length - 1]._id : null
 )
   -
     var navbar_args = {
@@ -64,18 +62,8 @@ article#content.market-section-wish(
         )
           span.icon.icon-loading-placeholder
 
-        ul.market-section-wish__item-list._affix(
-          data-affix-top={
-            offset:     500,
-            wire_above: 'market.section.wish:load_prev',
-            throttle:   100
-          }
-          data-affix-bottom={
-            offset:     500,
-            wire_below: 'market.section.wish:load_next',
-            throttle:   100
-          }
-        )!= self.partial('@market.blocks.item_wish_list')
+        ul.market-section-wish__item-list
+          != self.partial('@market.blocks.item_wish_list')
 
         .market-section-wish__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

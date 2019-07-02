@@ -3,24 +3,72 @@
 
 const _   = require('lodash');
 const bag = require('bagjs')({ prefix: 'nodeca' });
+const ScrollableList = require('nodeca.core/lib/app/scrollable_list');
 
 
 // Page state
 //
 // - hid:                current user hid
 // - active:             true if we're on this page, false otherwise
-// - first_offset:       offset of the first item in the DOM
 // - current_offset:     offset of the current item (first in the viewport)
 // - selected_items:     array of selected items in current section
 //
 let pageState = {};
+let scrollable_list;
 
 let $window = $(window);
 
-// height of a space between text content of a post and the next post header
-const TOP_OFFSET = 48;
 
-const navbarHeight = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
+// Use a separate debouncer that only fires when user stops scrolling,
+// so it's executed a lot less frequently.
+//
+// The reason is that `history.replaceState` is very slow in FF
+// on large pages: https://bugzilla.mozilla.org/show_bug.cgi?id=1250972
+//
+let update_url = _.debounce((item, index, item_offset) => {
+  let href, state;
+
+  if (item) {
+    state = {
+      hid:    $(item).data('item-hid'),
+      offset: item_offset
+    };
+  }
+
+  // save current offset, and only update url if current_item is different
+  if (pageState.current_offset !== index) {
+    let $query = {};
+
+    if (item) $query.from = $(item).data('item-hid');
+
+    href = N.router.linkTo('market.user.wish_active', {
+      user_hid: pageState.hid,
+      $query
+    });
+
+    if ((pageState.current_offset >= 0) !== (index >= 0) && !pageState.tag) {
+      $('meta[name="robots"]').remove();
+
+      if (index >= 0) {
+        $('head').append($('<meta name="robots" content="noindex,follow">'));
+      }
+    }
+
+    pageState.current_offset = index;
+  }
+
+  N.wire.emit('navigate.replace', { href, state })
+        .catch(err => N.wire.emit('error', err));
+}, 500);
+
+
+function on_list_scroll(item, index, item_offset) {
+  N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
+    current: index + 1 // `+1` because offset is zero based
+  }).catch(err => N.wire.emit('error', err));
+
+  update_url(item, index, item_offset);
+}
 
 
 /////////////////////////////////////////////////////////////////////
@@ -31,190 +79,68 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
 
   pageState.active             = true;
   pageState.hid                = data.params.user_hid;
-  pageState.first_offset       = pagination.chunk_offset;
   pageState.current_offset     = -1;
   pageState.selected_items     = [];
 
-  // disable automatic scroll to an anchor in the navigator
-  data.no_scroll = true;
+  let navbar_height = parseInt($('body').css('margin-top'), 10) + parseInt($('body').css('padding-top'), 10);
 
-  if (data.state && typeof data.state.hid !== 'undefined' && typeof data.state.offset !== 'undefined') {
+  // account for some spacing between posts
+  navbar_height += 48;
+
+  let scroll_done = false;
+
+  if (!scroll_done && data.state && typeof data.state.hid !== 'undefined' && typeof data.state.offset !== 'undefined') {
     let el = $('#item' + data.state.hid);
 
     if (el.length) {
-      $window.scrollTop(el.offset().top - navbarHeight - TOP_OFFSET + data.state.offset);
-      return;
+      $window.scrollTop(el.offset().top - navbar_height + data.state.offset);
+      scroll_done = true;
     }
-  } else if (data.params.$query && data.params.$query.from) {
+  }
+
+  if (!scroll_done && data.params.$query && data.params.$query.from) {
     let el = $('#item' + Number(data.params.$query.from));
 
     if (el.length) {
-      $window.scrollTop(el.offset().top - $('.navbar').height() - TOP_OFFSET);
+      $window.scrollTop(el.offset().top - navbar_height);
       el.addClass('market-list-item-wish__m-highlight');
-      return;
+      scroll_done = true;
     }
   }
 
   // If we're on the first page, scroll to the top;
   // otherwise scroll to the first item
   //
-  if (pagination.chunk_offset > 1 && $('.market-user__item-list').length) {
-    $window.scrollTop($('.market-user__item-list').offset().top - $('.navbar').height());
-
-  } else {
-    $window.scrollTop(0);
-  }
-});
-
-
-// Mark that user left the page
-//
-// Maybe it's better to set pageState = null to free memory? But it requires
-// a lot of work to make sure there are any delayed/debounced calls to it.
-//
-N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
-  pageState.active = false;
-});
-
-
-/////////////////////////////////////////////////////////////////////
-// Change URL when user scrolls the page
-//
-// Use a separate debouncer that only fires when user stops scrolling,
-// so it's executed a lot less frequently.
-//
-// The reason is that `history.replaceState` is very slow in FF
-// on large pages: https://bugzilla.mozilla.org/show_bug.cgi?id=1250972
-//
-let locationScrollHandler = null;
-
-N.wire.on('navigate.done:' + module.apiPath, function location_updater_init() {
-  if ($('.market-user__item-list').length === 0) return;
-
-  locationScrollHandler = _.debounce(function update_location_on_scroll() {
-    let items         = document.getElementsByClassName('market-list-item-wish');
-    let itemThreshold = navbarHeight + TOP_OFFSET;
-    let offset;
-    let currentIdx;
-
-    // Get offset of the first item in the viewport;
-    // "-1" means user sees navigation above all items
-    //
-    currentIdx = _.sortedIndexBy(items, null, item => {
-      if (!item) { return itemThreshold; }
-      return item.getBoundingClientRect().top;
-    }) - 1;
-
-    let href = null;
-    let state = null;
-
-    offset = currentIdx + pageState.first_offset;
-
-    if (currentIdx >= 0 && items.length) {
-      state = {
-        hid:    $(items[currentIdx]).data('item-hid'),
-        offset: itemThreshold - items[currentIdx].getBoundingClientRect().top
-      };
-    }
-
-    // save current offset, and only update url if offset is different
-    if (pageState.current_offset !== offset) {
-      let $query = {};
-
-      if (currentIdx >= 0) {
-        $query.from = $(items[currentIdx]).data('item-hid');
-      }
-
-      href = N.router.linkTo('market.user.wish_active', {
-        user_hid: pageState.hid,
-        $query
-      });
-
-      if (pageState.current_offset < 0 && offset >= 0) {
-        $('head').append($('<meta name="robots" content="noindex,follow">'));
-      } else if (pageState.current_offset >= 0 && offset < 0) {
-        $('meta[name="robots"]').remove();
-      }
-
-      pageState.current_offset = offset;
-    }
-
-    N.wire.emit('navigate.replace', { href, state });
-  }, 500);
-
-  // avoid executing it on first tick because of initial scrollTop()
-  setTimeout(() => {
-    $window.on('scroll', locationScrollHandler);
-  }, 1);
-});
-
-N.wire.on('navigate.exit:' + module.apiPath, function location_updater_teardown() {
-  if (!locationScrollHandler) return;
-  locationScrollHandler.cancel();
-  $window.off('scroll', locationScrollHandler);
-  locationScrollHandler = null;
-});
-
-
-/////////////////////////////////////////////////////////////////////
-// When user scrolls the page:
-//
-//  1. update progress bar
-//  2. show/hide navbar
-//
-let progressScrollHandler = null;
-
-
-N.wire.on('navigate.done:' + module.apiPath, function progress_updater_init() {
-  if ($('.market-user__item-list').length === 0) return;
-
-  progressScrollHandler = _.debounce(function update_progress_on_scroll() {
-    // If we scroll below page head, show the secondary navbar
-    //
-    let head = document.getElementsByClassName('page-head');
-
-    if (head.length && head[0].getBoundingClientRect().bottom > navbarHeight) {
-      $('.navbar').removeClass('navbar__m-secondary');
+  if (!scroll_done) {
+    if (pagination.chunk_offset > 1 && $('.market-user__item-list').length) {
+      $window.scrollTop($('.market-user__item-list').offset().top - navbar_height);
     } else {
-      $('.navbar').addClass('navbar__m-secondary');
+      $window.scrollTop(0);
     }
+    scroll_done = true;
+  }
 
-    // Update progress bar
-    //
-    let items         = document.getElementsByClassName('market-list-item-wish');
-    let itemThreshold = navbarHeight + TOP_OFFSET;
-    let offset;
-    let currentIdx;
+  // disable automatic scroll to an anchor in the navigator
+  data.no_scroll = true;
 
-    // Get offset of the first item in the viewport
-    //
-    currentIdx = _.sortedIndexBy(items, null, e => {
-      if (!e) { return itemThreshold; }
-      return e.getBoundingClientRect().top;
-    }) - 1;
-
-    offset = currentIdx + pageState.first_offset;
-
-    N.wire.emit('common.blocks.navbar.blocks.page_progress:update', {
-      current: offset + 1 // `+1` because offset is zero based
-    }).catch(err => N.wire.emit('error', err));
-  }, 100, { maxWait: 100 });
-
-  // avoid executing it on first tick because of initial scrollTop()
-  setTimeout(() => {
-    $window.on('scroll', progressScrollHandler);
+  scrollable_list = new ScrollableList({
+    N,
+    list_selector:               '.market-user__item-list',
+    item_selector:               '.market-list-item-wish',
+    get_content_id:              item => $(item).data('item-id'),
+    reached_top:                 true,
+    reached_bottom:              true,
+    navbar_height,
+    on_list_scroll
   });
-
-  // execute it once on page load
-  progressScrollHandler();
 });
 
 
-N.wire.on('navigate.exit:' + module.apiPath, function progress_updater_teardown() {
-  if (!progressScrollHandler) return;
-  progressScrollHandler.cancel();
-  $window.off('scroll', progressScrollHandler);
-  progressScrollHandler = null;
+N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
+  scrollable_list.destroy();
+  scrollable_list = null;
+  update_url.cancel();
+  pageState = {};
 });
 
 
@@ -288,6 +214,22 @@ function save_selected_items_immediate() {
 const save_selected_items = _.debounce(save_selected_items_immediate, 500);
 
 
+function update_selection_state(container) {
+  pageState.selected_items.forEach(itemId => {
+    let s = `.market-list-item-wish[data-item-id="${itemId}"]`;
+    container.find(s).addBack(s)
+      .addClass('market-list-item-wish__m-selected')
+      .find('.market-list-item-wish__select-cb')
+      .prop('checked', true);
+  });
+}
+
+N.wire.on('navigate.update', function update_selected_items(data) {
+  if (!pageState.active) return; // not on this page
+  update_selection_state(data.$);
+});
+
+
 // Load previously selected items
 //
 N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_selected_items() {
@@ -302,12 +244,7 @@ N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_sel
     .then(ids => {
       ids = ids || [];
       pageState.selected_items = ids;
-      pageState.selected_items.forEach(itemId => {
-        $(`.market-list-item-wish[data-item-id="${itemId}"]`)
-          .addClass('market-list-item-wish__m-selected')
-          .find('.market-list-item-wish__select-cb')
-          .prop('checked', true);
-      });
+      update_selection_state($(document));
 
       return ids.length ? updateToolbar() : null;
     })

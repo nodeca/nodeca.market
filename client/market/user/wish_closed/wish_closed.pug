@@ -10,8 +10,6 @@ article#content.market-user.market-user__m-wish-closed(
     'end':  'market.user.wish_closed:nav_to_end'
   }
   data-last-item-hid= self.last_item_hid
-  data-top-marker=    self.items && self.items.length > 0 ? self.items[0]._id : null
-  data-bottom-marker= self.items && self.items.length > 0 ? self.items[self.items.length - 1]._id : null
 )
   -
     var navbar_args = {
@@ -60,18 +58,8 @@ article#content.market-user.market-user__m-wish-closed(
         )
           span.icon.icon-loading-placeholder
 
-        ul.market-user__item-list._affix(
-          data-affix-top={
-            offset:     500,
-            wire_above: 'market.user.wish_closed:load_prev',
-            throttle:   100
-          }
-          data-affix-bottom={
-            offset:     500,
-            wire_below: 'market.user.wish_closed:load_next',
-            throttle:   100
-          }
-        )!= self.partial('@market.blocks.item_wish_list', { market_list_show_ignores: true, market_list_hide_user: true })
+        ul.market-user__item-list
+          != self.partial('@market.blocks.item_wish_list', { market_list_show_ignores: true, market_list_hide_user: true })
 
         .market-user__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

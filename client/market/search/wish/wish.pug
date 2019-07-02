@@ -34,12 +34,6 @@ article#content.market-search-wish
 
     != self.partial('@market.blocks.search_form_wish')
 
-    .market-search-wish__results._affix(
-      data-affix-bottom={
-        offset:     500,
-        wire_below: 'market.search.wish:load_next',
-        throttle:   100
-      }
-    )
+    .market-search-wish__results
       .market-search-wish__loading-next.nojs-hide
         span.icon.icon-loading-placeholder

@@ -8,8 +8,6 @@ article#content.market-section-buy(
     'end':  'market.section.buy:nav_to_end'
   }
   data-last-item-hid= self.last_item_hid
-  data-top-marker=    self.items && self.items.length > 0 ? self.items[0]._id : null
-  data-bottom-marker= self.items && self.items.length > 0 ? self.items[self.items.length - 1]._id : null
 )
   -
     var navbar_args = {
@@ -64,18 +62,8 @@ article#content.market-section-buy(
         )
           span.icon.icon-loading-placeholder
 
-        ul.market-section-buy__item-list._affix(
-          data-affix-top={
-            offset:     500,
-            wire_above: 'market.section.buy:load_prev',
-            throttle:   100
-          }
-          data-affix-bottom={
-            offset:     500,
-            wire_below: 'market.section.buy:load_next',
-            throttle:   100
-          }
-        )!= self.partial('@market.blocks.item_offer_list')
+        ul.market-section-buy__item-list
+          != self.partial('@market.blocks.item_offer_list')
 
         .market-section-buy__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
