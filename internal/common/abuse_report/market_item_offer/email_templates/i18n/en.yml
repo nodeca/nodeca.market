@@ -1,8 +1,8 @@
 en-US:
   subject:
-    subject: "abuse report about market item from #{user_name}"
+    subject: "report from #{user} (market offer)"
   body:
-    header: "Complaint from user #{url}:"
-    to: "About market item:"
+    header: "Report from user #{url}:"
+    to: "About market offer:"
     message_sent_to: "This message sent to: "
     report_topic: Topic with report.

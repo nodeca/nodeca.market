@@ -4,7 +4,12 @@
 = '\n'
 
 -
-  var title_escaped = self.item_title.replace(/([!#$%&*+\-:<=>@[\\\]^_`{}~])/g, '\\$1');
+  function escape_md(text) {
+    return text.replace(/([!#$%&*+\-:<=>@[\\\]^_`{}~])/g, '\\$1');
+  }
+
+-
+  var title_escaped = escape_md(self.item_title);
 
   // calculate minimum backtick length for ````quote, so it would encapsulate
   // original content (longest backtick sequence plus 1, but at least 3)
