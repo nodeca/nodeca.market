@@ -84,7 +84,7 @@ module.exports = function (N, apiPath) {
   N.wire.before(apiPath, async function fetch_draft(env) {
     env.data.draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
 
-    let uploaded = _.keyBy(env.data.draft.all_files);
+    let uploaded = env.data.draft ? _.keyBy(env.data.draft.all_files) : {};
 
     // restrict files to only files that were uploaded for this draft
     env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
