@@ -1,0 +1,43 @@
+article.users-bookmarks-item(
+  data-bookmark-id=self._id
+  id='item' + self._id
+)
+  header.users-bookmarks-item__header
+    .users-bookmarks-item__meta
+      a.users-bookmarks-item__title(
+        href=self.url
+      )= self.item.title
+
+      .users-bookmarks-item__stat-narrow.d-sm-none
+        a.users-bookmarks-item__stat-link.users-bookmarks-item__m-stat-parent(
+          href=self.link_to('market.section.offer', { section_hid: self.section.hid })
+        )= self.section.title
+
+      ul.users-bookmarks-item__stat
+        li.users-bookmarks-item__stat-item
+          = self.t('market_offer')
+
+        li.users-bookmarks-item__stat-item
+          != self.timetag(self.item.ts, 'relative')
+
+        li.users-bookmarks-item__stat-item.users-bookmarks-item__m-stat-parent.d-none.d-sm-inline-block
+          a.users-bookmarks-item__stat-link(
+            href=self.link_to('market.section.offer', { section_hid: self.section.hid })
+          )= self.section.title
+
+        li.users-bookmarks-item__stat-item
+          - var user = self.users[self.item.user]
+          if user
+            a.users-bookmarks-item__stat-link._ucard-popover(
+              href=self.link_to('users.member', { user_hid: user.hid })
+              data-user-id=user._id
+            )= user.nick
+
+    if self.runtime.user_hid === self.user_hid
+      .users-bookmarks-item__controls
+        a.users-bookmarks-item__btn-delete.icon.icon-x(
+          href='#'
+          title=self.t('delete_bookmark')
+          data-on-click='users.bookmarks:delete'
+          data-item-id=self._id
+        )

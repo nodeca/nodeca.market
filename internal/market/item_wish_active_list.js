@@ -108,15 +108,14 @@ module.exports = function (N, apiPath) {
   // Fetch and fill bookmarks
   //
   N.wire.after(apiPath, async function fetch_and_fill_bookmarks(env) {
-    let bookmarks = await N.models.market.ItemWishBookmark.find()
+    let bookmarks = await N.models.users.Bookmark.find()
                               .where('user').equals(env.user_info.user_id)
-                              .where('item').in(env.data.item_ids)
-                              .select('item')
+                              .where('src').in(env.data.item_ids)
                               .lean(true);
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'item');
+    env.res.own_bookmarks = _.map(bookmarks, 'src');
   });
 
 
