@@ -49,7 +49,7 @@ N.wire.once(module.apiPath, function init_handlers() {
 N.wire.on(module.apiPath, function show_item_move_many_dlg(options) {
   params = options;
 
-  return N.io.rpc('market.item.sections').then(res => {
+  return N.io.rpc('market.item.wish.move.sections').then(res => {
     $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, params, res)));
 
     $('body').append($dialog);

@@ -56,10 +56,16 @@ module.exports = function (N, apiPath) {
 
     if (!params.section) return;
 
-    env.data.section = await N.models.market.Section.findById(params.section)
-                                 .lean(true);
+    let section = await N.models.market.Section.findById(params.section)
+                            .lean(true);
 
-    if (!env.data.section) return;
+    if (!section) return;
+
+    let type_allowed = await N.models.market.Section.checkIfAllowed(section._id, 'offers');
+
+    if (!type_allowed) return;
+
+    env.data.section = section;
 
     env.res.section = await sanitize_section(N, env.data.section, env.user_info);
   });
@@ -140,7 +146,10 @@ module.exports = function (N, apiPath) {
 
     if (env.data.section && !env.data.search.search_all && !section_stats) {
       // get hids of specified section and all its non-linked subsections
-      let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
+      let children = await N.models.market.Section.getChildren({
+        section: env.data.section._id,
+        offers: true
+      });
 
       children = children.filter(s => !s.is_linked);
 
@@ -261,7 +270,7 @@ module.exports = function (N, apiPath) {
       }
     }
 
-    let section_tree = await N.models.market.Section.getChildren();
+    let section_tree = await N.models.market.Section.getChildren({ offers: true });
 
     // not sanitizing because fetchSections only returns _id, hid and title
     let all_sections = _.keyBy(await fetchSections(), '_id');

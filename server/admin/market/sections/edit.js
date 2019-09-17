@@ -26,7 +26,7 @@ module.exports = function (N, apiPath) {
   // Fetch sections tree & remove current leaf to avoid circular dependency
   //
   N.wire.on(apiPath, async function fetch_data(env) {
-    let allSections = await N.models.market.Section.getChildren();
+    let allSections = await N.models.market.Section.getChildren({ offers: true, wishes: true });
 
     // exclude current section
     allSections = _.filter(allSections, section => !section._id.equals(env.params._id));

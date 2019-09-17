@@ -26,6 +26,9 @@ module.exports = function (N, apiPath) {
     env.data.section_to = await N.models.market.Section.findOne({ hid: env.params.section_hid_to }).lean(true);
     if (!env.data.section_to) throw N.io.NOT_FOUND;
 
+    let type_allowed = await N.models.market.Section.checkIfAllowed(env.data.section_to._id, 'offers');
+    if (!type_allowed) throw N.io.NOT_FOUND;
+
     // Cannot move to a category. Should never happen - restricted on client
     if (env.data.section_to.is_category) throw N.io.BAD_REQUEST;
   });
@@ -34,12 +37,12 @@ module.exports = function (N, apiPath) {
   // Fetch item
   //
   N.wire.before(apiPath, async function fetch_item(env) {
-    env.data.item = await N.models.market.ItemWish
+    env.data.item = await N.models.market.ItemOffer
                               .findById(env.params.item_id)
                               .lean(true);
 
     if (!env.data.item) {
-      env.data.item = await N.models.market.ItemWishArchived
+      env.data.item = await N.models.market.ItemOfferArchived
                                 .findById(env.params.item_id)
                                 .lean(true);
       env.data.item_is_archived = true;
@@ -57,7 +60,7 @@ module.exports = function (N, apiPath) {
       user_info: env.user_info
     } };
 
-    await N.wire.emit('internal:market.access.item_wish', access_env);
+    await N.wire.emit('internal:market.access.item_offer', access_env);
 
     if (!access_env.data.access_read) throw N.io.NOT_FOUND;
   });
@@ -69,12 +72,12 @@ module.exports = function (N, apiPath) {
     if (String(env.data.item.section) === String(env.data.section_to._id)) return;
 
     if (env.data.item_is_archived) {
-      await N.models.market.ItemWishArchived.updateOne(
+      await N.models.market.ItemOfferArchived.updateOne(
         { _id: env.data.item._id },
         { $set: { section: env.data.section_to._id } }
       );
     } else {
-      await N.models.market.ItemWish.updateOne(
+      await N.models.market.ItemOffer.updateOne(
         { _id: env.data.item._id },
         { $set: { section: env.data.section_to._id } }
       );
@@ -87,14 +90,14 @@ module.exports = function (N, apiPath) {
   // Save old version in history
   //
   N.wire.after(apiPath, function save_history(env) {
-    return N.models.market.ItemWishHistory.add(
+    return N.models.market.ItemOfferHistory.add(
       {
         old_item: env.data.item,
         new_item: env.data.new_item
       },
       {
         user: env.user_info.user_id,
-        role: N.models.market.ItemWishHistory.roles.MODERATOR,
+        role: N.models.market.ItemOfferHistory.roles.MODERATOR,
         ip:   env.req.ip
       }
     );
@@ -106,7 +109,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function add_search_index(env) {
     if (String(env.data.item.section) === String(env.data.section_to._id)) return;
 
-    await N.queue.market_item_wishes_search_update_by_ids([ env.data.item._id ]).postpone();
+    await N.queue.market_item_offers_search_update_by_ids([ env.data.item._id ]).postpone();
   });
 
 

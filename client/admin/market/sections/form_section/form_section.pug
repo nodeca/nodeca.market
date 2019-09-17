@@ -24,6 +24,8 @@ form.form-horizontal(data-bind="submit: isNewSection ? create : update")
             label(for='section_' + name, data-yes=self.t('value_yes'), data-no=self.t('value_no')): i
 
     +option_field('is_category')
+    +option_field('allow_offers')
+    +option_field('allow_wishes')
 
   .form-group.row
     .col-9.ml-auto

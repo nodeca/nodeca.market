@@ -51,9 +51,14 @@ article#content.market-new
         .row
           .form-group.col
             label.market-new__label(for='market-new-section')= self.t('field_section')
-            select.form-control.custom-select#market-new-section(data-bind="value: offer.section", required)
+
+            select.form-control.custom-select#market-new-section(data-bind="value: offer.section, valueAllowUnset: true, visible: offer.type() === 'buy', attr: { required: offer.type() === 'buy' }")
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
-              +sections_tree(self.sections, 1)
+              +sections_tree(self.sections_buy, 1)
+
+            select.form-control.custom-select#market-new-section(data-bind="value: offer.section, valueAllowUnset: true, visible: offer.type() === 'sell', attr: { required: offer.type() === 'sell' }")
+              option(value="", disabled, selected, hidden)= self.t('section_placeholder')
+              +sections_tree(self.sections_sell, 1)
 
         -
           var min_images = null, max_images = null;

@@ -29,7 +29,7 @@ if items.length > 0 && items[items.length - 1] === 'header'
 .page-actions.market-search-wish__toolbar-controls
   if self.settings.market_can_create_items
     a.btn.btn-secondary.btn-square.icon.icon-plus(
-      href=self.link_to('market.new', { $query: { wish: '', section: (self.section || {})._id } })
+      href=self.link_to('market.new', { $query: { section: self.search.search_all ? null : self.search.section }})
       class=show_menu ? 'd-none d-sm-inline-block' : ''
       title=self.t('item_add')
     )

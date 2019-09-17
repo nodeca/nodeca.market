@@ -13,8 +13,17 @@ module.exports = function (N, apiPath) {
     env.data.sections = await N.models.market.Section
                                   .find()
                                   .sort('display_order')
-                                  .select('_id hid title parent is_category')
+                                  // select is used in place of sanitizer here
+                                  .select('_id hid title parent is_category allow_offers allow_wishes')
                                   .lean(true);
+
+    if (env.data.section_item_type === 'offers') {
+      env.data.sections = env.data.sections.filter(s => s.allow_offers);
+    } else if (env.data.section_item_type === 'wishes') {
+      env.data.sections = env.data.sections.filter(s => s.allow_wishes);
+    } else {
+      env.data.sections = [];
+    }
   });
 
 

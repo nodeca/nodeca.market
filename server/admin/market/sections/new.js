@@ -14,7 +14,7 @@ module.exports = function (N, apiPath) {
   // fetch sections tree
   //
   N.wire.before(apiPath, async function section_new(env) {
-    let allSections = await N.models.market.Section.getChildren();
+    let allSections = await N.models.market.Section.getChildren({ offers: true, wishes: true });
 
     // exclude links
     env.data.allowed_parents = allSections.filter(s => !s.is_linked);

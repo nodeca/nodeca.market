@@ -42,8 +42,13 @@ module.exports = function (N, apiPath) {
 
     if (!params.section) return;
 
-    env.data.section = await N.models.market.Section.findById(params.section)
-                                 .lean(true);
+    let section = await N.models.market.Section.findById(params.section).lean(true);
+
+    if (section) {
+      let type_allowed = await N.models.market.Section.checkIfAllowed(section._id, 'offers');
+
+      if (type_allowed) env.data.section = section;
+    }
   });
 
 

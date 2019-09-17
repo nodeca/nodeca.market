@@ -12,6 +12,7 @@ module.exports = function (N, apiPath) {
   // Fill sections via subcall
   //
   N.wire.on(apiPath, function subsections_fill_subcall(env) {
+    env.data.section_item_type = 'wishes';
     return N.wire.emit('internal:market.subsections_fill', env);
   });
 

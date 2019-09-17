@@ -71,9 +71,15 @@ module.exports = function (N, apiPath) {
   // Fetch section
   //
   N.wire.before(apiPath, async function fetch_section(env) {
-    let section = await N.models.market.Section.findOne({ hid: env.params.section_hid }).lean(true);
+    let section = await N.models.market.Section.findOne()
+                            .where('hid').equals(env.params.section_hid)
+                            .lean(true);
 
     if (!section) throw N.io.NOT_FOUND;
+
+    let type_allowed = await N.models.market.Section.checkIfAllowed(section._id, 'wishes');
+
+    if (!type_allowed) throw N.io.NOT_FOUND;
 
     env.data.section = section;
 
@@ -86,7 +92,10 @@ module.exports = function (N, apiPath) {
   // Get all subsections to search items in
   //
   N.wire.before(apiPath, async function fetch_subsections(env) {
-    let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
+    let children = await N.models.market.Section.getChildren({
+      section: env.data.section._id,
+      wishes: true
+    });
 
     children = children.filter(s => !s.is_linked);
 
@@ -111,6 +120,7 @@ module.exports = function (N, apiPath) {
   // Fill sections via subcall
   //
   N.wire.after(apiPath, function subsections_fill_subcall(env) {
+    env.data.section_item_type = 'wishes';
     return N.wire.emit('internal:market.subsections_fill', env);
   });
 

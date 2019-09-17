@@ -34,6 +34,9 @@ module.exports = function (N, apiPath) {
     env.data.section_to = await N.models.market.Section.findOne({ hid: env.params.section_hid_to }).lean(true);
     if (!env.data.section_to) throw N.io.NOT_FOUND;
 
+    let type_allowed = await N.models.market.Section.checkIfAllowed(env.data.section_to._id, 'wishes');
+    if (!type_allowed) throw N.io.NOT_FOUND;
+
     // Cannot move to a category. Should never happen - restricted on client
     if (env.data.section_to.is_category) throw N.io.BAD_REQUEST;
   });

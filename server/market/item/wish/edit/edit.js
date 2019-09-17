@@ -73,6 +73,7 @@ module.exports = function (N, apiPath) {
   // Fill sections tree by subcall
   //
   N.wire.on(apiPath, async function fill_sections_tree(env) {
+    env.data.section_item_type = 'wishes';
     await N.wire.emit('internal:market.sections_tree', env);
   });
 

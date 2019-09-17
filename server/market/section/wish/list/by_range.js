@@ -35,7 +35,10 @@ module.exports = function (N, apiPath) {
   // Get all subsections to search items in
   //
   N.wire.before(apiPath, async function fetch_subsections(env) {
-    let children = await N.models.market.Section.getChildren(env.data.section._id, Infinity);
+    let children = await N.models.market.Section.getChildren({
+      section: env.data.section._id,
+      wishes: true
+    });
 
     children = children.filter(s => !s.is_linked);
 

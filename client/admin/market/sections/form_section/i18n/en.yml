@@ -13,3 +13,5 @@ en-US:
   field_title: Title
   field_parent: Parent section
   field_is_category: Category
+  field_allow_offers: Allow offers
+  field_allow_wishes: Allow wishes

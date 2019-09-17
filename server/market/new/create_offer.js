@@ -69,8 +69,10 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function fetch_section_info(env) {
     let section = await N.models.market.Section.findById(env.params.section).lean(true);
-
     if (!section) throw N.io.NOT_FOUND;
+
+    let type_allowed = await N.models.market.Section.checkIfAllowed(section._id, 'offers');
+    if (!type_allowed) throw N.io.NOT_FOUND;
 
     env.data.section = section;
 

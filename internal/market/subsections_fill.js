@@ -84,10 +84,12 @@ module.exports = function (N, apiPath) {
   // Get subsections tree in flat style (id, level)
   //
   N.wire.before(apiPath, async function fetch_subsections_tree_info(env) {
-    let subsections = await N.models.market.Section.getChildren(
-      env.data.section ? env.data.section._id : null,
-      env.data.section ? 1 : 2
-    );
+    let subsections = await N.models.market.Section.getChildren({
+      section:     env.data.section ? env.data.section._id : null,
+      deepness:    env.data.section ? 1 : 2,
+      offers:      env.data.section_item_type === 'offers',
+      wishes:      env.data.section_item_type === 'wishes'
+    });
 
     env.data.subsections_info = subsections;
   });

@@ -42,6 +42,10 @@ module.exports = function (N, collectionName) {
     // Options
     is_category:      { type: Boolean, 'default': false },
 
+    // Options used to restrict item types within a section
+    allow_offers:     { type: Boolean, 'default': true },
+    allow_wishes:     { type: Boolean, 'default': true },
+
     // Cache
     cache,
     cache_hb:         cache
@@ -103,7 +107,7 @@ module.exports = function (N, collectionName) {
     N.models.market.Section
         .find()
         .sort('display_order')
-        .select('_id parent links')
+        .select('_id parent links allow_offers allow_wishes')
         .lean(true)
         .exec()
         .then(sections => {
@@ -115,7 +119,7 @@ module.exports = function (N, collectionName) {
           }, {});
 
           // root is a special fake `section` that contains array of the root-level sections
-          let root = { children: [], linked: [] };
+          let root = { children: [], linked: [], allow_offers: true, allow_wishes: true };
 
           Object.values(result).forEach(s => {
             s.parent = s.parent ? result[s.parent] : root;
@@ -151,23 +155,42 @@ module.exports = function (N, collectionName) {
   };
 
 
+  // Check that allow_offers/wishes is set to true for any section
+  // and its parents
+  //
+  //  - sectionID - section id
+  //  - type - 'offers' or 'wishes'
+  //
+  Section.statics.checkIfAllowed = function (sectionID, type) {
+    return getSectionsTree().then(sections => {
+      let current = sections[sectionID];
+
+      while (current && current._id) {
+        if (type === 'offers' && !current.allow_offers) return false;
+        if (type === 'wishes' && !current.allow_wishes) return false;
+
+        current = current.parent;
+      }
+
+      return true;
+    });
+  };
+
+
   // Returns list of child sections, including subsections until the given deepness.
   // Also, sets `level` property for found sections
   //
-  // - getChildren(section, deepness)
-  // - getChildren(deepness) - for root (on index page)
-  // - getChildren() - for all
+  // - getChildren(options)
+  //    - section  - root section id (default: 'root')
+  //    - deepness - max deepness (default: Infinity)
+  //    - offers   - include sections where offers are allowed
+  //    - wishes   - include sections where wishes are allowed
   //
   // result:
   //
   // - [ {_id, parent, children, level} ]
   //
-  Section.statics.getChildren = function (sectionID, deepness) {
-
-    if (arguments.length === 1) {
-      deepness = sectionID;
-      sectionID = null;
-    }
+  Section.statics.getChildren = function (options = {}) {
 
     let children = [];
 
@@ -178,22 +201,26 @@ module.exports = function (N, collectionName) {
       }
 
       section.children.forEach(childSection => {
-        children.push(Object.assign({ level: curDeepness }, childSection));
-        fillChildren(childSection, curDeepness + 1, maxDeepness);
+        if ((options.offers && childSection.allow_offers) || (options.wishes && childSection.allow_wishes)) {
+          children.push(Object.assign({ level: curDeepness }, childSection));
+          fillChildren(childSection, curDeepness + 1, maxDeepness);
+        }
       });
 
       // add linked sections, but don't resolve their children to prevent loops
       section.linked.forEach(linkedSection => {
-        children.push(Object.assign({ level: curDeepness }, linkedSection, { is_linked: true }));
+        if ((options.offers && linkedSection.allow_offers) || (options.wishes && linkedSection.allow_wishes)) {
+          children.push(Object.assign({ level: curDeepness }, linkedSection, { is_linked: true }));
+        }
       });
     }
 
     return getSectionsTree().then(sections => {
-      let storedSection = sections[sectionID || 'root'];
+      let storedSection = sections[options.section || 'root'];
 
-      if (!storedSection) throw new Error('no such section: ' + (sectionID || 'root'));
+      if (!storedSection) throw new Error('no such section: ' + (options.section || 'root'));
 
-      fillChildren(storedSection, 0, deepness);
+      fillChildren(storedSection, 0, options.deepness || Infinity);
       return children;
     });
   };

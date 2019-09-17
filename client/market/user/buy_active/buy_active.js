@@ -361,7 +361,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
     };
 
     return Promise.resolve()
-      .then(() => N.wire.emit('market.blocks.item_delete_many_dlg', params))
+      .then(() => N.wire.emit('market.section.buy.item_delete_many_dlg', params))
       .then(() => {
         let request = {
           item_ids: pageState.selected_items,
@@ -445,7 +445,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
     let params = {};
 
     return Promise.resolve()
-      .then(() => N.wire.emit('market.blocks.item_move_many_dlg', params))
+      .then(() => N.wire.emit('market.section.buy.item_move_many_dlg', params))
       .then(() => {
         let request = {
           section_hid_to: params.section_hid_to,

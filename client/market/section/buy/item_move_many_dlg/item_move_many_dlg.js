@@ -1,4 +1,4 @@
-// Popup dialog to move items
+// Popup dialog to move multiple items
 //
 // options:
 //
@@ -20,13 +20,14 @@ N.wire.once(module.apiPath, function init_handlers() {
 
   // Submit button handler
   //
-  N.wire.on(module.apiPath + ':submit', function submit_item_move_dlg(form) {
+  N.wire.on(module.apiPath + ':submit', function submit_item_move_many_dlg(form) {
     form.$this.addClass('was-validated');
 
     form.$this.find('[name="section_hid"]')[0].setCustomValidity(form.fields.section_hid ? '' : 'invalid section');
 
     if (form.$this[0].checkValidity() === false) return;
 
+    $dialog.modal('hide');
     params.section_hid_to = +form.fields.section_hid;
     result = params;
     $dialog.modal('hide');
@@ -45,10 +46,10 @@ N.wire.once(module.apiPath, function init_handlers() {
 
 // Init dialog
 //
-N.wire.on(module.apiPath, function show_item_move_dlg(options) {
+N.wire.on(module.apiPath, function show_item_move_many_dlg(options) {
   params = options;
 
-  return N.io.rpc('market.item.wish.move.sections').then(res => {
+  return N.io.rpc('market.item.buy.move.sections').then(res => {
     $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, params, res)));
 
     $('body').append($dialog);

@@ -1,7 +1,7 @@
 .modal.fade(tabindex='-1' role='dialog' aria-hidden='true')
   .modal-dialog(role='document')
     .modal-content
-      form(data-on-submit='market.blocks.item_delete_many_dlg:submit')
+      form(data-on-submit=self.apiPath + ':submit')
         .modal-header
           h4.modal-title=self.t('title')
           button.close(type='button' tabindex='-1' data-dismiss='modal') &times;
