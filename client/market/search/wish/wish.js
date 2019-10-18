@@ -96,7 +96,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
       // render & inject item list
       let $html = $(N.runtime.render('market.search.wish.results', res));
 
-      return N.wire.emit('navigate.update', {
+      return N.wire.emit('navigate.content_update', {
         $: $html,
         locals: res,
         $replace: $('.market-search-wish__results')
@@ -205,7 +205,7 @@ function update_selection_state(container) {
   });
 }
 
-N.wire.on('navigate.update', function update_selected_items(data) {
+N.wire.on('navigate.content_update', function update_selected_items(data) {
   if (!pageState.active) return; // not on this page
   update_selection_state(data.$);
 });

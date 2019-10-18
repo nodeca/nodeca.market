@@ -291,7 +291,7 @@ function update_selection_state(container) {
   });
 }
 
-N.wire.on('navigate.update', function update_selected_items(data) {
+N.wire.on('navigate.content_update', function update_selected_items(data) {
   if (!pageState.active) return; // not on this page
   update_selection_state(data.$);
 });
