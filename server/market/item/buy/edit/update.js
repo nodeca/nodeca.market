@@ -114,6 +114,8 @@ module.exports = function (N, apiPath) {
     let type_allowed = await N.models.market.Section.checkIfAllowed(section._id, 'offers');
     if (!type_allowed) throw N.io.NOT_FOUND;
 
+    env.data.section = section;
+
     // Should never happen, restricted on client
     if (section.is_category) throw N.io.BAD_REQUEST;
   });
