@@ -11,7 +11,7 @@ module.exports = function (N, apiPath) {
     $query:      {
       type: 'object',
       properties: {
-        wish:    { 'const': '' },
+        wish:    { const: '' },
         section: { format: 'mongo' }
       },
       additionalProperties: false

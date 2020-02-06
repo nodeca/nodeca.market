@@ -14,7 +14,7 @@ module.exports = function (N, collectionName) {
 
   let ItemOfferSimilarCache = new Schema({
     item:     Schema.ObjectId,
-    ts:       { type: Date, 'default': Date.now },
+    ts:       { type: Date, default: Date.now },
     results:  [ { item_id: Schema.ObjectId, weight: Number } ]
   }, {
     versionKey : false

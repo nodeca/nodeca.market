@@ -295,7 +295,7 @@ module.exports = function (N, apiPath) {
       nodes[foundSection._id] = foundSection;
     });
 
-    let expand_sections = { 'null': true };
+    let expand_sections = { null: true };
 
     if (env.data.section && !env.data.search.search_all) {
       expand_sections[env.data.section._id] = true;

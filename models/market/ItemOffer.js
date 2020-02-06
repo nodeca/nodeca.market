@@ -34,7 +34,7 @@ module.exports = function (N, collectionName) {
     section:      Schema.ObjectId,
     hid:          Number,
     user:         Schema.ObjectId,
-    ts:           { type: Date, 'default': Date.now }, // timestamp
+    ts:           { type: Date, default: Date.now }, // timestamp
     ip:           String, // ip address
     title:        String,
 
@@ -67,9 +67,9 @@ module.exports = function (N, collectionName) {
     // Time when this post was last edited (null if no edits)
     last_edit_ts: Date,
 
-    bookmarks:    { type: Number, 'default': 0 },
+    bookmarks:    { type: Number, default: 0 },
 
-    views:        { type: Number, 'default': 0 },
+    views:        { type: Number, default: 0 },
 
     del_reason:   String,
     del_by:       Schema.ObjectId,

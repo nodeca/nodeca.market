@@ -22,8 +22,8 @@ module.exports = function (N, collectionName) {
   set_content_type('MARKET_SECTION', 12);
 
   let cache = {
-    offer_count: { type: Number, 'default': 0 },
-    wish_count:  { type: Number, 'default': 0 }
+    offer_count: { type: Number, default: 0 },
+    wish_count:  { type: Number, default: 0 }
   };
 
   let Section = new Schema({
@@ -40,11 +40,11 @@ module.exports = function (N, collectionName) {
     links:            [ Schema.ObjectId ],
 
     // Options
-    is_category:      { type: Boolean, 'default': false },
+    is_category:      { type: Boolean, default: false },
 
     // Options used to restrict item types within a section
-    allow_offers:     { type: Boolean, 'default': true },
-    allow_wishes:     { type: Boolean, 'default': true },
+    allow_offers:     { type: Boolean, default: true },
+    allow_wishes:     { type: Boolean, default: true },
 
     // Cache
     cache,

@@ -7,7 +7,7 @@
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    type:           { type: 'string', 'enum': [ 'sell', 'buy' ] },
+    type:           { type: 'string', enum: [ 'sell', 'buy' ] },
     title:          { type: 'string' },
     price_value:    { type: 'number', minimum: 0 },
     price_currency: { type: 'string' },

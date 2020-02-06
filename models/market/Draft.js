@@ -9,7 +9,7 @@ module.exports = function (N, collectionName) {
 
   let Draft = new Schema({
     user:           Schema.ObjectId,
-    ts:             { type: Date, 'default': Date.now },
+    ts:             { type: Date, default: Date.now },
     data:           new Schema({
       type:           String,
       title:          String,

@@ -93,7 +93,7 @@ module.exports = function (N, apiPath) {
 
     let infraction = new N.models.users.Infraction({
       from: env.user_info.user_id,
-      'for': env.data.item.user,
+      for: env.data.item.user,
       type: env.params.type,
       reason,
       points: env.params.points,

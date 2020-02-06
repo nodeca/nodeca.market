@@ -44,7 +44,7 @@ module.exports = function (N, apiPath) {
       items: { format: 'mongo', required: true }
     },
     reason:  { type: 'string' },
-    method:  { type: 'string', 'enum': [ 'hard', 'soft' ], required: true }
+    method:  { type: 'string', enum: [ 'hard', 'soft' ], required: true }
   });
 
 

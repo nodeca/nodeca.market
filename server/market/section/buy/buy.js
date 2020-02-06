@@ -17,8 +17,8 @@ module.exports = function (N, apiPath) {
       type: 'object',
       properties: {
         from: { type: 'string' },
-        prev: { 'const': '' },
-        next: { 'const': '' }
+        prev: { const: '' },
+        next: { const: '' }
       },
       additionalProperties: false
     }
