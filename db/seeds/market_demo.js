@@ -8,7 +8,7 @@ const charlatan   = require('charlatan');
 const glob        = require('glob').sync;
 const ObjectId    = require('mongoose').Types.ObjectId;
 const path        = require('path');
-const pump        = require('pump');
+const pipeline    = require('util').promisify(require('stream').pipeline);
 const resize      = require('nodeca.users/models/users/_lib/resize');
 const resizeParse = require('nodeca.users/server/_lib/resize_parse');
 
@@ -92,7 +92,7 @@ async function createRandomPhoto() {
       params.filename = new_id + '_' + size;
     }
 
-    await pump(
+    await pipeline(
       models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
       models.core.File.createWriteStream(params)
     );

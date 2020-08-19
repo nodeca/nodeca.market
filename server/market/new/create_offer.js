@@ -7,7 +7,7 @@
 const _           = require('lodash');
 const charcount   = require('charcount');
 const mongoose    = require('mongoose');
-const pump        = require('util').promisify(require('pump'));
+const pipeline    = require('util').promisify(require('stream').pipeline);
 const resizeParse = require('nodeca.users/server/_lib/resize_parse');
 
 
@@ -202,7 +202,7 @@ module.exports = function (N, apiPath) {
           params.filename = new_id + '_' + size;
         }
 
-        await pump(
+        await pipeline(
           N.models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
           N.models.core.File.createWriteStream(params)
         );
