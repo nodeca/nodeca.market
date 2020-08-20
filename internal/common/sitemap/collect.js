@@ -55,7 +55,7 @@ module.exports = function (N, apiPath) {
 
     stream.pipeline(
       N.models.market.ItemOffer.find()
-          .where('st').in(N.models.market.ItemOffer.statuses.OPEN)
+          .where('st').equals(N.models.market.ItemOffer.statuses.OPEN)
           .select('section hid')
           .sort('hid')
           .lean(true)
@@ -81,7 +81,7 @@ module.exports = function (N, apiPath) {
 
     stream.pipeline(
       N.models.market.ItemWish.find()
-          .where('st').in(N.models.market.ItemWish.statuses.OPEN)
+          .where('st').equals(N.models.market.ItemWish.statuses.OPEN)
           .select('section hid')
           .sort('hid')
           .lean(true)
