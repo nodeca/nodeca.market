@@ -5,17 +5,5 @@
   "keywords": [ "nodeca" ],
   "homepage": "https://github.com/nodeca/nodeca.market",
   "license": "MIT",
-  "repository": "nodeca/nodeca.market",
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "presets": [
-            "@babel/preset-env"
-          ]
-        }
-      ]
-    ]
-  }
+  "repository": "nodeca/nodeca.market"
 }
