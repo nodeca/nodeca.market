@@ -7,6 +7,6 @@ en-US:
   move: Move
   history: History
   delete: Delete
-  undelete: Undelete
+  undelete: Restore
   ip_info: IP info
   add_infraction: Add infraction

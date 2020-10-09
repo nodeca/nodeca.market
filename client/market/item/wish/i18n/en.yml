@@ -6,7 +6,7 @@ en-US:
   contact: Contact buyer
   similar_items: 'Similar items:'
 
-  undelete_item_done: Item undeleted
+  undelete_item_done: Item restored
   move_item_done: Item moved
   open_item_done: Item opened
   close_item_done: Item closed
