@@ -3,4 +3,4 @@ i18n:
     users:
       activity:
         menu:
-          market: 'Market'
+          market: Market

@@ -1,0 +1,4 @@
+ru-RU:
+  results:
+    err_query_too_short: Запрос слишком короткий
+    err_invalid_price_range: Некорректный ценовой диапазон

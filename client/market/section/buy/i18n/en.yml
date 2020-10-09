@@ -6,6 +6,6 @@ en-US:
 
   msg_multiselect: Multiselect on
   many_items_deleted: Selected items have been deleted
-  many_close_confirm: Are you sure you want to close selected items?
+  many_close_confirm: Are you sure you wish to close selected items?
   many_items_closed: Selected items have been closed
   many_items_moved: Selected items have been moved

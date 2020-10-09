@@ -1,0 +1,25 @@
+ru-RU:
+  closed: Объявление закрыто
+  location: 'Местоположение:'
+  responded: 'Откликнулись:'
+  no_responses: Вам пока никто не написал.
+  contact: Написать покупателю
+  similar_items: 'Похожие объявления:'
+
+  undelete_item_done: Объявление восстановлено
+  move_item_done: Объявление перемещено
+  open_item_done: Объявление открыто
+  close_item_done: Объявление закрыто
+
+  del_reason: "(#{text})"
+  del_by: "Удалил:"
+
+  edit: Редактировать объявление
+  views: Просмотры
+  report: Сообщить модератору
+  abuse_reported: Жалоба отправлена
+  bookmark_add: Добавить в закладки
+  bookmark_remove: Удалить из закладок
+  infraction_added: Нарушение выдано
+  infraction_title: "#{points} ((балл|балла|баллов)):points, добавлено #{date}"
+  last_edited: "Последний раз отредактировано #{date}"

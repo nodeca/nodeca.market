@@ -1,0 +1,9 @@
+ru-RU:
+  search: Найти
+  options: Расширенный поиск
+  search_all: Искать во всех категориях
+  query_placeholder: Что бы вы хотели найти?
+  location: Местоположение
+  location_100km: Около меня +100 км
+  location_200km: Около меня +200 км
+  location_any: Везде

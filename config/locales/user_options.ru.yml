@@ -1,0 +1,9 @@
+i18n:
+  ru-RU:
+    users:
+
+      setting_cat:
+        market: Барахолка
+
+      setting_names:
+        market_displayed_currency: Отображать цены в

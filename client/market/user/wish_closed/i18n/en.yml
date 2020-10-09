@@ -9,10 +9,10 @@ en-US:
 
   msg_multiselect: Multiselect on
   many_items_deleted: Selected items have been deleted
-  many_undelete_confirm: Are you sure you want to restore selected items?
+  many_undelete_confirm: Are you sure you wish to restore selected items?
   many_items_undeleted: Selected items have been restored
-  many_close_confirm: Are you sure you want to close selected items?
-  many_open_confirm: Are you sure you want to open selected items?
+  many_close_confirm: Are you sure you wish to close selected items?
+  many_open_confirm: Are you sure you wish to open selected items?
   many_items_closed: Selected items have been closed
   many_items_opened: Selected items have been opened
   many_items_moved: Selected items have been moved

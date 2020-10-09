@@ -1,0 +1,20 @@
+ru-RU:
+  title: История
+  role_task: Это действие было выполнено автоматически
+  role_moderator: Это действие было выполнено модератором
+  price: 'Цена:'
+  location: 'Местоположение:'
+  delivery: 'Пересылка:'
+  delivery_available: да
+  delivery_not_available: нет
+  barter_info: 'В обмен на:'
+  condition: 'Состояние:'
+  condition_new: 'новый'
+  condition_used: 'б/у'
+  action_move: 'Объявление перемещено из <a href="#{old_link}" target="_blank">#{old_title}</a> в <a href="#{new_link}" target="_blank">#{new_title}</a>'
+  action_open: Объявление открыто
+  action_close: Объявление закрыто
+  action_delete: Объявление удалено
+  action_hard_delete: Объявление жёстко удалено
+  action_undelete: Объявление восстановлено
+  del_reason: "(#{text})"

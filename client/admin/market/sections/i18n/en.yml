@@ -2,6 +2,6 @@ en-US:
   index:
     new_section: Create new section
     new_link: Create new link
-    message_confirm_section_delete: 'Are you sure you want to delete "#{title}" section?'
-    message_confirm_link_delete: 'Are you sure you want to delete "#{title}" link?'
+    message_confirm_section_delete: 'Are you sure you wish to delete "#{title}" section?'
+    message_confirm_link_delete: 'Are you sure you wish to delete "#{title}" link?'
     error_link_must_have_parent: 'Link cannot be moved to the top of the tree'

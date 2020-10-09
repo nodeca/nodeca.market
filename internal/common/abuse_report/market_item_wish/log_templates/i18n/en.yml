@@ -1,7 +1,7 @@
 en-US:
   subject:
-    subject: "Report from #{user} (market wish)"
+    subject: "Report from #{user} (market)"
   body:
     header: "Report from user #{url}:"
     to: "About [market wish](#{url}):"
-    message_sent_to: "This message sent to: "
+    message_sent_to: "This report was also sent to: "

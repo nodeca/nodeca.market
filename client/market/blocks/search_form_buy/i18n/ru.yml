@@ -1,0 +1,15 @@
+ru-RU:
+  search: Найти
+  options: Расширенный поиск
+  search_all: Искать во всех категориях
+  query_placeholder: Что бы вы хотели найти?
+  only_new: Только новое
+  barter: Обмен
+  delivery: С пересылкой
+  price: Цена
+  price_min_placeholder: 0
+  price_max_placeholder: 999 999
+  location: Местоположение
+  location_100km: Около меня +100 км
+  location_200km: Около меня +200 км
+  location_any: Везде

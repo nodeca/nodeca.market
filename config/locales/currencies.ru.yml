@@ -1,0 +1,15 @@
+i18n:
+  ru-RU:
+    market:
+      currencies:
+        RUB:
+          name: Российский рубль
+          sign: ₽
+
+        USD:
+          name: Доллар США
+          sign: $
+
+        EUR:
+          name: Евро
+          sign: €

@@ -1,0 +1,20 @@
+ru-RU:
+  title: Редактировать объявление
+  section_placeholder: ''
+  field_title: Название
+  field_price: Цена
+  field_section: Категория
+  field_description: Описание
+  field_photos: Фотографии
+  field_photos_limit_range: ' (#{min}-#{max})'
+  field_photos_limit_low: ' (>= #{min})'
+  field_barter: Обмен
+  field_barter_help: Оставьте поле пустым, если обмен не интересует. Или укажите, на что хотели бы обменять товар.
+  field_delivery: Пересылка возможна
+  field_is_new: Новый товар (не использовался)
+  mode_preview: Предпросмотр
+  mode_edit: Редактирование
+  attach_main: Основное фото
+  attach_set_main: Сделать основным
+  attach_delete: Удалить
+  submit: Опубликовать
