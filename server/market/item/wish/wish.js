@@ -267,10 +267,10 @@ module.exports = function (N, apiPath) {
       // dialog is not used, we just check that it exists
       if (!dialogs_by_id[msg.parent]) continue;
 
-      env.data.users.push(msg.user);
+      env.data.users.push(dialogs_by_id[msg.parent].with);
 
       env.res.responses.push({
-        user:    msg.user,
+        user:    dialogs_by_id[msg.parent].with,
         dialog:  msg.parent,
         message: msg._id
       });
