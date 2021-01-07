@@ -46,7 +46,19 @@ each item, idx in self.items
                 = self.location_names[item.location[0] + ':' + item.location[1]]
 
         .market-list-item-wish__details
-          .market-list-item-wish__details-item!= self.timetag(item.ts, 'relative')
+          .market-list-item-wish__details-item
+            - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
+            if self.market_list_show_close_date && isClosed && item.closed_at_ts
+              != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
+            else if self.market_list_show_close_date && !isClosed && item.autoclose_at_ts
+              -
+                // make sure timestamp is set in the future (or at least now)
+                var date = Math.max(new Date(item.autoclose_at_ts), Date.now());
+                // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
+                date = new Date(date - date % (60 * 60 * 1000));
+              != self.t('autoclose_at', { date: self.timetag(date, 'relative') })
+            else
+              != self.timetag(item.ts, 'relative')
 
           if !self.market_list_hide_user
             .market-list-item-wish__details-item

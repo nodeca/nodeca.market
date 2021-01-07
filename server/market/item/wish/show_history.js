@@ -81,6 +81,7 @@ module.exports = function (N, apiPath) {
       'ste',
       'del_reason',
       'del_by',
+      'autoclose_at_ts',
       'prev_st',
       'location'
     ]);

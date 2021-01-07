@@ -76,14 +76,10 @@ module.exports = function (N, apiPath) {
                     .sort('-_id')
                     .select('_id');
 
-    let market_items_expire = await N.settings.get('market_items_expire');
-
     // limit results to last 2 months
-    if (market_items_expire <= 0) {
-      let cutoff = Date.now() - 2 * market_items_expire * 24 * 60 * 60 * 1000;
+    let cutoff = Date.now() - 2 * 30 * 24 * 60 * 60 * 1000;
 
-      query = query.where('_id').lt(new ObjectId(cutoff / 1000)).lean(true);
-    }
+    query = query.where('_id').gt(new ObjectId(cutoff / 1000));
 
     // limit results to one page
     query = query.limit(env.data.items_per_page);

@@ -100,9 +100,10 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Create offer
+  // Create wish
   //
-  N.wire.on(apiPath, async function create_offer(env) {
+  N.wire.on(apiPath, async function create_wish(env) {
+    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
     let statuses = N.models.market.ItemWish.statuses;
     let item = new N.models.market.ItemWish();
 
@@ -113,6 +114,10 @@ module.exports = function (N, apiPath) {
     item.md = env.params.description;
     item.ip = env.req.ip;
     item.params = env.data.parse_options;
+
+    if (market_items_expire > 0) {
+      item.autoclose_at_ts = new Date(Date.now() + (market_items_expire * 24 * 60 * 60 * 1000));
+    }
 
     if (env.user_info.hb) {
       item.st  = statuses.HB;

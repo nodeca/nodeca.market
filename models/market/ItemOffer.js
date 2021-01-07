@@ -67,6 +67,14 @@ module.exports = function (N, collectionName) {
     // Time when this post was last edited (null if no edits)
     last_edit_ts: Date,
 
+    // Time when this post is scheduled to be archived, used in automatic archiving tasks.
+    // It should only be present in Item (not ItemArchived) collections.
+    autoclose_at_ts: Date,
+
+    // Time when this post was archived (automatically or manually).
+    // It should only be present in ItemArchived (not Item) collections.
+    closed_at_ts: Date,
+
     bookmarks:    { type: Number, default: 0 },
 
     views:        { type: Number, default: 0 },
@@ -110,6 +118,9 @@ module.exports = function (N, collectionName) {
 
   // get a list of items in a section
   ItemOffer.index({ section: 1, st: 1, _id: -1 });
+
+  // get a list of items to move to archive
+  ItemOffer.index({ autoclose_at_ts: 1 });
 
 
   // Set 'hid' for the new item.

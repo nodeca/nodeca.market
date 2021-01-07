@@ -59,7 +59,7 @@ article#content.market-user.market-user__m-wish-closed(
           span.icon.icon-loading-placeholder
 
         ul.market-user__item-list
-          != self.partial('@market.blocks.item_wish_list', { market_list_show_ignores: true, market_list_hide_user: true })
+          != self.partial('@market.blocks.item_wish_list', { market_list_show_ignores: true, market_list_hide_user: true, market_list_show_close_date: true })
 
         .market-user__loading-next.nojs-hide(
           class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')

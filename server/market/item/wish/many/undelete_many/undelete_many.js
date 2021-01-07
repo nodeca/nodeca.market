@@ -96,7 +96,6 @@ module.exports = function (N, apiPath) {
 
     let statuses = N.models.market.ItemWish.statuses;
     let settings = await env.extras.settings.fetch([
-      'market_items_expire',
       'market_mod_can_delete_items',
       'market_mod_can_see_hard_deleted_items'
     ]);
@@ -118,14 +117,14 @@ module.exports = function (N, apiPath) {
 
       let prev_st = Object.assign({}, item.prev_st);
 
-      if (settings.market_items_expire > 0 &&
-          item.ts < Date.now() - settings.market_items_expire * 24 * 60 * 60 * 1000) {
+      if (item.autoclose_at_ts && item.autoclose_at_ts < Date.now()) {
         // undeleting previously open, but old item: should close automatically
         if (prev_st.st === statuses.HB && prev_st.ste === statuses.OPEN) {
           prev_st.ste = statuses.CLOSED;
         } else if (prev_st.st === statuses.OPEN) {
           prev_st.st = statuses.CLOSED;
         }
+        update.$set.closed_at_ts = new Date();
       }
 
       Object.assign(update.$set, prev_st);

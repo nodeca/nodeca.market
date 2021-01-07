@@ -182,6 +182,7 @@ module.exports = function (N, apiPath) {
   // Create offer
   //
   N.wire.on(apiPath, async function create_offer(env) {
+    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
     let files = [];
 
     for (let file of env.data.files) {
@@ -228,6 +229,10 @@ module.exports = function (N, apiPath) {
     item.delivery = env.params.delivery;
     item.is_new = env.params.is_new;
     item.files = item.all_files = files;
+
+    if (market_items_expire > 0) {
+      item.autoclose_at_ts = new Date(Date.now() + (market_items_expire * 24 * 60 * 60 * 1000));
+    }
 
     if (env.user_info.hb) {
       item.st  = statuses.HB;

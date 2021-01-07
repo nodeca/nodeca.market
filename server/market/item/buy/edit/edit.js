@@ -67,6 +67,13 @@ module.exports = function (N, apiPath) {
     if (env.user_info.user_id !== String(env.data.item.user)) {
       throw N.io.FORBIDDEN;
     }
+
+    let statuses = N.models.market.ItemOffer.statuses;
+
+    // Only allow owner to edit open items
+    if (env.data.item.st !== statuses.OPEN && env.data.item.st !== statuses.OPEN) {
+      throw N.io.FORBIDDEN;
+    }
   });
 
 

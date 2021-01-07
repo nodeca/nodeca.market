@@ -102,19 +102,21 @@ module.exports = function (N, apiPath) {
         continue;
       }
 
-      // cannot open old items (pointless, they'd be auto-closed again)
-      if (settings.market_items_expire > 0 &&
-          item.ts < Date.now() - settings.market_items_expire * 24 * 60 * 60 * 1000) {
-        continue;
-      }
-
-      let update;
+      let update = { $set: {}, $unset: {} };
 
       if (item.st === statuses.HB) {
-        update = { ste: statuses.OPEN };
+        update.$set.ste = statuses.OPEN;
       } else {
-        update = { st: statuses.OPEN };
+        update.$set.st = statuses.OPEN;
       }
+
+      if (settings.market_items_expire > 0) {
+        update.$set.autoclose_at_ts = new Date(Date.now() + settings.market_items_expire * 24 * 60 * 60 * 1000);
+      } else {
+        update.$unset.autoclose_at_ts = true;
+      }
+
+      update.$unset.closed_at_ts = true;
 
       let new_item = mongo_apply(item, update);
 

@@ -92,6 +92,7 @@ module.exports = function (N, apiPath) {
     let statuses = N.models.market.ItemOffer.statuses;
     let bulk_active = N.models.market.ItemOffer.collection.initializeUnorderedBulkOp();
     let bulk_archived = N.models.market.ItemOfferArchived.collection.initializeUnorderedBulkOp();
+    let now = new Date();
 
     for (let item of env.data.items) {
       if (item.st === statuses.DELETED || item.st === statuses.DELETED_HARD) {
@@ -101,9 +102,9 @@ module.exports = function (N, apiPath) {
       let update;
 
       if (item.st === statuses.HB) {
-        update = { ste: statuses.CLOSED };
+        update = { ste: statuses.CLOSED, closed_at_ts: now };
       } else {
-        update = { st: statuses.CLOSED };
+        update = { st: statuses.CLOSED, closed_at_ts: now };
       }
 
       let new_item = mongo_apply(item, update);

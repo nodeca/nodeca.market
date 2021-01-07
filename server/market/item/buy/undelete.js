@@ -94,25 +94,26 @@ module.exports = function (N, apiPath) {
   //
   N.wire.on(apiPath, async function undelete_item(env) {
     let statuses = N.models.market.ItemOffer.statuses;
-    let market_items_expire = await N.settings.get('market_items_expire');
     let item = env.data.item;
 
     let update = {
+      $set: {},
       $unset: { del_reason: 1, prev_st: 1, del_by: 1 }
     };
 
     let prev_st = Object.assign({}, item.prev_st);
 
-    if (market_items_expire > 0 && item.ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
+    if (item.autoclose_at_ts && item.autoclose_at_ts < Date.now()) {
       // undeleting previously open, but old item: should close automatically
       if (prev_st.st === statuses.HB && prev_st.ste === statuses.OPEN) {
         prev_st.ste = statuses.CLOSED;
       } else if (prev_st.st === statuses.OPEN) {
         prev_st.st = statuses.CLOSED;
       }
+      update.$set.closed_at_ts = new Date();
     }
 
-    Object.assign(update, prev_st);
+    Object.assign(update.$set, prev_st);
 
     let new_item = mongo_apply(env.data.item, update);
 

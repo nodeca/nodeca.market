@@ -39,6 +39,7 @@ module.exports = function (N, collectionName) {
     ste:          Number, // real state, if user is hellbanned
     del_reason:   String,
     del_by:       Schema.ObjectId,
+    autoclose_at_ts: Date,
     prev_st: {
       st: Number,
       ste: Number

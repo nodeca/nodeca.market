@@ -37,6 +37,21 @@ article#content.market-item-wish(
     != self.partial('@users.blocks.announces')
     != self.partial('@market.blocks.drafts')
 
+    if isOpen && user && user._id === self.runtime.user_id && self.item.autoclose_at_ts
+      .market-item-wish__renew.alert.alert-info
+        -
+          // make sure timestamp is set in the future (or at least now)
+          var date = Math.max(new Date(self.item.autoclose_at_ts), Date.now());
+          // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
+          date = new Date(date - date % (60 * 60 * 1000));
+        != self.t('renew_text', { interval: self.timetag(date, 'relative_days') })
+        if Math.abs(new Date(self.item.autoclose_at_ts) - new Date(Date.now() + (self.settings.market_items_expire * 24 * 60 * 60 * 1000))) >= 24 * 60 * 60 * 1000
+          a.market-item-wish__renew-btn(
+            href='#'
+            data-on-click='market.item.wish:renew'
+            data-item-id=self.item._id
+          )= self.t('renew_btn')
+
     header.page-head.market-item-wish__head
       .market-item-wish__title-toolbar
         h1.market-item-wish__title.page-head__title(itemprop='name')
@@ -44,7 +59,7 @@ article#content.market-item-wish(
 
           span.market-item-wish__title-text= self.item.title
 
-          if self.item.user === self.runtime.user_id && self.settings.market_can_create_items || self.settings.market_mod_can_edit_items
+          if (self.item.user === self.runtime.user_id && self.settings.market_can_create_items && isOpen) || self.settings.market_mod_can_edit_items
             a.market-item-wish__edit.icon.icon-edit(
               href=self.link_to('market.item.wish.edit', { section_hid: self.section.hid, item_hid: self.item.hid })
               title=self.t('edit')

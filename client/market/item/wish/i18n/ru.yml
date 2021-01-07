@@ -1,4 +1,7 @@
 ru-RU:
+  renew_text: 'Это объявление будет автоматически закрыто через #{interval}.'
+  renew_btn: Продлить
+
   closed: Объявление закрыто
   location: 'Местоположение:'
   responded: 'Откликнулись:'
@@ -10,6 +13,7 @@ ru-RU:
   move_item_done: Объявление перемещено
   open_item_done: Объявление открыто
   close_item_done: Объявление закрыто
+  renew_item_done: Объявление продлено
 
   del_reason: "(#{text})"
   del_by: "Удалил:"

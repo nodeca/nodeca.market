@@ -17,4 +17,5 @@ ru-RU:
   action_delete: Объявление удалено
   action_hard_delete: Объявление жёстко удалено
   action_undelete: Объявление восстановлено
+  action_renew: Объявление продлено до
   del_reason: "(#{text})"

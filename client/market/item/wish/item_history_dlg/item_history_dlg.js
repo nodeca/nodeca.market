@@ -84,6 +84,10 @@ function get_status_actions(new_item, old_item = {}) {
     result.push([ 'open' ]);
   }
 
+  if (old_item.autoclose_at_ts !== new_item.autoclose_at_ts) {
+    result.push([ 'renew', new_item.autoclose_at_ts ]);
+  }
+
   if (old_is_deleted || new_is_deleted) {
     if (old_item.st !== new_item.st || old_item.del_reason !== new_item.del_reason || result.length > 0) {
       if (old_is_deleted) {

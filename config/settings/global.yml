@@ -14,7 +14,7 @@ setting_schemas:
       group_key: market_general
       category_key: market_common
       type: number
-      default: 30 # 30 days
+      default: 31 # 1 month
 
     market_drafts_expire:
       priority: 20

@@ -4,6 +4,30 @@
 'use strict';
 
 
+// apply $set and $unset operations on an object
+function mongo_apply(object, ops) {
+  let result = Object.assign({}, object);
+
+  for (let [ k, v ]  of Object.entries(ops)) {
+    if (k === '$set') {
+      Object.assign(result, v);
+      continue;
+    }
+
+    if (k === '$unset') {
+      for (let delete_key of Object.keys(v)) {
+        delete result[delete_key];
+      }
+      continue;
+    }
+
+    result[k] = v;
+  }
+
+  return result;
+}
+
+
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -67,11 +91,11 @@ module.exports = function (N, apiPath) {
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
-    let market_items_expire = await N.settings.get('market_items_expire');
+    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
 
-    // cannot open old items (pointless, they'd be auto-closed again),
-    // is restricted on the client also
-    if (market_items_expire > 0 && env.data.item.ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
+    // users cannot open old items, restricted on the client also
+    if (!env.params.as_moderator && market_items_expire > 0 && env.data.item.closed_at_ts &&
+         env.data.item.closed_at_ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
       throw N.io.FORBIDDEN;
     }
 
@@ -79,14 +103,8 @@ module.exports = function (N, apiPath) {
     // Check moderator permissions
     //
     if (env.params.as_moderator) {
-      let settings = await env.extras.settings.fetch([
-        'market_mod_can_move_items'
-      ]);
-
-      if (!settings.market_mod_can_move_items) {
-        throw N.io.FORBIDDEN;
-      }
-
+      let market_mod_can_move_items = await env.extras.settings.fetch('market_mod_can_move_items');
+      if (!market_mod_can_move_items) throw N.io.FORBIDDEN;
       return;
     }
 
@@ -104,18 +122,28 @@ module.exports = function (N, apiPath) {
   // Open item
   //
   N.wire.on(apiPath, async function open_item(env) {
+    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
+
     let statuses = N.models.market.ItemOffer.statuses;
 
     let item = env.data.item;
-    let update;
+    let update = { $set: {}, $unset: {} };
 
     if (item.st === statuses.HB) {
-      update = { ste: statuses.OPEN };
+      update.$set.ste = statuses.OPEN;
     } else {
-      update = { st: statuses.OPEN };
+      update.$set.st = statuses.OPEN;
     }
 
-    let new_item = Object.assign({}, env.data.item, update);
+    if (market_items_expire > 0) {
+      update.$set.autoclose_at_ts = new Date(Date.now() + market_items_expire * 24 * 60 * 60 * 1000);
+    } else {
+      update.$unset.autoclose_at_ts = true;
+    }
+
+    update.$unset.closed_at_ts = true;
+
+    let new_item = mongo_apply(item, update);
 
     // move item to active collection if it wasn't there already, update otherwise
     if (!env.data.item_is_archived) {

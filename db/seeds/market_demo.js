@@ -165,6 +165,9 @@ async function createItemOffer(section, user, isClosed = false) {
     files,
     all_files:   files,
 
+    /*eslint-disable no-undefined*/
+    closed_at_ts: isClosed ? ts : undefined,
+
     // don't property randomize this to avoid needless requests
     // to geolocation services
     location:    charlatan.Helpers.sample([ [ 0, 51.5 ], [ -74, 40.7 ] ]),
@@ -222,6 +225,9 @@ async function createItemWish(section, user, isClosed = false) {
     st:       isClosed ? models.market.ItemWish.statuses.CLOSED : models.market.ItemWish.statuses.OPEN,
     section,
     user,
+
+    /*eslint-disable no-undefined*/
+    closed_at_ts: isClosed ? ts : undefined,
 
     // don't property randomize this to avoid needless requests
     // to geolocation services

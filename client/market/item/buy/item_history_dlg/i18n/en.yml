@@ -17,4 +17,5 @@ en-US:
   action_delete: Item deleted
   action_hard_delete: Item hard deleted
   action_undelete: Item restored
+  action_renew: Item renewed until
   del_reason: "(#{text})"

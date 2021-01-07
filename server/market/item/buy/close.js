@@ -96,11 +96,12 @@ module.exports = function (N, apiPath) {
 
     let item = env.data.item;
     let update;
+    let now = new Date();
 
     if (item.st === statuses.HB) {
-      update = { ste: statuses.CLOSED };
+      update = { ste: statuses.CLOSED, closed_at_ts: now };
     } else {
-      update = { st: statuses.CLOSED };
+      update = { st: statuses.CLOSED, closed_at_ts: now };
     }
 
     let new_item = Object.assign({}, env.data.item, update);

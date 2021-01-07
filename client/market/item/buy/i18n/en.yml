@@ -1,4 +1,7 @@
 en-US:
+  renew_text: 'This item will be automatically archived in #{interval}.'
+  renew_btn: Renew
+
   closed: Item closed
   location: 'Location:'
   delivery: 'Delivery:'
@@ -17,6 +20,7 @@ en-US:
   move_item_done: Item moved
   open_item_done: Item opened
   close_item_done: Item closed
+  renew_item_done: Item renewed
 
   del_reason: "(#{text})"
   del_by: "Deleted by:"

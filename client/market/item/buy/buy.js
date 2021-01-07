@@ -127,6 +127,20 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   });
 
 
+  // Renew item
+  //
+  N.wire.on(module.apiPath + ':renew', function item_renew(data) {
+    let request = {
+      item_id: data.$this.data('item-id')
+    };
+
+    return Promise.resolve()
+      .then(() => N.io.rpc('market.item.buy.renew', request))
+      .then(() => N.wire.emit('navigate.reload'))
+      .then(() => N.wire.emit('notify.info', t('renew_item_done')));
+  });
+
+
   // Add/remove bookmark
   //
   N.wire.on(module.apiPath + ':item_bookmark', function item_bookmark(data) {
