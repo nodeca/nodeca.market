@@ -99,8 +99,8 @@ article#content.market-item-wish(
     footer.market-item-wish__controls
       ul.market-item-wish__controls-blk
 
-      li.market-item-wish__control-item.market-item-wish__ts
-        != self.timetag(self.item.ts, 'relative')
+        li.market-item-wish__control-item.market-item-wish__ts
+          != self.timetag(self.item.ts, 'relative')
 
         - var infraction = self.infractions[self.item._id];
         if infraction
@@ -122,39 +122,39 @@ article#content.market-item-wish(
             )
               span.icon.icon-report
 
-      if self.runtime.is_member
-        li.market-item-wish__control-item.market-item-wish__bookmark
-          button.btn.market-item-wish__action.market-item-wish__bookmark-add(
-            data-on-click='market.item.wish:item_bookmark'
-            data-item-id=self.item._id
-            title=self.t('bookmark_add')
-          )
-            span.icon.icon-bookmark
-            span.market-item-wish__bookmarks-count(data-bm-count=self.item.bookmarks)
+        if self.runtime.is_member
+          li.market-item-wish__control-item.market-item-wish__bookmark
+            button.btn.market-item-wish__action.market-item-wish__bookmark-add(
+              data-on-click='market.item.wish:item_bookmark'
+              data-item-id=self.item._id
+              title=self.t('bookmark_add')
+            )
+              span.icon.icon-bookmark
+              span.market-item-wish__bookmarks-count(data-bm-count=self.item.bookmarks)
 
-          button.btn.market-item-wish__action.market-item-wish__bookmark-remove(
-            data-on-click='market.item.wish:item_bookmark'
-            data-item-id=self.item._id
-            data-remove='true'
-            title=self.t('bookmark_remove')
-          )
-            span.icon.icon-bookmark
-            span.market-item-wish__bookmarks-count(data-bm-count=self.item.bookmarks)
+            button.btn.market-item-wish__action.market-item-wish__bookmark-remove(
+              data-on-click='market.item.wish:item_bookmark'
+              data-item-id=self.item._id
+              data-remove='true'
+              title=self.t('bookmark_remove')
+            )
+              span.icon.icon-bookmark
+              span.market-item-wish__bookmarks-count(data-bm-count=self.item.bookmarks)
 
-      if self.item.edit_count
-        li.market-item-wish__control-item.market-item-wish__history
-          button.btn.market-item-wish__action(
-            title=self.t('last_edited', { date: self.date(self.item.last_edit_ts, 'datetime') })
-            data-on-click='market.item.wish:history'
-            data-item-id=self.item._id
-          )
-            span.icon.icon-history.icon-space-after= self.item.edit_count
+        if self.item.edit_count
+          li.market-item-wish__control-item.market-item-wish__history
+            button.btn.market-item-wish__action(
+              title=self.t('last_edited', { date: self.date(self.item.last_edit_ts, 'datetime') })
+              data-on-click='market.item.wish:history'
+              data-item-id=self.item._id
+            )
+              span.icon.icon-history.icon-space-after= self.item.edit_count
 
-      li.market-item-wish__control-item.market-item-wish__views
-        span.icon.icon-views.icon-space-after(
-          title=self.t('views')
-        )
-          = self.item.views
+        li.market-item-wish__control-item.market-item-wish__views
+          span.icon.icon-views.icon-space-after(
+            title=self.t('views')
+          )
+            = self.item.views
 
     .market-item-wish-responses
       if user && user._id === self.runtime.user_id

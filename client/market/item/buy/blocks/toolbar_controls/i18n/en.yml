@@ -5,7 +5,6 @@ en-US:
   close: Close
   open: Open
   move: Move
-  history: History
   delete: Delete
   undelete: Restore
   ip_info: IP info
