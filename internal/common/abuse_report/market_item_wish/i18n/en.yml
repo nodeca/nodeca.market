@@ -1,0 +1,7 @@
+en-US:
+  subject_log: 'Market: report from #{author.user_nick}'
+  subject_email: '#{project_name} (market): report from #{author.user_nick}'
+
+  header: "Report from user [#{name}](#{url}):"
+  src_description: "About [item wish](#{url}):"
+  report_topic: Topic with report.
