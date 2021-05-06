@@ -4,8 +4,7 @@
 
 const _        = require('lodash');
 const cheerio  = require('cheerio');
-const got      = require('got');
-const got_pkg  = require('got/package.json');
+const needle   = require('needle');
 const Mongoose = require('mongoose');
 const memoize  = require('promise-memoize');
 const Schema   = Mongoose.Schema;
@@ -66,14 +65,20 @@ module.exports = function (N, collectionName) {
    * Update all exchange rates (method is called from cron task)
    */
   let rootUrl = _.get(N.config, 'bind.default.mount', 'http://localhost') + '/';
-  let userAgent = `${got_pkg.name}/${got_pkg.version} (Nodeca; +${rootUrl})`;
+  let userAgent = `needle/${needle.version} (Nodeca; +${rootUrl})`;
 
   CurrencyRate.statics.fetch = async function fetch() {
-    let response = await got('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', {
+    let response = await needle('get', 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', {
       headers: { 'User-Agent': userAgent },
-      timeout: 30000,
-      retry:   1
+      open_timeout: 10000,
+      response_timeout: 30000,
+      read_timeout: 30000,
+      parse_response: false
     });
+
+    if (response.statusCode !== 200) {
+      throw new Error(`Wrong HTTP response code: ${response.statusCode}`);
+    }
 
     let tree = cheerio(response.body, { xmlMode: true });
 
