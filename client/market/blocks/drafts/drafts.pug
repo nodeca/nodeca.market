@@ -1,7 +1,7 @@
 each draft in self.drafts || []
   .market-draft.alert.alert-info.alert-dismissible.fade.show
-    button.close.icon.icon-x(
-      data-dismiss='alert'
+    button.btn-close(
+      data-bs-dismiss='alert'
       aria-label='close'
       data-on-click='market.blocks.drafts:remove'
       data-draft-id=draft._id
