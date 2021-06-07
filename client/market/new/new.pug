@@ -20,20 +20,20 @@ article#content.market-new
     form#market-new-form(novalidate, data-bind='submit: offer.type() === "buy" ? submitBuy : submitSell, css: { "was-validated": showErrors }')
       fieldset
         .row
-          .form-group.col-lg-3.col-md-4.col-sm-6
-            select.form-control.custom-select(data-bind="value: offer.type, options: offerTypes, optionsText: 'title', optionsValue: 'value'", required)
+          .col-lg-3.col-md-4.col-sm-6.mb-3
+            select.form-control.form-select(data-bind="value: offer.type, options: offerTypes, optionsText: 'title', optionsValue: 'value'", required)
 
         .row
-          .form-group.col
-            label.market-new__label(for='market-new-title')= self.t('field_title')
+          .col.mb-3
+            label.form-label.market-new__label(for='market-new-title')= self.t('field_title')
             input.form-control#market-new-title(type='text', data-bind="textInput: offer.title", required)
 
         .row(data-bind="visible: offer.type() === 'sell'")
-          .form-group.col-lg-3.col-md-4.col-sm-6
-            label.market-new__label(for='market-new-price')= self.t('field_price')
+          .col-lg-3.col-md-4.col-sm-6.mb-3
+            label.form-label.market-new__label(for='market-new-price')= self.t('field_price')
             .input-group
               input.form-control#market-new-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value, attr: { required: offer.type() === 'sell' }")
-              select.form-control.market-new__currency.custom-select.input-group-append(data-bind="value: offer.price_currency, optionsCaption: '', options: currencyTypes, optionsText: 'title', optionsValue: 'value', attr: { required: offer.type() === 'sell' }")
+              select.form-control.market-new__currency.form-select(data-bind="value: offer.price_currency, optionsCaption: '', options: currencyTypes, optionsText: 'title', optionsValue: 'value', attr: { required: offer.type() === 'sell' }")
 
         mixin sections_tree(sections, deepness)
           each section in sections
@@ -49,14 +49,14 @@ article#content.market-new
               +sections_tree(section.children, deepness + 1)
 
         .row
-          .form-group.col
-            label.market-new__label(for='market-new-section')= self.t('field_section')
+          .col.mb-3
+            label.form-label.market-new__label(for='market-new-section')= self.t('field_section')
 
-            select.form-control.custom-select#market-new-section(data-bind="value: offer.section, valueAllowUnset: true, visible: offer.type() === 'buy', attr: { required: offer.type() === 'buy' }")
+            select.form-control.form-select#market-new-section(data-bind="value: offer.section, valueAllowUnset: true, visible: offer.type() === 'buy', attr: { required: offer.type() === 'buy' }")
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +sections_tree(self.sections_buy, 1)
 
-            select.form-control.custom-select#market-new-section(data-bind="value: offer.section, valueAllowUnset: true, visible: offer.type() === 'sell', attr: { required: offer.type() === 'sell' }")
+            select.form-control.form-select#market-new-section(data-bind="value: offer.section, valueAllowUnset: true, visible: offer.type() === 'sell', attr: { required: offer.type() === 'sell' }")
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +sections_tree(self.sections_sell, 1)
 
@@ -78,7 +78,7 @@ article#content.market-new
 
         if max_images === null || max_images > 0
           .row(data-bind="visible: offer.type() === 'sell'")
-            .form-group.col
+            .col.mb-3
               //- Hidden
               input#market-new-upload(
                 name='files[]'
@@ -87,7 +87,7 @@ article#content.market-new
                 multiple
               )
 
-              label.market-new__label
+              label.form-label.market-new__label
                 = self.t('field_photos')
                 if min_images !== null && max_images !== null
                   if max_images !== null
@@ -136,7 +136,7 @@ article#content.market-new
                 <!-- /ko -->
 
         .row
-          .form-group.col
+          .col.mb-3
             ul.market-new__tabs.nav.nav-tabs
               li.nav-item
                 span.market-new__label.nav-link.disabled= self.t('field_description')
@@ -149,25 +149,25 @@ article#content.market-new
             .market-new__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
 
         .row(data-bind="visible: offer.type() === 'sell'")
-          .form-group.col
-            label.market-new__label(for='market-new-barter')= self.t('field_barter')
+          .col.mb-3
+            label.form-label.market-new__label(for='market-new-barter')= self.t('field_barter')
             input.form-control#market-new-barter(type='text', data-bind='textInput: offer.barter_info')
             small.form-text.text-muted= self.t('field_barter_help')
 
         .row(data-bind="visible: offer.type() === 'sell'")
-          .form-group.col
-            .form-check.form-check-inline
+          .col.mb-3
+            .form-check
               label.form-check-label
                 input.form-check-input(type='checkbox', data-bind='checked: offer.delivery')
                 = self.t('field_delivery')
 
         .row(data-bind="visible: offer.type() === 'sell'")
-          .form-group.col
-            .form-check.form-check-inline
+          .col.mb-3
+            .form-check
               label.form-check-label
                 input.form-check-input(type='checkbox', data-bind='checked: offer.is_new')
                 = self.t('field_is_new')
 
         .row
-          .form-actions.col
+          .col
             button.btn.btn-primary(type='submit', data-bind='enable: !isSubmitting()')= self.t('submit')

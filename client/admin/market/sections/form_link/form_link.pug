@@ -2,14 +2,14 @@ form.form-horizontal(data-bind="submit: create")
   fieldset
     legend #{self.t('legend_market_settings')}
 
-    .form-group.row
+    .row.mb-3
       label.col-form-label.col-3 #{self.t('field_section')}
-      .col-4: select.form-control.custom-select(data-bind="value: currentLink.section, options: allowedParents, optionsText: 'title', optionsValue: '_id'")
+      .col-4: select.form-control.form-select(data-bind="value: currentLink.section, options: allowedParents, optionsText: 'title', optionsValue: '_id'")
 
-    .form-group.row
+    .row.mb-3
       label.col-form-label.col-3 #{self.t('field_parent')}
-      .col-4: select.form-control.custom-select(data-bind="value: currentLink.parent, options: allowedParents, optionsText: 'title', optionsValue: '_id'")
+      .col-4: select.form-control.form-select(data-bind="value: currentLink.parent, options: allowedParents, optionsText: 'title', optionsValue: '_id'")
 
-  .form-group.row
+  .row.mb-3
     .col-9.ml-auto
       button.btn.btn-primary(type="submit", data-bind="enable: isDirty") #{self.t('button_save')}

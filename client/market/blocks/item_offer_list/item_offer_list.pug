@@ -120,7 +120,7 @@ each item, idx in self.items
               = self.t('del_reason', { text: item.del_reason })
 
       if multiselect_allowed
-        label.market-list-item-offer__select(title=self.t('multiselect_hint'))
+        label.form-label.market-list-item-offer__select(title=self.t('multiselect_hint'))
           input.market-list-item-offer__select-cb(
             type='checkbox'
             data-item-id=item._id

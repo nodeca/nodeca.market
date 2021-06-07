@@ -18,8 +18,8 @@ article#content.market-item-wish-edit
     form#market-edit-form(novalidate, data-bind='submit: submit, css: { "was-validated": showErrors }')
       fieldset
         .row
-          .form-group.col
-            label.market-item-wish-edit__label(for='market-edit-title')= self.t('field_title')
+          .col.mb-3
+            label.form-label.market-item-wish-edit__label(for='market-edit-title')= self.t('field_title')
             input.form-control#market-edit-title(type='text', data-bind="textInput: offer.title", required)
 
         mixin sections_tree(sections, deepness)
@@ -36,14 +36,14 @@ article#content.market-item-wish-edit
               +sections_tree(section.children, deepness + 1)
 
         .row
-          .form-group.col
-            label.market-item-wish-edit__label(for='market-edit-section')= self.t('field_section')
-            select.form-control.custom-select#market-edit-section(data-bind="value: offer.section", required)
+          .col.mb-3
+            label.form-label.market-item-wish-edit__label(for='market-edit-section')= self.t('field_section')
+            select.form-control.form-select#market-edit-section(data-bind="value: offer.section", required)
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +sections_tree(self.sections, 1)
 
         .row
-          .form-group.col
+          .col.mb-3
             ul.market-item-wish-edit__tabs.nav.nav-tabs
               li.nav-item
                 span.market-item-wish-edit__label.nav-link.disabled= self.t('field_description')
@@ -56,5 +56,5 @@ article#content.market-item-wish-edit
             .market-item-wish-edit__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
 
         .row
-          .form-actions.col
+          .col
             button.btn.btn-primary(type='submit', data-bind='enable: isDirty() && !isSubmitting()')= self.t('submit')
