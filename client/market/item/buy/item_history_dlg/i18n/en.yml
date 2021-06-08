@@ -7,7 +7,7 @@ en-US:
   delivery: 'Delivery:'
   delivery_available: yes
   delivery_not_available: n/a
-  barter_info: 'In exchange for:'
+  barter_info: 'Exchange:'
   condition: 'Condition:'
   condition_new: 'new'
   condition_used: 'used'

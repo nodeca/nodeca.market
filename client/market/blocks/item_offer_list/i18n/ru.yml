@@ -2,7 +2,7 @@ ru-RU:
   used: б/у
   no_photo: Нет фото
   icon_delivery: Пересылка возможна
-  icon_exchange: Продавец согласен на обмен
+  icon_exchange: Возможен обмен
   del_reason: "(#{text})"
   del_by: "Удалил:"
   closed: Закрытое объявление

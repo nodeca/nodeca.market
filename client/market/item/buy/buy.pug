@@ -129,6 +129,10 @@ article#content.market-item-buy(
                 = self.location_name
 
       .market-item-buy__details-item
+        .market-item-buy__details-key= self.t('condition')
+        .market-item-buy__details-value= self.item.is_new ? self.t('condition_new') : self.t('condition_used')
+
+      .market-item-buy__details-item
         .market-item-buy__details-key= self.t('delivery')
         .market-item-buy__details-value= self.item.delivery ? self.t('delivery_available') : self.t('delivery_not_available')
 
@@ -136,10 +140,6 @@ article#content.market-item-buy(
         .market-item-buy__details-item
           .market-item-buy__details-key= self.t('barter_info')
           .market-item-buy__details-value= self.item.barter_info
-
-      .market-item-buy__details-item
-        .market-item-buy__details-key= self.t('condition')
-        .market-item-buy__details-value= self.item.is_new ? self.t('condition_new') : self.t('condition_used')
 
     footer.market-item-buy__controls
       ul.market-item-buy__controls-blk

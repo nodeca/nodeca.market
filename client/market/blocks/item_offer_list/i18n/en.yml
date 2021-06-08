@@ -2,7 +2,7 @@ en-US:
   used: used
   no_photo: No photo
   icon_delivery: Delivery is available
-  icon_exchange: Seller agrees to a barter trade
+  icon_exchange: Exchange is possible
   del_reason: "(#{text})"
   del_by: "Deleted by:"
   closed: Closed item

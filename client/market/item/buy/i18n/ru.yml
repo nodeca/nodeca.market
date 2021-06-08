@@ -3,11 +3,11 @@ ru-RU:
   renew_btn: Продлить
 
   closed: Объявление закрыто
-  location: 'Местоположение:'
+  location: 'Где:'
   delivery: 'Пересылка:'
   delivery_available: есть
   delivery_not_available: нет
-  barter_info: 'В обмен на:'
+  barter_info: 'Обмен:'
   condition: 'Состояние:'
   condition_new: 'новый'
   condition_used: 'б/у'

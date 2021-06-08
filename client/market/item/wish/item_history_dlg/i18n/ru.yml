@@ -2,7 +2,7 @@ ru-RU:
   title: История
   role_task: Это действие было выполнено автоматически
   role_moderator: Это действие было выполнено модератором
-  location: 'Местоположение:'
+  location: 'Где:'
   action_move: 'Объявление перемещено из <a href="#{old_link}" target="_blank">#{old_title}</a> в <a href="#{new_link}" target="_blank">#{new_title}</a>'
   action_open: Объявление открыто
   action_close: Объявление закрыто
