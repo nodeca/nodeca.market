@@ -39,8 +39,7 @@ each item, idx in self.items
           a.market-list-item-offer__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
             = item.title
           if !item.is_new
-            sub.market-list-item-offer__icon
-              = ' '
+            sub.market-list-item-offer__used
               = self.t('used')
 
         .market-list-item-offer__price
@@ -48,8 +47,7 @@ each item, idx in self.items
           = self.price(price.value, price.currency, self.settings.market_displayed_currency, self.currency_rates[price.currency])
 
           if item.barter_info
-            = ' '
-            span.market-list-item-offer__icon.icon.icon-interchange(title=self.t('icon_exchange'))
+            span.market-list-item-offer__interchange.icon.icon-interchange(title=self.t('icon_exchange'))
 
         .market-list-item-offer__location
           if item.location
@@ -65,8 +63,7 @@ each item, idx in self.items
                 = self.location_names[item.location[0] + ':' + item.location[1]]
 
           if item.delivery
-            = ' '
-            span.market-list-item-offer__icon.icon.icon-delivery(title=self.t('icon_delivery'))
+            span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
 
         .market-list-item-offer__details
           .market-list-item-offer__details-item
