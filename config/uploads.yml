@@ -3,7 +3,7 @@ market:
     extensions: [ jpg, jpeg, png, gif, svg ]
     jpeg_quality: 75
     gif_animation: true
-    max_size: 2000000
+    max_size: 2048000 # display round number, "> 2000 KB"
 
     resize:
       orig:
