@@ -83,10 +83,10 @@
                                 data-latitude= value && value[1]
                                 data-longitude= value && value[0]
                               )
-                                span.icon.icon-location.icon-space-after
-
                                 if self.location_names[value[0] + ':' + value[1]]
                                   = self.location_names[value[0] + ':' + value[1]]
+                                else
+                                  span.icon.icon-location
                         default
                           if new_value
                             if new_value !== value

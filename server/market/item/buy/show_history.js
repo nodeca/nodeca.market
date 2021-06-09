@@ -139,7 +139,7 @@ module.exports = function (N, apiPath) {
   // Fetch locations
   //
   N.wire.after(apiPath, async function fetch_locations(env) {
-    let locations = _.map(env.res.history_data, 'item.location').filter(Boolean);
+    let locations = _.map(env.res.history, 'item.location').filter(Boolean);
 
     let resolved = locations.length ?
                    await N.models.core.Location.info(locations, env.user_info.locale) :

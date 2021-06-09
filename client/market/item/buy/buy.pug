@@ -123,10 +123,10 @@ article#content.market-item-buy(
               data-latitude= self.item.location && self.item.location[1]
               data-longitude= self.item.location && self.item.location[0]
             )
-              span.icon.icon-location.icon-space-after
-
               if self.location_name
                 = self.location_name
+              else
+                span.icon.icon-location
 
       .market-item-buy__details-item
         .market-item-buy__details-key= self.t('condition')

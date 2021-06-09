@@ -57,10 +57,10 @@ each item, idx in self.items
               data-latitude= item.location && item.location[1]
               data-longitude= item.location && item.location[0]
             )
-              span.icon.icon-location.icon-space-after
-
               if self.location_names[item.location[0] + ':' + item.location[1]]
                 = self.location_names[item.location[0] + ':' + item.location[1]]
+              else
+                span.icon.icon-location
 
           if item.delivery
             span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))

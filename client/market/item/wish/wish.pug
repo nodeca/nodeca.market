@@ -106,10 +106,10 @@ article#content.market-item-wish(
               data-latitude= self.item.location && self.item.location[1]
               data-longitude= self.item.location && self.item.location[0]
             )
-              span.icon.icon-location.icon-space-after
-
               if self.location_name
                 = self.location_name
+              else
+                span.icon.icon-location
 
     footer.market-item-wish__controls
       ul.market-item-wish__controls-blk
