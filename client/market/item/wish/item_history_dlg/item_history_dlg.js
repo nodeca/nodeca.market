@@ -132,7 +132,9 @@ function build_diff(history) {
 
   let attr_diffs = [];
 
-  attr_diffs.push([ 'location', history[0].item.location ]);
+  if (history[0].item.location) {
+    attr_diffs.push([ 'location', history[0].item.location ]);
+  }
 
   // Get first version for this post (no actual diff)
   result.push({

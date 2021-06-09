@@ -163,10 +163,20 @@ function build_diff(history) {
 
   let attr_diffs = [];
 
-  attr_diffs.push([ 'price', get_price(history[0].item), get_price(history[0].item) ]);
-  attr_diffs.push([ 'location', history[0].item.location ]);
+  if (history[0].item.price) {
+    attr_diffs.push([ 'price', get_price(history[0].item), get_price(history[0].item) ]);
+  }
+
+  if (history[0].item.location) {
+    attr_diffs.push([ 'location', history[0].item.location ]);
+  }
+
   attr_diffs.push([ 'delivery', get_delivery(history[0].item), get_delivery(history[0].item) ]);
-  attr_diffs.push([ 'barter_info', diff_line(history[0].item.barter_info, history[0].item.barter_info) ]);
+
+  if (history[0].item.barter_info) {
+    attr_diffs.push([ 'barter_info', diff_line(history[0].item.barter_info, history[0].item.barter_info) ]);
+  }
+
   attr_diffs.push([ 'condition', get_condition(history[0].item), get_condition(history[0].item) ]);
 
   // Get first version for this post (no actual diff)
