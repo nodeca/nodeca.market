@@ -1,5 +1,8 @@
 market:
   currencies:
-    RUB: ~
-    USD: ~
-    EUR: ~
+    RUB:
+      min_price: 10
+    USD:
+      min_price: 0.1
+    EUR:
+      min_price: 0.1

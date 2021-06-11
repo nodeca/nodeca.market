@@ -4,8 +4,9 @@
 'use strict';
 
 
-const _         = require('lodash');
-const charcount = require('charcount');
+const _            = require('lodash');
+const charcount    = require('charcount');
+const format_price = require('nodeca.market/lib/app/price_format');
 
 
 module.exports = function (N, apiPath) {
@@ -162,14 +163,22 @@ module.exports = function (N, apiPath) {
   // Check and convert currency
   //
   N.wire.before(apiPath, async function convert_currency(env) {
-    // check that price and currency are present and valid,
-    // shouldn't happen because restricted on the client
-    if (!(env.params.price_value >= 0)) {
+    if (!N.config.market.currencies.hasOwnProperty(env.params.price_currency)) {
       throw N.io.BAD_REQUEST;
     }
 
-    if (!N.config.market.currencies.hasOwnProperty(env.params.price_currency)) {
-      throw N.io.BAD_REQUEST;
+    let min_price = N.config.market.currencies[env.params.price_currency].min_price || 0;
+
+    if (!(env.params.price_value >= min_price)) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_price_too_low', {
+          min: format_price(
+            min_price,
+            env.t(`@market.currencies.${env.params.price_currency}.sign`)
+          )
+        })
+      };
     }
 
     let rate = await N.models.market.CurrencyRate.get(env.params.price_currency);

@@ -2,5 +2,6 @@ en-US:
   update:
     err_title_too_short: "Title should have at least #{count} ((character|characters))"
     err_desc_too_short: "Description should have at least #{count} ((character|characters))"
+    err_price_too_low: "Unable to list an item with price lower than #{min}"
     err_too_few_images: "Market offer can't have fewer than #{count} ((image|images))"
     err_too_many_images: "Market offer can't have more than #{count} ((image|images))"
