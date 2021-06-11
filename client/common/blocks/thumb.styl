@@ -24,3 +24,32 @@ gridSpace        = 10px
   .thumb__image
     max-width thumbImageWidth
     max-height thumbImageHeight
+
+.thumb-grid__m-market
+.thumb__m-market
+  .thumb
+  &.thumb
+    width thumbImageWidth
+    height thumbImageHeight
+
+  .thumb__image
+    max-width thumbImageWidth
+    max-height thumbImageHeight
+
+// 136x120 -> 85x75
+downScaleSm = 1.6
+
+thumbImageWidthSm  = round(thumbImageWidth / downScaleSm)
+thumbImageHeightSm = round(thumbImageHeight / downScaleSm)
+
+// Modifier to show images in small size
+.thumb-grid__m-market.thumb-grid__m-sm
+.thumb__m-market.thumb__m-sm
+  .thumb
+  &.thumb
+    width thumbImageWidthSm
+    height thumbImageHeightSm
+
+  .thumb__image
+    max-width thumbImageWidthSm
+    max-height thumbImageHeightSm

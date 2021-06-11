@@ -8,7 +8,7 @@
 .market-list-item-offer__aside
   flex 0 0 '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
 
-.market-list-item-offer__info
+.market-list-item-offer__container
   margin-left 1rem
   flex 1 1 auto
 
@@ -130,3 +130,27 @@
 
 .market-list-item-offer__m-selected
   background-color #ffd
+
+.market-list-item-offer__aside-sm
+  display none
+
+@media (max-width: $grid-breakpoints.sm - 1)
+  .market-list-item-offer__aside
+    display none
+
+  .market-list-item-offer__aside-sm
+    display block
+    margin-right .5rem
+    flex 0 0 85px
+
+  .market-list-item-offer__container
+    margin-left 0
+
+  .market-list-item-offer__info
+    display flex
+
+  .market-list-item-offer__info-contents
+    flex 1 1 auto
+
+  .market-list-item-offer__title
+    margin-bottom .5rem
