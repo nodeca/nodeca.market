@@ -77,8 +77,30 @@ each item, idx in self.items
                     )= user.name
 
             .market-list-item-offer__price
-              - var price = item.price || {};
-              = self.price(price.value, price.currency, self.settings.market_displayed_currency, self.currency_rates[price.currency])
+              if item.price
+                -
+                  function get_symbol(currency) {
+                    var p = '@market.currencies.' + currency + '.sign';
+                    return self.t.exists(p) ? self.t(p) : currency;
+                  }
+
+                  var user_currency  = self.settings.market_displayed_currency;
+                  var rate           = self.currency_rates[item.price.currency] ;
+                  var price_original = self.price(item.price.value, get_symbol(item.price.currency));
+                  var price_converted;
+
+                  if (user_currency && user_currency !== item.price.currency && rate && rate > 0) {
+                    price_converted = self.price(item.price.value * rate, get_symbol(user_currency), true);
+                  }
+
+                if price_converted
+                  span.market-list-item-offer__price-value(
+                    title= self.t('price_approximate')
+                  )= price_converted
+                  = ' '
+                  span.market-list-item-offer__price-original= '(' + price_original + ')'
+                else
+                  span.market-list-item-offer__price-value= price_original
 
               if item.barter_info
                 span.market-list-item-offer__interchange.icon.icon-interchange(title=self.t('icon_exchange'))
@@ -96,8 +118,8 @@ each item, idx in self.items
                   else
                     span.icon.icon-location
 
-            if item.delivery
-              span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
+              if item.delivery
+                span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
 
             .market-list-item-offer__details.d-none.d-sm-block
               .market-list-item-offer__details-item

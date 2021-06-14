@@ -15,6 +15,7 @@ en-US:
   no_responses: Nobody responded to your offer yet.
   contact: Contact seller
   similar_items: 'Similar items:'
+  price_approximate: Approximate
 
   undelete_item_done: Item restored
   move_item_done: Item moved

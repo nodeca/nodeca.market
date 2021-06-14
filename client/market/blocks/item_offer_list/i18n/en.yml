@@ -13,3 +13,4 @@ en-US:
   multiselect_hint: Click with shift to start range selection
   autoclose_at: 'until #{date}'
   closed_at: 'until #{date}'
+  price_approximate: Approximate

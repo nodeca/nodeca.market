@@ -13,3 +13,4 @@ ru-RU:
   multiselect_hint: Нажмите с shift для выбора диапазона
   autoclose_at: 'до #{date}'
   closed_at: 'до #{date}'
+  price_approximate: Приблизительно
