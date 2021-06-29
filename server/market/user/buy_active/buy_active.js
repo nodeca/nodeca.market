@@ -3,7 +3,7 @@
 
 'use strict';
 
-const _        = require('lodash');
+
 const ObjectId = require('mongoose').Types.ObjectId;
 
 
@@ -50,7 +50,7 @@ module.exports = function (N, apiPath) {
                             .select('_id')
                             .lean(true);
 
-    env.data.item_ids = _.map(entries, '_id');
+    env.data.item_ids = entries.map(x => x._id);
   }
 
 
@@ -86,7 +86,7 @@ module.exports = function (N, apiPath) {
 
     let entries = await query.lean(true);
 
-    env.data.item_ids = _.map(entries, '_id');
+    env.data.item_ids = entries.map(x => x._id);
   }
 
 
@@ -154,7 +154,7 @@ module.exports = function (N, apiPath) {
       chunk_offset: offset
     };
 
-    env.res.last_item_hid = env.res.items_active && env.res.items_active.length ?
+    env.res.last_item_hid = env.res.items_active?.length ?
                             env.res.items_active[env.res.items_active.length - 1].hid :
                             0;
   });
@@ -172,7 +172,7 @@ module.exports = function (N, apiPath) {
     env.data.users = env.data.users || [];
     env.data.users.push(env.data.user._id);
 
-    if (env.params.$query && env.params.$query.from) {
+    if (env.params.$query?.from) {
       env.res.head.robots = 'noindex,follow';
     }
   });

@@ -119,7 +119,7 @@ module.exports = function (N, apiPath) {
     let c = N.config.market.currencies || {};
 
     env.res.currency_types = Object.keys(c)
-                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
+                               .sort((a, b) => (c[a]?.priority ?? 100) - (c[b]?.priority ?? 100));
   });
 
 

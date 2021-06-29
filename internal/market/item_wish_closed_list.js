@@ -106,7 +106,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fetch_sections(env) {
     let sections = await N.models.market.Section.find()
-                             .where('_id').in(_.uniq(_.map(env.data.items, 'section').map(String)))
+                             .where('_id').in(_.uniq(env.data.items.map(x => x.section).map(String)))
                              .lean(true);
 
     env.res.sections_by_id = env.res.sections_by_id || {};
@@ -124,7 +124,7 @@ module.exports = function (N, apiPath) {
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'src');
+    env.res.own_bookmarks = bookmarks.map(x => x.src);
   });
 
 

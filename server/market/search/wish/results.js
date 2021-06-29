@@ -131,10 +131,10 @@ module.exports = function (N, apiPath) {
 
       if (children.length > 0) {
         let s = await N.models.market.Section.find()
-                          .where('_id').in(_.map(children, '_id'))
+                          .where('_id').in(children.map(x => x._id))
                           .lean(true);
 
-        hids = hids.concat(_.map(s, 'hid'));
+        hids = hids.concat(s.map(x => x.hid));
       }
 
       if (hids.length > 0) {
@@ -229,7 +229,7 @@ module.exports = function (N, apiPath) {
 
     let expand_sections = { null: true };
 
-    if (env.data.section && !env.data.search.search_all) {
+    if (env.data.section?.search_all) {
       expand_sections[env.data.section._id] = true;
 
       for (let id of await N.models.market.Section.getParentList(env.data.section._id)) {

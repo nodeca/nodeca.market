@@ -33,10 +33,10 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function update_display_orders(env) {
 
-    var _ids = env.params.sibling_order;
+    let _ids = env.params.sibling_order;
 
     // create hash table for _ids, where array index means display order
-    var siblingOrder = {};
+    let siblingOrder = {};
 
     _.forEach(_ids, (value, index) => { siblingOrder[value] = index + 1; });
 

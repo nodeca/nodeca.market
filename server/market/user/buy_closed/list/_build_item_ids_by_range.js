@@ -22,8 +22,6 @@
 //
 'use strict';
 
-const _ = require('lodash');
-
 
 module.exports = function (N) {
 
@@ -44,7 +42,7 @@ module.exports = function (N) {
                           .limit(env.data.select_before)
                           .lean(true);
 
-    return _.map(entries, '_id').reverse();
+    return entries.map(x => x._id).reverse();
   }
 
 
@@ -74,7 +72,7 @@ module.exports = function (N) {
                           .limit(count)
                           .lean(true);
 
-    return _.map(entries, '_id');
+    return entries.map(x => x._id);
   }
 
 

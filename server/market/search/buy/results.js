@@ -157,10 +157,10 @@ module.exports = function (N, apiPath) {
 
       if (children.length > 0) {
         let s = await N.models.market.Section.find()
-                          .where('_id').in(_.map(children, '_id'))
+                          .where('_id').in(children.map(x => x._id))
                           .lean(true);
 
-        hids = hids.concat(_.map(s, 'hid'));
+        hids = hids.concat(s.map(x => x.hid));
       }
 
       if (hids.length > 0) {

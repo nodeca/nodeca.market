@@ -101,7 +101,7 @@ module.exports = function (N, apiPath) {
 
     let section_ids = [ env.data.section._id ];
 
-    if (children.length > 0) section_ids = section_ids.concat(_.map(children, '_id'));
+    if (children.length > 0) section_ids = section_ids.concat(children.map(x => x._id));
 
     env.data.section_ids = section_ids;
   });
@@ -199,7 +199,7 @@ module.exports = function (N, apiPath) {
     let c = N.config.market.currencies || {};
 
     env.res.currency_types = Object.keys(c)
-                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
+                               .sort((a, b) => (c[a]?.priority ?? 100) - (c[b]?.priority ?? 100));
   });
 
 
@@ -209,7 +209,7 @@ module.exports = function (N, apiPath) {
     env.res.head = env.res.head || {};
     env.res.head.title = env.data.section.title;
 
-    if (env.params.$query && env.params.$query.from) {
+    if (env.params.$query?.from) {
       env.res.head.robots = 'noindex,follow';
     }
   });

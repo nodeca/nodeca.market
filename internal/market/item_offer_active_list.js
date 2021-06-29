@@ -97,7 +97,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fetch_sections(env) {
     let sections = await N.models.market.Section.find()
-                             .where('_id').in(_.uniq(_.map(env.data.items, 'section').map(String)))
+                             .where('_id').in(_.uniq(env.data.items.map(x => x.section).map(String)))
                              .lean(true);
 
     env.res.sections_by_id = env.res.sections_by_id || {};
@@ -115,7 +115,7 @@ module.exports = function (N, apiPath) {
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'src');
+    env.res.own_bookmarks = bookmarks.map(x => x.src);
   });
 
 
@@ -154,7 +154,7 @@ module.exports = function (N, apiPath) {
   // Fetch currency rates
   //
   N.wire.after(apiPath, async function fetch_currency_rates(env) {
-    let currencies = _.uniq(env.data.items.map(i => i.price && i.price.currency).filter(Boolean));
+    let currencies = _.uniq(env.data.items.map(i => i.price?.currency).filter(Boolean));
 
     env.res.currency_rates = {};
 

@@ -59,7 +59,7 @@ module.exports = function (N, apiPath) {
 
     // transform fetched data & glue to output
     env.res.breadcrumbs = env.res.breadcrumbs.concat(
-      _.map(bc_list, function (section_info) {
+      bc_list.map(function (section_info) {
         return {
           text: section_info.title,
           route: 'market.section.' + (data.wish ? 'wish' : 'buy'),

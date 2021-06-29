@@ -27,11 +27,11 @@ module.exports = function (N, apiPath) {
     locals.sandbox = {};
 
     let items_active = await N.models.market.ItemWish.find()
-                                 .where('_id').in(_.map(locals.params.bookmarks, 'src'))
+                                 .where('_id').in(locals.params.bookmarks.map(x => x.src))
                                  .lean(true);
 
     let items_archived = await N.models.market.ItemWishArchived.find()
-                                   .where('_id').in(_.map(locals.params.bookmarks, 'src'))
+                                   .where('_id').in(locals.params.bookmarks.map(x => x.src))
                                    .lean(true);
 
     locals.sandbox.items = [].concat(items_active).concat(items_archived);

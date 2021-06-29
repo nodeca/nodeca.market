@@ -112,15 +112,15 @@ module.exports = function (N, collectionName) {
   //
   ItemOfferArchived.pre('save', function () {
     /*eslint-disable no-undefined*/
-    if (this.imports && this.imports.length === 0) {
+    if (this.imports?.length === 0) {
       this.imports = undefined;
     }
 
-    if (this.import_users && this.import_users.length === 0) {
+    if (this.import_users?.length === 0) {
       this.import_users = undefined;
     }
 
-    if (this.location && this.location.length === 0) {
+    if (this.location?.length === 0) {
       this.location = undefined;
     }
   });

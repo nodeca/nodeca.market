@@ -168,7 +168,7 @@ module.exports = function (N, apiPath) {
   // Update user counters
   //
   N.wire.after(apiPath, async function update_user(env) {
-    let users = _.map(env.data.items.filter(item => env.data.items_to_update.has(String(item._id))), 'user');
+    let users = env.data.items.filter(item => env.data.items_to_update.has(String(item._id))).map(x => x.user);
     users = _.uniq(users.map(String));
 
     await N.models.market.UserItemOfferCount.recount(users);

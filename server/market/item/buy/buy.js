@@ -184,7 +184,7 @@ module.exports = function (N, apiPath) {
 
     if (!bookmarks.length) return;
 
-    env.res.own_bookmarks = _.map(bookmarks, 'src');
+    env.res.own_bookmarks = bookmarks.map(x => x.src);
   });
 
 
@@ -247,7 +247,7 @@ module.exports = function (N, apiPath) {
     if (!refs.length) return;
 
     let messages = await N.models.users.DlgMessage.find()
-                             .where('_id').in(_.map(refs, 'message'))
+                             .where('_id').in(refs.map(x => x.message))
                              .where('exists').equals(true)
                              .sort('_id')
                              .lean(true);
@@ -255,7 +255,7 @@ module.exports = function (N, apiPath) {
     let dialogs = await N.models.users.Dialog.find()
                             .where('user').equals(env.user_info.user_id)
                             .where('exists').equals(true)
-                            .where('_id').in(_.map(messages, 'parent'))
+                            .where('_id').in(messages.map(x => x.parent))
                             .lean(true);
 
     let dialogs_by_id = _.keyBy(dialogs, '_id');
@@ -292,11 +292,11 @@ module.exports = function (N, apiPath) {
 
     if (data.results && data.results.length > 0) {
       let items = await N.models.market.ItemOffer.find()
-                            .where('_id').in(_.map(data.results, 'item_id'))
+                            .where('_id').in(data.results.map(x => x.item_id))
                             .lean(true);
 
       let sections = await N.models.market.Section.find()
-                               .where('_id').in(_.uniq(_.map(items, 'section').map(String)))
+                               .where('_id').in(_.uniq(items.map(x => x.section).map(String)))
                                .lean(true);
 
       let access_env = { params: { items, user_info: env.user_info } };
@@ -323,7 +323,7 @@ module.exports = function (N, apiPath) {
   N.wire.after(apiPath, async function fetch_currency_rates(env) {
     let currencies = _.uniq(
       [ env.res.item ].concat((env.res.similar_items || []).map(s => s.item))
-                      .map(i => i.price && i.price.currency)
+                      .map(i => i.price?.currency)
                       .filter(Boolean)
     );
 

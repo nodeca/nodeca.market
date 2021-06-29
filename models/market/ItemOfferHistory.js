@@ -139,7 +139,7 @@ module.exports = function (N, collectionName) {
     // (this fetches large numbers of smaller documents, index only)
     //
     let history_ids = await N.models.market.ItemOfferHistory.find()
-                                .where('item').in(_.map(changes, 'new_item._id'))
+                                .where('item').in(changes.map(x => x.new_item?._id))
                                 .select('item _id')
                                 .sort('_id')
                                 .lean(true);
@@ -165,7 +165,7 @@ module.exports = function (N, collectionName) {
     //
     let last_history_entry = _.keyBy(
       await N.models.market.ItemOfferHistory.find()
-                .where('_id').in(_.map(Object.values(history), 'last').filter(Boolean))
+                .where('_id').in(Object.values(history).map(x => x.last).filter(Boolean))
                 .lean(true),
       'item'
     );

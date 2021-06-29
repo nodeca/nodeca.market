@@ -8,9 +8,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 let $dialog;
 let params;
 let result;
@@ -50,7 +47,7 @@ N.wire.on(module.apiPath, function show_item_move_many_dlg(options) {
   params = options;
 
   return N.io.rpc('market.item.wish.move.sections').then(res => {
-    $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, params, res)));
+    $dialog = $(N.runtime.render(module.apiPath, Object.assign({ apiPath: module.apiPath }, params, res)));
 
     $('body').append($dialog);
 

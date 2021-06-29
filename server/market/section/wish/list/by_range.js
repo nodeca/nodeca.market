@@ -44,7 +44,7 @@ module.exports = function (N, apiPath) {
 
     let section_ids = [ env.data.section._id ];
 
-    if (children.length > 0) section_ids = section_ids.concat(_.map(children, '_id'));
+    if (children.length > 0) section_ids = section_ids.concat(children.map(x => x._id));
 
     env.data.section_ids = section_ids;
   });

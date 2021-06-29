@@ -55,7 +55,7 @@ module.exports = function (N, apiPath) {
       wish: Object.prototype.hasOwnProperty.call(env.params.$query || {}, 'wish')
     };
 
-    if (env.params.$query && env.params.$query.section) {
+    if (env.params.$query?.section) {
       let selected_section = await N.models.market.Section.findById(env.params.$query.section).lean(true);
 
       if (selected_section && !selected_section.is_category) {
@@ -97,7 +97,7 @@ module.exports = function (N, apiPath) {
     let c = N.config.market.currencies || {};
 
     env.res.currency_types = Object.keys(c)
-                               .sort((a, b) => ((c[a] || {}).priority || 100) - ((c[b] || {}).priority || 100));
+                               .sort((a, b) => (c[a]?.priority ?? 100) - (c[b]?.priority ?? 100));
   });
 
 

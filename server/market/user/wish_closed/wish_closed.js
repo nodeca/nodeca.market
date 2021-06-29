@@ -173,7 +173,7 @@ module.exports = function (N, apiPath) {
     env.data.users = env.data.users || [];
     env.data.users.push(env.data.user._id);
 
-    if (env.params.$query && env.params.$query.from) {
+    if (env.params.$query?.from) {
       env.res.head.robots = 'noindex,follow';
     }
   });

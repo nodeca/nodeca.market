@@ -145,7 +145,7 @@ module.exports = function (N, collectionName) {
       let parentList = [];
       let current = sections[sectionID].parent;
 
-      while (current && current._id) {
+      while (current?._id) {
         parentList.unshift(current._id);
         current = current.parent;
       }
@@ -165,7 +165,7 @@ module.exports = function (N, collectionName) {
     return getSectionsTree().then(sections => {
       let current = sections[sectionID];
 
-      while (current && current._id) {
+      while (current?._id) {
         if (type === 'offers' && !current.allow_offers) return false;
         if (type === 'wishes' && !current.allow_wishes) return false;
 

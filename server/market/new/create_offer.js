@@ -253,7 +253,7 @@ module.exports = function (N, apiPath) {
     item.section = env.data.section._id;
     item.user    = env.user_info.user_id;
 
-    item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
+    item.location = (await N.models.users.User.findById(env.user_info.user_id).lean(true))?.location;
 
     await item.save();
 

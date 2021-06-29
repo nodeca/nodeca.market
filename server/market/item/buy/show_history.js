@@ -67,7 +67,7 @@ module.exports = function (N, apiPath) {
       delete item.ste;
     }
 
-    if (item.prev_st && item.prev_st.st === N.models.market.ItemOffer.statuses.HB) {
+    if (item.prev_st?.st === N.models.market.ItemOffer.statuses.HB) {
       item.prev_st = Object.assign({}, item.prev_st);
       item.prev_st.st = item.prev_st.ste;
       delete item.prev_st.ste;
@@ -106,17 +106,17 @@ module.exports = function (N, apiPath) {
       ts:   env.data.item.ts,
       role: N.models.market.ItemOfferHistory.roles.USER
     } ].concat(
-      _.map(history, i => ({ user: i.user, ts: i.ts, role: i.role }))
+      history.map(i => ({ user: i.user, ts: i.ts, role: i.role }))
     );
 
-    let history_items = _.map(history, 'item_data')
+    let history_items = history.map(x => x.item_data)
                          .concat([ env.data.item ])
                          .map(sanitize_item);
 
     env.res.history = _.zip(history_meta, history_items)
                        .map(([ meta, item ]) => ({ meta, item }));
 
-    env.data.users = (env.data.users || []).concat(_.map(env.res.history, 'meta.user'));
+    env.data.users = (env.data.users || []).concat(env.res.history.map(x => x.meta?.user));
   });
 
 
@@ -124,7 +124,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function fetch_sections(env) {
     let sections = [];
-    let section_ids = _.uniq(_.map(env.res.history, 'item.section').filter(Boolean).map(String));
+    let section_ids = _.uniq(env.res.history.map(x => x.item?.section).filter(Boolean).map(String));
 
     if (section_ids) {
       sections = await N.models.market.Section.find()
@@ -139,7 +139,7 @@ module.exports = function (N, apiPath) {
   // Fetch locations
   //
   N.wire.after(apiPath, async function fetch_locations(env) {
-    let locations = _.map(env.res.history, 'item.location').filter(Boolean);
+    let locations = env.res.history.map(x => x.item?.location).filter(Boolean);
 
     let resolved = locations.length ?
                    await N.models.core.Location.info(locations, env.user_info.locale) :

@@ -9,9 +9,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 let $dialog;
 let params;
 let result;
@@ -46,7 +43,7 @@ N.wire.once(module.apiPath, function init_handlers() {
 //
 N.wire.on(module.apiPath, function show_item_delete_many_dlg(options) {
   params = options;
-  $dialog = $(N.runtime.render(module.apiPath, _.assign({ apiPath: module.apiPath }, params)));
+  $dialog = $(N.runtime.render(module.apiPath, Object.assign({ apiPath: module.apiPath }, params)));
 
   $('body').append($dialog);
 

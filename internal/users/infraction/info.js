@@ -20,10 +20,8 @@ module.exports = function (N, apiPath) {
   // Fetch infractions issued for market item offers
   //
   N.wire.on(apiPath, async function market_item_offers_fetch_infraction_info(info_env) {
-    let item_ids = _.map(info_env.infractions.filter(
-                          i => i.src_type === N.shared.content_type.MARKET_ITEM_OFFER
-                        ), 'src');
-
+    let item_ids = info_env.infractions.filter(i => i.src_type === N.shared.content_type.MARKET_ITEM_OFFER)
+                                       .map(x => x.src);
     if (!item_ids.length) return;
 
 
@@ -40,7 +38,7 @@ module.exports = function (N, apiPath) {
     // Fetch sections
     //
     let sections = await N.models.market.Section.find()
-                             .where('_id').in(_.map(items, 'section'))
+                             .where('_id').in(items.map(x => x.section))
                              .lean(true);
 
     let access_env = { params: {
@@ -73,9 +71,8 @@ module.exports = function (N, apiPath) {
   // Fetch infractions issued for market item wishes
   //
   N.wire.on(apiPath, async function market_item_wishes_fetch_infraction_info(info_env) {
-    let item_ids = _.map(info_env.infractions.filter(
-                          i => i.src_type === N.shared.content_type.MARKET_ITEM_WISH
-                        ), 'src');
+    let item_ids = info_env.infractions.filter(i => i.src_type === N.shared.content_type.MARKET_ITEM_WISH)
+                                       .map(x => x.src);
     if (!item_ids.length) return;
 
 
@@ -92,7 +89,7 @@ module.exports = function (N, apiPath) {
     // Fetch sections
     //
     let sections = await N.models.market.Section.find()
-                             .where('_id').in(_.map(items, 'section'))
+                             .where('_id').in(items.map(x => x.section))
                              .lean(true);
 
     let access_env = { params: {

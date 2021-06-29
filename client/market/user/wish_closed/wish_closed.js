@@ -129,7 +129,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup(data) {
     }
   }
 
-  if (!scroll_done && data.params.$query && data.params.$query.from) {
+  if (!scroll_done && data.params.$query?.from) {
     let el = $('#item' + Number(data.params.$query.from));
 
     if (el.length) {

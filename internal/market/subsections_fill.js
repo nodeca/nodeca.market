@@ -85,7 +85,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function fetch_subsections_tree_info(env) {
     let subsections = await N.models.market.Section.getChildren({
-      section:     env.data.section ? env.data.section._id : null,
+      section:     env.data.section?._id,
       deepness:    env.data.section ? 1 : 2,
       offers:      env.data.section_item_type === 'offers',
       wishes:      env.data.section_item_type === 'wishes'
@@ -135,7 +135,7 @@ module.exports = function (N, apiPath) {
   // Build response tree
   //
   N.wire.after(apiPath, function subsections_fill_response(env) {
-    let root = (env.data.section || {})._id || null;
+    let root = env.data.section?._id;
     env.res.subsections = to_tree(env.data.subsections, root);
   });
 };

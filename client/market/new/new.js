@@ -183,7 +183,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   };
 
   view.attachDragOver = function attach_drag_over(attach, jqEvent) {
-    if (jqEvent.originalEvent.dataTransfer.types && jqEvent.originalEvent.dataTransfer.types[0] === 'Files') {
+    if (jqEvent.originalEvent.dataTransfer.types?.[0] === 'Files') {
       jqEvent.originalEvent.dataTransfer.dropEffect = 'copy';
       return;
     }
@@ -219,7 +219,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   };
 
   view.plusDragOver = function file_drag_over(__, jqEvent) {
-    if (jqEvent.originalEvent.dataTransfer.types && jqEvent.originalEvent.dataTransfer.types[0] === 'Files') {
+    if (jqEvent.originalEvent.dataTransfer.types?.[0] === 'Files') {
       jqEvent.originalEvent.dataTransfer.dropEffect = 'copy';
     }
   };

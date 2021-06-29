@@ -40,7 +40,7 @@ module.exports = function (N, collectionName) {
    */
   const get_rates = memoize(function _get_rates(id) {
     return N.models.market.CurrencyRate.findOne(id).sort('-ts').lean(true)
-               .then(res => (res && res.rates || {}));
+               .then(res => (res?.rates || {}));
   }, { maxAge: 5 * 60 * 1000 });
 
   CurrencyRate.statics.get = async function getRate(from, to) {

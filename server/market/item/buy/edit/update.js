@@ -257,7 +257,7 @@ module.exports = function (N, apiPath) {
     // only update location if user edits his own item,
     // do not update it for moderator actions
     if (!env.params.as_moderator) {
-      item.location = ((await N.models.users.User.findById(env.user_info.user_id).lean(true)) || {}).location;
+      item.location = (await N.models.users.User.findById(env.user_info.user_id).lean(true))?.location;
     }
 
     env.data.new_item = await item.save();

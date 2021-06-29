@@ -25,7 +25,7 @@ function get_source(post) {
   result = result.replace(/\n?$/, '\n');
 
   // add attachments
-  if (post.files && post.files.length) {
+  if (post.files?.length) {
     result += '\n';
     result += post.files.map(function (item) {
       return '![](' + N.router.linkTo('core.gridfs', { bucket: item }) + ')';
