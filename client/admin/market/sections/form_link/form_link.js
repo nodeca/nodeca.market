@@ -19,11 +19,13 @@ N.wire.on(module.apiPath + '.setup', function page_setup(data) {
   let currentLink = {};
 
   // Create observable fields on currentLink.
-  _.forEach(SECTION_FIELD_DEFAULTS, (defaultValue, key) => {
-    let value = _.has(data.current_section, key) ? data.current_section[key] : defaultValue;
+  for (let [ key, defaultValue ] of Object.entries(SECTION_FIELD_DEFAULTS)) {
+    let value = Object.prototype.hasOwnProperty.call(data.current_section || {}, key) ?
+                data.current_section[key] :
+                defaultValue;
 
     currentLink[key] = ko.observable(value).extend({ dirty: true });
-  });
+  }
 
 
   // Collect allowedParents list using tree order.
@@ -39,7 +41,7 @@ N.wire.on(module.apiPath + '.setup', function page_setup(data) {
     let sections = data.allowed_parents.filter(section => parent === (section.parent || null));
 
     _.sortBy(sections, 'display_order').forEach(section => {
-      let prefix = '| ' + _.repeat('– ', section.level);
+      let prefix = '| ' + '– '.repeat(section.level);
 
       allowedParents.push({
         _id:   section._id,
@@ -59,18 +61,18 @@ N.wire.on(module.apiPath + '.setup', function page_setup(data) {
   view.allowedParents = allowedParents;
 
   // Check if any field values of currentLink were changed.
-  view.isDirty = ko.computed(() => _.some(currentLink, field => field.isDirty()));
+  view.isDirty = ko.computed(() => Object.values(currentLink).some(field => field.isDirty()));
 
   // Save new section.
   view.create = function create() {
     let request = {};
 
-    _.forEach(currentLink, (field, key) => {
+    for (let [ key, field ] of Object.entries(currentLink)) {
       request[key] = field();
-    });
+    }
 
     N.io.rpc('admin.market.sections.create_link', request).then(() => {
-      _.forEach(currentLink, field => field.markClean());
+      for (let field of Object.values(currentLink)) field.markClean();
 
       N.wire.emit('notify.info', t('message_created'));
       return N.wire.emit('navigate.to', { apiPath: 'admin.market.sections.index' });

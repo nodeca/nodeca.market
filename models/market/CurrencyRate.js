@@ -2,7 +2,6 @@
 'use strict';
 
 
-const _        = require('lodash');
 const cheerio  = require('cheerio');
 const needle   = require('needle');
 const Mongoose = require('mongoose');
@@ -64,7 +63,7 @@ module.exports = function (N, collectionName) {
   /*
    * Update all exchange rates (method is called from cron task)
    */
-  let rootUrl = _.get(N.config, 'bind.default.mount', 'http://localhost') + '/';
+  let rootUrl = (N.config.bind?.default?.mount || 'http://localhost') + '/';
   let userAgent = `needle/${needle.version} (Nodeca; +${rootUrl})`;
 
   CurrencyRate.statics.fetch = async function fetch() {

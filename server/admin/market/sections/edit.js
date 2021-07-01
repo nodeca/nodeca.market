@@ -29,7 +29,7 @@ module.exports = function (N, apiPath) {
     let allSections = await N.models.market.Section.getChildren({ offers: true, wishes: true });
 
     // exclude current section
-    allSections = _.filter(allSections, section => !section._id.equals(env.params._id));
+    allSections = allSections.filter(section => !section._id.equals(env.params._id));
 
     // exclude links
     env.data.allowed_parents = allSections.filter(s => !s.is_linked);
