@@ -150,7 +150,7 @@ module.exports = function (N, apiPath) {
         )
       );
 
-      offset = _.sum(counters_by_status);
+      offset = counters_by_status.reduce((a, b) => a + b, 0);
     }
 
     env.res.pagination = {

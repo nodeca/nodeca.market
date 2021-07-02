@@ -3,7 +3,6 @@
 'use strict';
 
 
-const _       = require('lodash');
 const memoize = require('promise-memoize');
 
 
@@ -21,9 +20,9 @@ module.exports = function (N, apiPath) {
         let result = [];
 
         // sort result in the same order as ids
-        _.forEach(ids, id => {
-          result.push(_.find(parents, p => p._id.equals(id)));
-        });
+        for (let id of ids) {
+          result.push(parents.find(p => p._id.equals(id)));
+        }
 
         return result;
       }),
@@ -51,7 +50,7 @@ module.exports = function (N, apiPath) {
     }
 
     // no parents - we are on the root
-    if (_.isEmpty(parents)) return;
+    if (!parents || parents.length === 0) return;
 
     let parentsInfo = await fetchSectionsInfo(parents);
 
@@ -59,13 +58,11 @@ module.exports = function (N, apiPath) {
 
     // transform fetched data & glue to output
     env.res.breadcrumbs = env.res.breadcrumbs.concat(
-      bc_list.map(function (section_info) {
-        return {
-          text: section_info.title,
-          route: 'market.section.' + (data.wish ? 'wish' : 'buy'),
-          params: { section_hid: section_info.hid }
-        };
-      })
+      bc_list.map(section_info => ({
+        text: section_info.title,
+        route: 'market.section.' + (data.wish ? 'wish' : 'buy'),
+        params: { section_hid: section_info.hid }
+      }))
     );
   });
 };

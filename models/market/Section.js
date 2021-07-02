@@ -111,24 +111,22 @@ module.exports = function (N, collectionName) {
         .lean(true)
         .exec()
         .then(sections => {
-
           // create hash of trees for each section
-          let result = sections.reduce((acc, s) => {
-            acc[s._id] = Object.assign({ children: [], linked: [] }, s);
-            return acc;
-          }, {});
+          let result = {};
+
+          for (let s of sections) result[s._id] = Object.assign({ children: [], linked: [] }, s);
 
           // root is a special fake `section` that contains array of the root-level sections
           let root = { children: [], linked: [], allow_offers: true, allow_wishes: true };
 
-          Object.values(result).forEach(s => {
+          for (let s of Object.values(result)) {
             s.parent = s.parent ? result[s.parent] : root;
             s.parent.children.push(s);
-          });
+          }
 
-          Object.values(result).forEach(s => {
+          for (let s of Object.values(result)) {
             s.linked = s.links.map(ss => result[ss]).filter(Boolean);
-          });
+          }
 
           result.root = root;
 

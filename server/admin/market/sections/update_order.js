@@ -6,9 +6,6 @@
 'use strict';
 
 
-const _  = require('lodash');
-
-
 module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     _id:            { format: 'mongo',          required: true },
@@ -38,7 +35,7 @@ module.exports = function (N, apiPath) {
     // create hash table for _ids, where array index means display order
     let siblingOrder = {};
 
-    _.forEach(_ids, (value, index) => { siblingOrder[value] = index + 1; });
+    _ids.forEach((value, index) => { siblingOrder[value] = index + 1; });
 
     let sections = await N.models.market.Section
                             .find({ _id: { $in: _ids } })
