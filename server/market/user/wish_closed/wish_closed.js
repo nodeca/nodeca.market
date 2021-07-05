@@ -3,8 +3,6 @@
 
 'use strict';
 
-const _  = require('lodash');
-
 
 module.exports = function (N, apiPath) {
 
@@ -57,7 +55,7 @@ module.exports = function (N, apiPath) {
       next = typeof query.next !== 'undefined';
 
       // get hid by id
-      if (query.from && _.isInteger(+query.from)) {
+      if (query.from && Number.isInteger(+query.from)) {
         let item = await N.models.market.ItemWishArchived.findOne()
                               .where('user').equals(env.data.user._id)
                               .where('hid').equals(+query.from)

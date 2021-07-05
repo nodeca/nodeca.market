@@ -4,7 +4,6 @@
 'use strict';
 
 
-const _                = require('lodash');
 const memoize          = require('promise-memoize');
 const sanitize_section = require('nodeca.market/lib/sanitizers/section');
 
@@ -45,7 +44,7 @@ module.exports = function (N, apiPath) {
       next = typeof query.next !== 'undefined';
 
       // get hid by id
-      if (query.from && _.isInteger(+query.from)) {
+      if (query.from && Number.isInteger(+query.from)) {
         let item = await N.models.market.ItemWish.findOne()
                               .where('section').in(env.data.section_ids)
                               .where('hid').equals(+query.from)
