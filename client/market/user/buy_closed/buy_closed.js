@@ -392,7 +392,7 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
       // Unselect
       //
       data.$this.closest('.market-list-item-offer').removeClass('market-list-item-offer__m-selected');
-      pageState.selected_items = _.without(pageState.selected_items, itemId);
+      pageState.selected_items = pageState.selected_items.filter(x => x !== itemId);
     }
 
     save_selected_items();

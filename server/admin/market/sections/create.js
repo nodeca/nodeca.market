@@ -3,9 +3,6 @@
 'use strict';
 
 
-const _     = require('lodash');
-
-
 module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     parent:         { type: [ 'null', 'string' ], required: true },
@@ -32,13 +29,13 @@ module.exports = function (N, apiPath) {
 
     // Find and set first available `display_order` value in the end of siblings list.
     let result = await N.models.market.Section
-                          .find({ parent: newSection.parent })
+                          .findOne({ parent: newSection.parent })
                           .select('display_order')
                           .sort('-display_order')
                           .limit(1)
                           .lean(true);
 
-    newSection.display_order = _.isEmpty(result) ? 1 : result[0].display_order + 1;
+    newSection.display_order = (result?.display_order ?? 0) + 1;
 
     // Save new section into the database.
     await newSection.save();

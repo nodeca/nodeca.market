@@ -93,7 +93,7 @@ module.exports = function (N, apiPath) {
     // Sort in `env.data.item_ids` order.
     // May be slow on large item volumes
     env.data.item_ids.forEach(id => {
-      let item = _.find(items, t => t._id.equals(id));
+      let item = items.find(t => t._id.equals(id));
 
       if (item) {
         env.data.items.push(item);

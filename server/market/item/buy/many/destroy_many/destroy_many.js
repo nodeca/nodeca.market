@@ -88,11 +88,10 @@ module.exports = function (N, apiPath) {
 
     env.data.items = items.filter((__, idx) => access_env.data.access_read[idx]);
 
-    // makes a map _id=>Boolean showing which collection the item is in
-    env.data.item_is_archived = Object.assign({},
-      _.mapValues(_.keyBy(items_archived, '_id'), () => true),
-      _.mapValues(_.keyBy(items_active, '_id'), () => false)
-    );
+    // make a map _id=>Boolean showing which collection the item is in
+    env.data.item_is_archived = {};
+    for (let item of items_archived) env.data.item_is_archived[item._id] = true;
+    for (let item of items_active)   env.data.item_is_archived[item._id] = false;
   });
 
 
@@ -188,7 +187,7 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, async function update_user(env) {
     let users = env.data.items.filter(item => env.data.items_to_update.has(String(item._id))).map(x => x.user);
-    users = _.uniq(users.map(String));
+    users = [ ...new Set(users.map(String)) ];
 
     await N.models.market.UserItemOfferCount.recount(users);
     await N.models.market.UserItemOfferArchivedCount.recount(users);

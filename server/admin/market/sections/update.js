@@ -6,9 +6,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     _id:            { format: 'mongo', required: true },
@@ -43,13 +40,13 @@ module.exports = function (N, apiPath) {
     if (section.isModified('parent')) {
       // This is the most simple way to find max value of a field in Mongo.
       let result = await N.models.market.Section
-                            .find({ parent: section.parent })
+                            .findOne({ parent: section.parent })
                             .select('display_order')
                             .sort('-display_order')
                             .limit(1)
                             .lean(true);
 
-      section.display_order = _.isEmpty(result) ? 1 : result[0].display_order + 1;
+      section.display_order = (result?.display_order ?? 0) + 1;
     }
 
     await section.save();

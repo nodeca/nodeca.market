@@ -3,9 +3,6 @@
 'use strict';
 
 
-const _ = require('lodash');
-
-
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
@@ -64,11 +61,10 @@ module.exports = function (N, apiPath) {
 
     env.data.items = items.filter((__, idx) => access_env.data.access_read[idx]);
 
-    // makes a map _id=>Boolean showing which collection the item is in
-    env.data.item_is_archived = Object.assign({},
-      _.mapValues(_.keyBy(items_archived, '_id'), () => true),
-      _.mapValues(_.keyBy(items_active, '_id'), () => false)
-    );
+    // make a map _id=>Boolean showing which collection the item is in
+    env.data.item_is_archived = {};
+    for (let item of items_archived) env.data.item_is_archived[item._id] = true;
+    for (let item of items_active)   env.data.item_is_archived[item._id] = false;
   });
 
 

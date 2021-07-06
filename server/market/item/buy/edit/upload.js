@@ -4,7 +4,6 @@
 'use strict';
 
 
-const _           = require('lodash');
 const mime        = require('mime-types').lookup;
 const path        = require('path');
 const resize      = require('nodeca.users/models/users/_lib/resize');
@@ -82,7 +81,7 @@ module.exports = function (N, apiPath) {
 
     // Usually file size and type are checked on client side,
     // but we must check it on server side for security reasons
-    let allowedTypes = _.map(mediaConfig.extensions, ext => mime(ext));
+    let allowedTypes = mediaConfig.extensions.map(ext => mime(ext));
 
     if (allowedTypes.indexOf(fileInfo.headers['content-type']) === -1) {
       // Fallback attempt: FF can send strange mime,

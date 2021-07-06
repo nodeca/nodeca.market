@@ -109,7 +109,7 @@ module.exports = function (N, apiPath) {
 
     // sort result in the same order as ids
     env.data.subsections_info.forEach(subsectionInfo => {
-      let foundSection = _.find(sections, s => s._id.equals(subsectionInfo._id));
+      let foundSection = sections.find(s => s._id.equals(subsectionInfo._id));
 
       if (!foundSection) return; // continue
 
