@@ -197,13 +197,3 @@ article#content.market-item-wish(
           data-ref='market_item_wish:'+self.section.hid+':'+self.item.hid
           data-item-id=self.item._id
         )= self.t('contact')
-
-    if self.similar_items && self.similar_items.length > 0
-      .market-item-wish-similar
-        .market-item-wish-similar__header= self.t('similar_items')
-
-        ul.market-item-wish-similar__item-list
-          each s in self.similar_items
-            li.market-item-wish-similar-item
-              a.market-item-wish-similar-item__title(href=self.link_to('market.item.wish', { section_hid: s.section_hid, item_hid: s.item.hid }))
-                = s.item.title

@@ -276,44 +276,4 @@ module.exports = function (N, apiPath) {
       });
     }
   });
-
-
-  // Add "similar items" block
-  //
-  N.wire.after(apiPath, async function fill_similar_items(env) {
-    let data = { item_id: env.data.item._id };
-
-    try {
-      await N.wire.emit('internal:market.similar_item_wishes', data);
-    } catch (__) {
-      // if similar items can't be fetched, just show empty result
-      return;
-    }
-
-    if (data.results?.length) {
-      let items = await N.models.market.ItemWish.find()
-                            .where('_id').in(data.results.map(x => x.item_id))
-                            .lean(true);
-
-      let sections = await N.models.market.Section.find()
-                               .where('_id').in(_.uniq(items.map(x => x.section).map(String)))
-                               .lean(true);
-
-      let access_env = { params: { items, user_info: env.user_info } };
-
-      await N.wire.emit('internal:market.access.item_wish', access_env);
-
-      items = items.filter((__, idx) => access_env.data.access_read[idx]);
-
-      let items_by_id    = _.keyBy(await sanitize_item_wish(N, items, env.user_info), '_id');
-      let sections_by_id = _.keyBy(sections, '_id'); // not sanitized because only hid is used
-
-      env.res.similar_items = data.results.filter(result => items_by_id[result.item_id])
-                                          .map(result => ({
-                                            item:        items_by_id[result.item_id],
-                                            section_hid: sections_by_id[items_by_id[result.item_id].section].hid,
-                                            weight:      result.weight
-                                          }));
-    }
-  });
 };
