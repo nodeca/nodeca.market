@@ -230,7 +230,7 @@ async function createItemWish(section, user, isClosed = false) {
 
     // don't property randomize this to avoid needless requests
     // to geolocation services
-    location: charlatan.Helpers.sample([ [ 50, 0 ], [ 40.7, -74 ], null ]),
+    location: charlatan.Helpers.sample([ [ 0, 51.5 ], [ -74, 40.7 ] ]),
 
     /*eslint-disable new-cap*/
     ip:       charlatan.Internet.IPv4(),

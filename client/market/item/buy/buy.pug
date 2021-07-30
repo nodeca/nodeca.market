@@ -269,7 +269,7 @@ article#content.market-item-buy(
                 a.market-item-buy-similar-item__title(href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid }))
                   = s.item.title
 
-                span.market-item-buy-similar-item__price
+                .market-item-buy-similar-item__price
                   if s.item.price
                     -
                       function get_symbol(currency) {
