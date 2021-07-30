@@ -95,8 +95,8 @@ article#content.market-item-wish(
 
     .market-item-wish__description.markup!= self.item.html
 
-    .market-item-wish__details
-      if self.item.location
+    if self.item.location
+      .market-item-wish__details
         .market-item-wish__details-item
           .market-item-wish__details-key= self.t('location')
           .market-item-wish__details-value
