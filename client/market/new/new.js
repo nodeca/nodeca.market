@@ -1,10 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
+const bag = require('bagjs')({ prefix: 'nodeca' });
 
 
 // Knockout bindings root object.
 let view = null;
+let last_used_currency = '';
 
 
 N.wire.on('navigate.preload:' + module.apiPath, function load_deps(preload) {
@@ -12,6 +14,17 @@ N.wire.on('navigate.preload:' + module.apiPath, function load_deps(preload) {
 
   // editor itself is not used, only markdown parser and mdedit cache
   preload.push('mdedit');
+});
+
+
+// Get last currency user selected previously
+//
+N.wire.before('navigate.done:' + module.apiPath, function load_settings() {
+  return bag.get('market_new_item_currency')
+    .then(currency => {
+      last_used_currency = currency || '';
+    })
+    .catch(() => {}); // Suppress storage errors
 });
 
 
@@ -41,7 +54,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     type:           ko.observable(view.offerTypes[0].value),
     title:          ko.observable(''),
     price_value:    ko.observable(''),
-    price_currency: ko.observable(''),
+    price_currency: ko.observable(last_used_currency),
     section:        ko.observable(''),
     description:    ko.observable(''),
     files:          ko.observableArray(),
@@ -49,7 +62,6 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     delivery:       ko.observable(false),
     is_new:         ko.observable(false)
   };
-
 
   if (N.runtime.page_data.defaults.section) {
     view.offer.section(N.runtime.page_data.defaults.section);
@@ -70,6 +82,11 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
       }
     }
   }
+
+  view.offer.price_currency.subscribe(function (v) {
+    bag.set('market_new_item_currency', v)
+      .catch(() => {}); // suppress storage errors
+  });
 
   // force price to be numeric (better to do with extenders, but subscription is easier to do)
   view.offer.price_value.subscribe(v => {

@@ -139,7 +139,7 @@ article#content.market-new
           .col.mb-3
             ul.market-new__tabs.nav.nav-tabs
               li.nav-item
-                span.market-new__label.nav-link.disabled= self.t('field_description')
+                span.market-new__label.market-new__label-description.nav-link.disabled= self.t('field_description')
               li.nav-item
                 a.nav-link(href='#', data-bind='click: togglePreview.bind($data, false), css: { "active": !showPreview() }')=self.t('mode_edit')
               li.nav-item

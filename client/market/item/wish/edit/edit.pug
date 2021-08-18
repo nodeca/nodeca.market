@@ -37,7 +37,7 @@ article#content.market-item-wish-edit
 
         .row
           .col.mb-3
-            label.form-label.market-item-wish-edit__label(for='market-edit-section')= self.t('field_section')
+            label.form-label.market-item-wish-edit__label.market-item-wish-edit__label-description(for='market-edit-section')= self.t('field_section')
             select.form-control.form-select#market-edit-section(data-bind="value: offer.section", required)
               option(value="", disabled, selected, hidden)= self.t('section_placeholder')
               +sections_tree(self.sections, 1)

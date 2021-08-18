@@ -35,6 +35,9 @@
 .market-item-buy__renew-btn
   float right
 
+.market-item-buy__price
+  font-size $font-size-lg
+
 .market-item-buy__info
   color $body-color-secondary
   margin 0
@@ -69,6 +72,10 @@
 .market-item-buy__details-value
   display table-cell
   vertical-align top
+
+.market-item-buy__location-link
+  // make link the same color as normal text
+  color inherit
 
 .market-item-buy__controls-blk
   display flex
@@ -132,6 +139,9 @@
 //
 // Responses block
 //
+.market-item-buy-responses
+  margin-top 2rem
+
 .market-item-buy-responses__m-empty
   color $body-color-secondary
 
@@ -145,6 +155,7 @@
 
 .market-item-buy-response__link
   color $body-color-secondary
+  font-size $font-size-sm
 
 .market-item-buy-response__avatar
   display inline-block
