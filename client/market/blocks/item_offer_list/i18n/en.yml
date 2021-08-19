@@ -1,6 +1,5 @@
 en-US:
   used: used
-  no_photo: No photo
   icon_delivery: Delivery is available
   icon_exchange: Exchange is possible
   del_reason: "(#{text})"

@@ -288,6 +288,14 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Clear "similar items" cache (for item offers only)
+  //
+  N.wire.after(apiPath, async function clear_similar_items_cache(env) {
+    await N.models.market.ItemOfferSimilarCache.remove()
+                         .where('item').equals(env.data.new_item._id);
+  });
+
+
   // Schedule search index update
   //
   N.wire.after(apiPath, async function add_search_index(env) {

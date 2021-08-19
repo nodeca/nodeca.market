@@ -94,7 +94,7 @@ function get_status_actions(new_item, old_item = {}) {
     result.push([ 'open' ]);
   }
 
-  if (old_item.autoclose_at_ts !== new_item.autoclose_at_ts) {
+  if (old_item.autoclose_at_ts && old_item.autoclose_at_ts !== new_item.autoclose_at_ts) {
     result.push([ 'renew', new_item.autoclose_at_ts ]);
   }
 
