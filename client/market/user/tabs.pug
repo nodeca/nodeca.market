@@ -2,35 +2,35 @@
 - self.users = self.users || {};
 - var user = self.users[self.user_id] || {};
 
-.market-user__tabs.nav.nav-tabs-underlined
-  a.nav-link(
-    href=self.link_to('market.user.buy_active', { user_hid: user.hid })
-    class=self.active_tab === 'buy_active' ? 'active' : ''
-  )
-    = self.t('buy_active')
-    span.market-user__tab-counter
-      = '(' + String(self.stats.active_offers) + ')'
+ul.content-tabs.market-user__tabs
+  li.content-tabs-item
+    a.content-tabs-link(
+      href=self.link_to('market.user.buy_active', { user_hid: user.hid })
+      class=self.active_tab === 'buy_active' ? 'active' : ''
+    )
+      = self.t('buy_active')
+      span.content-tabs-counter= self.stats.active_offers
 
-  a.nav-link(
-    href=self.link_to('market.user.buy_closed', { user_hid: user.hid })
-    class=self.active_tab === 'buy_closed' ? 'active' : ''
-  )
-    = self.t('buy_closed')
-    span.market-user__tab-counter
-      = '(' + String(self.stats.closed_offers) + ')'
+  li.content-tabs-item
+    a.content-tabs-link(
+      href=self.link_to('market.user.buy_closed', { user_hid: user.hid })
+      class=self.active_tab === 'buy_closed' ? 'active' : ''
+    )
+      = self.t('buy_closed')
+      span.content-tabs-counter= self.stats.closed_offers
 
-  a.nav-link(
-    href=self.link_to('market.user.wish_active', { user_hid: user.hid })
-    class=self.active_tab === 'wish_active' ? 'active' : ''
-  )
-    = self.t('wish_active')
-    span.market-user__tab-counter
-      = '(' + String(self.stats.active_wishes) + ')'
+  li.content-tabs-item
+    a.content-tabs-link(
+      href=self.link_to('market.user.wish_active', { user_hid: user.hid })
+      class=self.active_tab === 'wish_active' ? 'active' : ''
+    )
+      = self.t('wish_active')
+      span.content-tabs-counter= self.stats.active_wishes
 
-  a.nav-link(
-    href=self.link_to('market.user.wish_closed', { user_hid: user.hid })
-    class=self.active_tab === 'wish_closed' ? 'active' : ''
-  )
-    = self.t('wish_closed')
-    span.market-user__tab-counter
-      = '(' + String(self.stats.closed_wishes) + ')'
+  li.content-tabs-item
+    a.content-tabs-link(
+      href=self.link_to('market.user.wish_closed', { user_hid: user.hid })
+      class=self.active_tab === 'wish_closed' ? 'active' : ''
+    )
+      = self.t('wish_closed')
+      span.content-tabs-counter= self.stats.closed_wishes
