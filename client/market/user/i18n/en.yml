@@ -1,6 +1,6 @@
 en-US:
   tabs:
-    buy_active: Active offers
-    buy_closed: Closed offers
-    wish_active: Active wishes
-    wish_closed: Closed wishes
+    buy_active: 'Offers: active'
+    buy_closed: 'Offers: closed'
+    wish_active: 'Wishes: active'
+    wish_closed: 'Wishes: closed'
