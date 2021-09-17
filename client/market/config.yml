@@ -8,3 +8,5 @@ type:
   widget_i18n: i18n/*.yml
   widget_view: "*.pug"
   widget_js: "*.js"
+  bin:
+    - "*.svg"
