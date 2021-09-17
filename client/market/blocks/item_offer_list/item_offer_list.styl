@@ -18,6 +18,11 @@
 .market-list-item-offer__price
   font-size $h5-font-size
 
+.market-list-item-offer__price-original
+  color $body-color-secondary
+  margin-left .2rem
+
+
 .market-list-item-offer__location-link
 .market-list-item-offer__user-link
 .market-list-item-offer__section-link
@@ -34,7 +39,10 @@
 
 .market-list-item-offer__details-item + .market-list-item-offer__details-item
   &:before
-    content ' | '
+    content '|'
+    margin-left .5rem
+    margin-right .5rem
+    opacity .7
 
 .market-list-item-offer__used
   margin-left .3rem
