@@ -26,7 +26,7 @@ module.exports = function (N) {
                             .lean(true);
     if (!section) return;
 
-    data.html = render(N, 'common.blocks.markup.market_section_buy_link', {
+    data.html = render(N, 'common.blocks.markup.market_section_offer_link', {
       href:    data.url,
       section
     }, {});
