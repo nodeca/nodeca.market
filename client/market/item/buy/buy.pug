@@ -257,13 +257,12 @@ article#content.market-item-buy(
         ul.market-item-buy-similar__item-list
           each s in self.similar_items
             li.market-item-buy-similar-item
-              a.market-item-buy-similar-item__photo.thumb(
-                href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid })
-              )
-                if s.item.files && s.item.files.length > 0
+              - var item_link = self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid });
+              if s.item.files && s.item.files.length > 0
+                a.market-item-buy-similar-item__photo.thumb(href=item_link)
                   img.thumb__image(src=self.link_to('core.gridfs', { bucket: s.item.files[0] + '_sm' }))
-                else
-                  .thumb__content
+              else
+                a.market-item-buy-similar-item__photo.thumb.market-no-foto(href=item_link)
 
               .market-item-buy-similar-item__info
                 a.market-item-buy-similar-item__title(href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid }))
@@ -277,10 +276,10 @@ article#content.market-item-buy(
                         return self.t.exists(p) ? self.t(p) : currency;
                       }
 
-                      var user_currency  = self.settings.market_displayed_currency;
-                      var rate           = self.currency_rates[s.item.price.currency] ;
-                      var price_original = self.price(s.item.price.value, get_symbol(s.item.price.currency));
-                      var price_converted;
+                      var user_currency   = self.settings.market_displayed_currency;
+                      var rate            = self.currency_rates[s.item.price.currency];
+                      var price_original  = self.price(s.item.price.value, get_symbol(s.item.price.currency));
+                      var price_converted = null;
 
                       if (user_currency && user_currency !== s.item.price.currency && rate && rate > 0) {
                         price_converted = self.price(s.item.price.value * rate, get_symbol(user_currency), true);
