@@ -28,8 +28,8 @@ article#content.market-index-buy
             )= section.title
 
           each subsection in section.child_list
-            .market-index-buy__subsection
-              a.market-index-buy__subsection-link(
-                class=subsection.is_linked ? 'market-index-buy__linked-section' : ''
-                href=self.link_to('market.section.buy', { section_hid: subsection.hid })
-              )= subsection.title
+            if !subsection.is_linked
+              .market-index-buy__subsection
+                a.market-index-buy__subsection-link(
+                  href=self.link_to('market.section.buy', { section_hid: subsection.hid })
+                )= subsection.title
