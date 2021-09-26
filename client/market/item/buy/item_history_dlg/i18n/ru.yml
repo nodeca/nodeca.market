@@ -9,7 +9,7 @@ ru-RU:
   delivery_not_available: нет
   barter_info: 'Обмен:'
   condition: 'Состояние:'
-  condition_new: 'новый'
+  condition_new: 'новое'
   condition_used: 'б/у'
   action_move: 'Объявление перемещено из <a href="#{old_link}" target="_blank">#{old_title}</a> в <a href="#{new_link}" target="_blank">#{new_title}</a>'
   action_open: Объявление открыто

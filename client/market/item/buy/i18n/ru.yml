@@ -9,7 +9,7 @@ ru-RU:
   delivery_not_available: нет
   barter_info: 'Обмен:'
   condition: 'Состояние:'
-  condition_new: 'новый'
+  condition_new: 'новое'
   condition_used: 'б/у'
   responded: 'Откликнулись:'
   no_responses: Вам пока никто не написал.
