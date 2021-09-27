@@ -215,7 +215,7 @@ module.exports = function (N, apiPath) {
       // ignore linked categories
       if (subsectionInfo.is_linked) return;
 
-      let foundSection = all_sections.find(s => s._id.equals(subsectionInfo._id));
+      let foundSection = Object.values(all_sections).find(s => s._id.equals(subsectionInfo._id));
 
       if (!foundSection) return; // continue
 
