@@ -5,6 +5,7 @@ ru-RU:
   field_price: Цена
   field_section: Категория
   field_description: Описание
+  field_description_help: 'Вы можете использовать <a href="#{link}">маркдаун</a>, чтоб отформатировать описание.'
   field_photos: Фотографии
   field_photos_limit_range: ' (#{min}-#{max})'
   field_photos_limit_low: ' (>= #{min})'
@@ -13,7 +14,6 @@ ru-RU:
   field_delivery: Пересылка возможна
   field_is_new: Новый товар (не использовался)
   mode_preview: Предпросмотр
-  mode_edit: Редактирование
   attach_main: Основное фото
   attach_set_main: Сделать основным
   attach_delete: Удалить

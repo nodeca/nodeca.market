@@ -7,6 +7,7 @@ en-US:
   field_price: Price
   field_section: Category
   field_description: Description
+  field_description_help: 'You can use <a href="#{link}">markdown</a> to write formatted description.'
   field_photos: 'Photos'
   field_photos_limit_range: ' (#{min}-#{max})'
   field_photos_limit_low: ' (>= #{min})'
@@ -15,7 +16,6 @@ en-US:
   field_delivery: Delivery is available
   field_is_new: New item (not used) 
   mode_preview: Preview
-  mode_edit: Edit
   attach_main: Main photo
   attach_set_main: Set as main
   attach_delete: Delete

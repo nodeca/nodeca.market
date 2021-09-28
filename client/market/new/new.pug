@@ -137,16 +137,15 @@ article#content.market-new
 
         .row
           .col.mb-3
-            ul.market-new__tabs.nav.nav-tabs
-              li.nav-item
-                span.market-new__label.market-new__label-description.nav-link.disabled= self.t('field_description')
-              li.nav-item
-                a.nav-link(href='#', data-bind='click: togglePreview.bind($data, false), css: { "active": !showPreview() }')=self.t('mode_edit')
-              li.nav-item
-                a.nav-link(href='#', data-bind='click: togglePreview.bind($data, true), css: { "active": showPreview() }')=self.t('mode_preview')
+            .market-new__preview-controls
+              label.form-label.market-new__label(for='market-edit-description')= self.t('field_description')
+              a.market-new__preview-btn.btn.btn-sm(
+                data-bind='click: togglePreview, css: { "btn-outline-success": showPreview(), "btn-link": !showPreview() }'
+              )=self.t('mode_preview')
 
             textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
             .market-new__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
+            small.form-text.text-muted!= self.t('field_description_help', { link: self.link_to('common.faq_markup') })
 
         .row(data-bind="visible: offer.type() === 'sell'")
           .col.mb-3

@@ -4,6 +4,6 @@ en-US:
   field_title: Title
   field_section: Category
   field_description: Description
+  field_description_help: 'You can use <a href="#{link}">markdown</a> to write formatted description.'
   mode_preview: Preview
-  mode_edit: Edit
   submit: Publish
