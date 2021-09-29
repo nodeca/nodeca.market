@@ -42,6 +42,16 @@ function has_status(status_set, st) {
 }
 
 
+// Round timestamp down to nearest hour (exact time is meaningless if task is delayed)
+//
+function approximate_autoclose(value) {
+  if (!value) return null;
+  let date = new Date(value);
+  date = new Date(date - date % (60 * 60 * 1000));
+  return date;
+}
+
+
 // Detect changes in topic statuses
 //
 // Input:
@@ -94,8 +104,9 @@ function get_status_actions(new_item, old_item = {}) {
     result.push([ 'open' ]);
   }
 
-  if (old_item.autoclose_at_ts && old_item.autoclose_at_ts !== new_item.autoclose_at_ts) {
-    result.push([ 'renew', new_item.autoclose_at_ts ]);
+  if (old_item.autoclose_at_ts &&
+      +approximate_autoclose(old_item.autoclose_at_ts) !== +approximate_autoclose(new_item.autoclose_at_ts)) {
+    result.push([ 'renew', approximate_autoclose(new_item.autoclose_at_ts) ]);
   }
 
   if (old_is_deleted || new_is_deleted) {
@@ -247,15 +258,18 @@ function build_diff(history) {
       attr_diffs.push([ 'condition', old_condition, new_condition ]);
     }
 
-    result.push({
-      user:       new_revision.meta.user,
-      ts:         new_revision.meta.ts,
-      role:       new_revision.meta.role,
-      text_diff,
-      title_diff,
-      actions,
-      attr_diffs
-    });
+    // don't show entry if only change is renewal within same 1-hour period
+    if (text_diff || title_diff || actions.length || attr_diffs.length) {
+      result.push({
+        user:       new_revision.meta.user,
+        ts:         new_revision.meta.ts,
+        role:       new_revision.meta.role,
+        text_diff,
+        title_diff,
+        actions,
+        attr_diffs
+      });
+    }
   }
 
   return result;

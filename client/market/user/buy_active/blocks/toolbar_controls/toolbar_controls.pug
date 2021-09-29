@@ -4,6 +4,13 @@
 
 - items.push('currency')
 
+// show "renew all" button if:
+//  - it's user own page
+//  - user can renew items (same permission setting for creation and renewal)
+//  - there is at least one active offer or wish
+if self.user_id === self.runtime.user_id && self.settings.market_can_create_items && (self.stats.active_offers || self.stats.active_wishes)
+  - items.push('renew_all')
+
 - var show_menu = items.length > 0;
 
 
@@ -47,6 +54,12 @@ if items.length > 0 && items[items.length - 1] === 'header'
                 data-on-click='market.blocks.currency_select_dlg'
                 data-currency=self.settings.market_displayed_currency
               )= self.t('currency')
+
+            when 'renew_all'
+              button.dropdown-item(
+                type='button'
+                data-on-click='market.user.buy_active:renew_all'
+              )= self.t('renew_all')
 
             when 'divider'
               .dropdown-divider

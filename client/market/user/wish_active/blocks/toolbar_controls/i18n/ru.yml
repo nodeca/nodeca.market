@@ -1,5 +1,6 @@
 ru-RU:
   currency: Валюта
+  renew_all: Продлить всё
   many_header: "С #{count} ((объявлением|объявлениями|объявлениями)):"
   many_unselect: Снять выделение
   many_delete: Удалить

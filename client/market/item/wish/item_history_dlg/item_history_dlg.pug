@@ -56,13 +56,9 @@
                             = ' ' + self.t('del_reason', { text: value })
                       when 'renew'
                         .diff-line
-                          -
-                            var date = new Date(value);
-                            // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
-                            date = new Date(date - date % (60 * 60 * 1000));
                           = self.t('action_' + key)
                           = ' '
-                          != self.timetag(date, 'date')
+                          != self.timetag(value, 'date')
                       default
                         .diff-line= self.t('action_' + key)
 

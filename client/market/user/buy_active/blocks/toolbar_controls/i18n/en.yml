@@ -1,5 +1,6 @@
 en-US:
   currency: Currency
+  renew_all: Renew all
   many_header: "With #{count} ((item|items)):"
   many_unselect: Clear selection
   many_delete: Delete

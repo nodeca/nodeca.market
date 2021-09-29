@@ -400,6 +400,16 @@ N.wire.once('navigate.done:' + module.apiPath, function market_item_selection_in
   });
 
 
+  // Renew all open items
+  //
+  N.wire.on(module.apiPath + ':renew_all', function renew_all() {
+    return Promise.resolve()
+      .then(() => N.io.rpc('market.user.renew_all'))
+      .then(() => N.wire.emit('notify.info', t('all_items_renewed')))
+      .then(() => N.wire.emit('navigate.reload'));
+  });
+
+
   // Unselect all items
   //
   N.wire.on(module.apiPath + ':items_unselect', function unselect_many() {
