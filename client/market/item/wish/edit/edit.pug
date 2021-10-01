@@ -52,7 +52,7 @@ article#content.market-item-wish-edit
 
             textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
             .market-item-wish__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
-            small.form-text.text-muted!= self.t('field_description_help', { link: self.link_to('common.faq_markup') })
+            .form-text!= self.t('field_description_help', { link: self.link_to('common.faq_markup') })
 
         .row
           .col

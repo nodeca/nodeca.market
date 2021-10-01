@@ -135,13 +135,13 @@ article#content.market-item-buy-edit
 
             textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
             .market-item-buy__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
-            small.form-text.text-muted!= self.t('field_description_help', { link: self.link_to('common.faq_markup') })
+            .form-text!= self.t('field_description_help', { link: self.link_to('common.faq_markup') })
 
         .row
           .col.mb-3
             label.form-label.market-item-buy-edit__label(for='market-edit-barter')= self.t('field_barter')
             input.form-control#market-edit-barter(type='text', data-bind='textInput: offer.barter_info')
-            small.form-text.text-muted= self.t('field_barter_help')
+            .form-text= self.t('field_barter_help')
 
         .row
           .col.mb-3
