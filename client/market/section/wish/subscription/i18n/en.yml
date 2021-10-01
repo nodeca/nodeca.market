@@ -1,0 +1,7 @@
+en-US:
+  normal: No subscription
+  normal_desc: You will not receive notifications about new wishes.
+  tracking: Normal
+  tracking_desc: You will see new wishes in tracker.
+  watching: Urgent
+  watching_desc: You will see new wishes in tracker and receive email notifications.
