@@ -34,7 +34,7 @@ each item, idx in self.items
 
         .market-list-item-wish__info
           .market-list-item-wish__details.d-block.d-sm-none
-            .market-list-item-wish__details-item
+            span.market-list-item-wish__details-item
               - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
               if self.market_list_show_close_date && isClosed && item.closed_at_ts
                 != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
@@ -49,7 +49,7 @@ each item, idx in self.items
                 != self.timetag(item.ts, 'relative')
 
             if !self.market_list_hide_user
-              .market-list-item-wish__details-item
+              span.market-list-item-wish__details-item
                 - var user = self.users[item.user];
                 if user
                   a.market-list-item-wish__user-link._ucard-popover(
@@ -72,7 +72,7 @@ each item, idx in self.items
                   span.icon.icon-location
 
           .market-list-item-wish__details.d-none.d-sm-block
-            .market-list-item-wish__details-item
+            span.market-list-item-wish__details-item
               - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
               if self.market_list_show_close_date && isClosed && item.closed_at_ts
                 != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
@@ -87,16 +87,16 @@ each item, idx in self.items
                 != self.timetag(item.ts, 'relative')
 
             if !self.market_list_hide_user
-              .market-list-item-wish__details-item
+              span.market-list-item-wish__details-item
                 - var user = self.users[item.user];
                 if user
                   a.market-list-item-wish__user-link._ucard-popover(
                     href=self.link_to('users.member', { user_hid: user.hid })
                     data-user-id=user._id
                     data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
-                  )= user.name
+                  )= user.nick
 
-            .market-list-item-wish__details-item
+            span.market-list-item-wish__details-item
               a.market-list-item-wish__section-link(
                 href=self.link_to('market.section.wish', { section_hid: section.hid })
               )
@@ -116,7 +116,7 @@ each item, idx in self.items
               href=self.link_to('users.member', { user_hid: delUser.hid })
               data-user-id=delUser._id
               data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
-            )= delUser.name
+            )= delUser.nick
 
             if item.del_reason
               = ' '

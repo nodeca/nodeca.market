@@ -52,7 +52,7 @@ each item, idx in self.items
 
           .market-list-item-offer__info-contents
             .market-list-item-offer__details.d-block.d-sm-none
-              .market-list-item-offer__details-item
+              span.market-list-item-offer__details-item
                 - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
                 if self.market_list_show_close_date && isClosed && item.closed_at_ts
                   != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
@@ -67,14 +67,14 @@ each item, idx in self.items
                   != self.timetag(item.ts, 'relative')
 
               if !self.market_list_hide_user
-                .market-list-item-offer__details-item
+                span.market-list-item-offer__details-item
                   - var user = self.users[item.user];
                   if user
                     a.market-list-item-offer__user-link._ucard-popover(
                       href=self.link_to('users.member', { user_hid: user.hid })
                       data-user-id=user._id
                       data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
-                    )= user.name
+                    )= user.nick
 
             .market-list-item-offer__price
               if item.price
@@ -122,7 +122,7 @@ each item, idx in self.items
                 span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
 
             .market-list-item-offer__details.d-none.d-sm-block
-              .market-list-item-offer__details-item
+              span.market-list-item-offer__details-item
                 - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
                 if self.market_list_show_close_date && isClosed && item.closed_at_ts
                   != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
@@ -137,16 +137,16 @@ each item, idx in self.items
                   != self.timetag(item.ts, 'relative')
 
               if !self.market_list_hide_user
-                .market-list-item-offer__details-item
+                span.market-list-item-offer__details-item
                   - var user = self.users[item.user];
                   if user
                     a.market-list-item-offer__user-link._ucard-popover(
                       href=self.link_to('users.member', { user_hid: user.hid })
                       data-user-id=user._id
                       data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
-                    )= user.name
+                    )= user.nick
 
-              .market-list-item-offer__details-item
+              span.market-list-item-offer__details-item
                 a.market-list-item-offer__section-link(
                   href=self.link_to('market.section.buy', { section_hid: section.hid })
                 )
