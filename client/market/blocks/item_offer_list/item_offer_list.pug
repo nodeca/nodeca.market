@@ -51,31 +51,6 @@ each item, idx in self.items
               a.market-list-item-offer__photo-sm.thumb.thumb__m-market.thumb__m-sm.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
 
           .market-list-item-offer__info-contents
-            .market-list-item-offer__details.d-block.d-sm-none
-              span.market-list-item-offer__details-item
-                - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
-                if self.market_list_show_close_date && isClosed && item.closed_at_ts
-                  != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
-                else if self.market_list_show_close_date && !isClosed && item.autoclose_at_ts
-                  -
-                    // make sure timestamp is set in the future (or at least now)
-                    var date = Math.max(new Date(item.autoclose_at_ts), Date.now());
-                    // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
-                    date = new Date(date - date % (60 * 60 * 1000));
-                  != self.t('autoclose_at', { date: self.timetag(date, 'relative') })
-                else
-                  != self.timetag(item.ts, 'relative')
-
-              if !self.market_list_hide_user
-                span.market-list-item-offer__details-item
-                  - var user = self.users[item.user];
-                  if user
-                    a.market-list-item-offer__user-link._ucard-popover(
-                      href=self.link_to('users.member', { user_hid: user.hid })
-                      data-user-id=user._id
-                      data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
-                    )= user.nick
-
             .market-list-item-offer__price
               if item.price
                 -
@@ -105,23 +80,7 @@ each item, idx in self.items
               if item.barter_info
                 span.market-list-item-offer__interchange.icon.icon-interchange(title=self.t('icon_exchange'))
 
-            .market-list-item-offer__location
-              if item.location
-                a.market-list-item-offer__location-link(
-                  href= '#'
-                  data-on-click= 'common.blocks.location_show_dlg'
-                  data-latitude= item.location && item.location[1]
-                  data-longitude= item.location && item.location[0]
-                )
-                  if self.location_names[item.location[0] + ':' + item.location[1]]
-                    = self.location_names[item.location[0] + ':' + item.location[1]]
-                  else
-                    span.icon.icon-location
-
-              if item.delivery
-                span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
-
-            .market-list-item-offer__details.d-none.d-sm-block
+            .market-list-item-offer__details
               span.market-list-item-offer__details-item
                 - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
                 if self.market_list_show_close_date && isClosed && item.closed_at_ts
@@ -151,6 +110,22 @@ each item, idx in self.items
                   href=self.link_to('market.section.buy', { section_hid: section.hid })
                 )
                   = section.title
+
+            .market-list-item-offer__location
+              if item.location
+                a.market-list-item-offer__location-link(
+                  href= '#'
+                  data-on-click= 'common.blocks.location_show_dlg'
+                  data-latitude= item.location && item.location[1]
+                  data-longitude= item.location && item.location[0]
+                )
+                  if self.location_names[item.location[0] + ':' + item.location[1]]
+                    = self.location_names[item.location[0] + ':' + item.location[1]]
+                  else
+                    span.icon.icon-location
+
+              if item.delivery
+                span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
 
         .market-list-item-offer__meta-ignored.icon.icon-ignore.icon-space-after
           = self.t('ignored')

@@ -7,6 +7,7 @@
 
 .market-list-item-wish__container
   flex 1 1 auto
+  min-width 0
 
 .market-list-item-wish__title
   font-size $font-size-lg
@@ -26,16 +27,14 @@
 
 .market-list-item-wish__details
   color $body-color-secondary
-  margin 0
-  padding 0
-  list-style none
+  shortable()
 
 .market-list-item-wish__details-item + .market-list-item-wish__details-item
   &:before
     content '|'
     margin-left .5rem
     margin-right .5rem
-    opacity .7
+    opacity .5
 
 .market-list-item-wish__meta-del-by
   color $body-color-secondary

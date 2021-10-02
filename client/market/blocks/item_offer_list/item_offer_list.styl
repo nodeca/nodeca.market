@@ -5,12 +5,17 @@
   margin-bottom 1rem
   margin-right .25rem
 
-.market-list-item-offer__aside
-  flex 0 0 '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
-
 .market-list-item-offer__container
   margin-left 1rem
   flex 1 1 auto
+  min-width 0 // fix for ellipsis inside flexbox child
+
+.market-list-item-offer__info
+  display flex
+
+.market-list-item-offer__info-contents
+  flex 1 1 auto
+  min-width 0 // fix for ellipsis inside flexbox child
 
 .market-list-item-offer__title
   font-size 1.5rem
@@ -39,16 +44,14 @@
 
 .market-list-item-offer__details
   color $body-color-secondary
-  margin 0
-  padding 0
-  list-style none
+  shortable()
 
 .market-list-item-offer__details-item + .market-list-item-offer__details-item
   &:before
     content '|'
     margin-left .5rem
     margin-right .5rem
-    opacity .7
+    opacity .5
 
 .market-list-item-offer__used
   margin-left .3rem
@@ -155,16 +158,9 @@
   .market-list-item-offer__aside-sm
     display block
     margin-right .5rem
-    flex 0 0 85px
 
   .market-list-item-offer__container
     margin-left 0
-
-  .market-list-item-offer__info
-    display flex
-
-  .market-list-item-offer__info-contents
-    flex 1 1 auto
 
   .market-list-item-offer__title
     margin-bottom .5rem
