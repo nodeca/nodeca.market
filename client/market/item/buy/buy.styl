@@ -190,19 +190,6 @@
   margin-top 1rem
   font-size $font-size-sm
 
-$thumb-similar-width  = 51px
-$thumb-similar-height = $thumb-similar-width * '$$ N.config.market.uploads.resize.sm.max_height / N.config.market.uploads.resize.sm.max_width $$'
-
-.market-item-offer-similar__attach-link
-  box-shadow 0 0 1px $body-color-secondary
-  background-color $body-bg-secondary
-
-.market-item-offer-similar__attach-link
-.market-item-offer-similar__attach-image
-  border-radius 2px
-  width $thumb-similar-width
-  height $thumb-similar-height
-
 .market-item-buy-similar-item__info
   margin-left 1rem
 
@@ -213,3 +200,26 @@ $thumb-similar-height = $thumb-similar-width * '$$ N.config.market.uploads.resiz
 .market-item-buy-similar-item__price
   display block
   color $body-color-secondary
+
+
+//
+// Thumbnails
+//
+
+// 136x120 -> 51x45px
+$thumb-similar-width  = 51px
+$thumb-similar-height = $thumb-similar-width * '$$ N.config.market.uploads.resize.sm.max_height / N.config.market.uploads.resize.sm.max_width $$'
+$corner-radius-similar = 2px
+
+.market-item-offer-similar__attach-link
+  border-radius $corner-radius-similar
+  width $thumb-similar-width
+  height $thumb-similar-height
+  box-shadow 0 0 1px $body-color-secondary
+  background-color $body-bg-secondary
+  display block
+
+.market-item-offer-similar__attach-image
+  border-radius $corner-radius-similar
+  max-width $thumb-similar-width
+  max-height $thumb-similar-height

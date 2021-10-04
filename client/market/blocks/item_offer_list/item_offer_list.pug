@@ -27,10 +27,10 @@ each item, idx in self.items
     )
       .market-list-item-offer__aside
         if item.files && item.files.length > 0
-          a.market-list-item-offer__photo.thumb.thumb__m-market(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
-            img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+          a.market-list-item-offer__attach-link.mthumb.mthumb__m-market(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+            img.market-list-item-offer__attach-image.mthumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
         else
-          a.market-list-item-offer__photo.thumb.thumb__m-market.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+          a.market-list-item-offer__attach-link.mthumb.mthumb__m-market.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
 
       .market-list-item-offer__container
         .market-list-item-offer__title
@@ -45,10 +45,10 @@ each item, idx in self.items
         .market-list-item-offer__info
           .market-list-item-offer__aside-sm
             if item.files && item.files.length > 0
-              a.market-list-item-offer__photo-sm.thumb.thumb__m-market.thumb__m-sm(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
-                img.thumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+              a.market-list-item-offer__attach-link.mthumb.mthumb__m-market.mthumb__m-sm(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+                img.market-list-item-offer__attach-image.mthumb__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
             else
-              a.market-list-item-offer__photo-sm.thumb.thumb__m-market.thumb__m-sm.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+              a.market-list-item-offer__attach-link.mthumb.mthumb__m-market.mthumb__m-sm.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
 
           .market-list-item-offer__info-contents
             .market-list-item-offer__price
