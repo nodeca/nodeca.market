@@ -3,7 +3,6 @@
 .market-list-item-offer
   display flex
   margin-bottom 1rem
-  margin-right .25rem
 
 .market-list-item-offer__container
   margin-left 1rem
@@ -117,7 +116,7 @@
     opacity 0.7
     &:hover
       opacity 1
-    .market-list-item-offer__attach-link
+    .market-list-item-offer__image-link
     .market-list-item-offer__price
     .market-list-item-offer__location
     .market-list-item-offer__details
@@ -129,7 +128,7 @@
   opacity 0.7
   &:hover
     opacity 1
-  .market-list-item-offer__attach-link
+  .market-list-item-offer__image-link
   .market-list-item-offer__price
   .market-list-item-offer__location
   .market-list-item-offer__details
@@ -179,7 +178,7 @@ $thumb-image-width-sm  = round($thumb-image-width / $down-scale-sm)
 $thumb-image-height-sm = round($thumb-image-height / $down-scale-sm)
 $corner-radius-sm = 2px
 
-.market-list-item-offer__attach-link
+.market-list-item-offer__image-link
   border-radius $corner-radius
   width $thumb-image-width
   height $thumb-image-height
@@ -187,18 +186,18 @@ $corner-radius-sm = 2px
   background-color $body-bg-secondary
   display block
 
-.market-list-item-offer__attach-image
+.market-list-item-offer__image
   border-radius $corner-radius
   max-width $thumb-image-width
   max-height $thumb-image-height
 
 .market-list-item-offer__aside-sm
-  .market-list-item-offer__attach-link
+  .market-list-item-offer__image-link
     border-radius $corner-radius-sm
     width $thumb-image-width-sm
     height $thumb-image-height-sm
 
-  .market-list-item-offer__attach-image
+  .market-list-item-offer__image
     border-radius $corner-radius-sm
     max-width $thumb-image-width-sm
     max-height $thumb-image-height-sm
