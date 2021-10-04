@@ -259,10 +259,10 @@ article#content.market-item-buy(
             li.market-item-buy-similar-item
               - var item_link = self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid });
               if s.item.files && s.item.files.length > 0
-                a.market-item-buy-similar-item__photo.thumb(href=item_link)
-                  img.thumb__image(src=self.link_to('core.gridfs', { bucket: s.item.files[0] + '_sm' }))
+                a.market-item-offer-similar__attach-link(href=item_link)
+                  img.market-item-offer-similar__attach-image(src=self.link_to('core.gridfs', { bucket: s.item.files[0] + '_sm' }))
               else
-                a.market-item-buy-similar-item__photo.thumb.market-no-foto(href=item_link)
+                a.market-item-offer-similar__attach-link.market-no-foto(href=item_link)
 
               .market-item-buy-similar-item__info
                 a.market-item-buy-similar-item__title(href=self.link_to('market.item.buy', { section_hid: s.section_hid, item_hid: s.item.hid }))
