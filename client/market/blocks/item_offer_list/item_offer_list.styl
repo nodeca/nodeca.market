@@ -1,28 +1,31 @@
 @import "nodeca.core/client/common/_variables"
 
 .market-list-item-offer
-  display flex
   margin-bottom 1rem
 
-.market-list-item-offer__container
-  margin-left 1rem
-  flex 1 1 auto
-  min-width 0 // fix for ellipsis inside flexbox child
-
-.market-list-item-offer__info
-  display flex
-
-.market-list-item-offer__info-contents
-  flex 1 1 auto
-  min-width 0 // fix for ellipsis inside flexbox child
-
-.market-list-item-offer__title
-  font-size 1.5rem
+.market-list-item-offer__title-sm
+  font-size 1.25rem
   line-height 1.125em
   margin-bottom .5rem
+  width 100%
+
+.market-list-item-offer__content
+  display flex
+
+.market-list-item-offer__aside
+  margin-right 1rem
+
+.market-list-item-offer__info
+  flex 1 1 auto
+  min-width 0
+
+.market-list-item-offer__title
+  font-size 1.25rem
+  line-height 1.125em
+  margin-bottom .375rem
 
 .market-list-item-offer__price
-  font-size $font-size-lg
+  font-size 1.125rem
   line-height 1.125em
   margin-bottom .125rem
 
@@ -147,35 +150,22 @@
 .market-list-item-offer__m-selected
   background-color #ffd
 
-.market-list-item-offer__aside-sm
-  display none
-
-@media (max-width: $grid-breakpoints.sm - 1)
-  .market-list-item-offer__aside
-    display none
-
-  .market-list-item-offer__aside-sm
-    display block
-    margin-right .5rem
-
-  .market-list-item-offer__container
-    margin-left 0
-
-  .market-list-item-offer__title
-    margin-bottom .5rem
-
-
 //
 // Thumbnails
 //
-$thumb-image-width  = '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
-$thumb-image-height = '$$ N.config.market.uploads.resize.sm.max_height || N.config.market.uploads.resize.sm.height $$'px
+$thumb-image-width-full  = '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
+$thumb-image-height-full = '$$ N.config.market.uploads.resize.sm.max_height || N.config.market.uploads.resize.sm.height $$'px
+
+// 136x120 -> 113x100
+$down-scale = 1.2
+$thumb-image-width  = round($thumb-image-width-full / $down-scale)
+$thumb-image-height = round($thumb-image-height-full / $down-scale)
 $corner-radius = 3px
 
 // 136x120 -> 85x75
 $down-scale-sm = 1.6
-$thumb-image-width-sm  = round($thumb-image-width / $down-scale-sm)
-$thumb-image-height-sm = round($thumb-image-height / $down-scale-sm)
+$thumb-image-width-sm  = round($thumb-image-width-full / $down-scale-sm)
+$thumb-image-height-sm = round($thumb-image-height-full / $down-scale-sm)
 $corner-radius-sm = 2px
 
 .market-list-item-offer__image-link
@@ -191,7 +181,7 @@ $corner-radius-sm = 2px
   max-width $thumb-image-width
   max-height $thumb-image-height
 
-.market-list-item-offer__aside-sm
+@media (max-width: $grid-breakpoints.sm - 1)
   .market-list-item-offer__image-link
     border-radius $corner-radius-sm
     width $thumb-image-width-sm

@@ -25,132 +25,133 @@ each item, idx in self.items
       data-item-hid=item.hid
       data-item-index=(self.index_offset || 0) + idx
     )
-      .market-list-item-offer__aside
-        if item.files && item.files.length > 0
-          a.market-list-item-offer__image-link(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
-            img.market-list-item-offer__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
-        else
-          a.market-list-item-offer__image-link.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+      .market-list-item-offer__title-sm.d-sm-none
+        span.market-list-item-offer__bookmarked-marker.icon.icon-bookmark.icon-space-after(title=self.t('bookmarked'))
+        span.market-list-item-offer__deleted-marker.icon.icon-x.icon-dimmed.icon-space-after(title=self.t('deleted'))
+        a.market-list-item-offer__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+          = item.title
+        if !item.is_new
+          sub.market-list-item-offer__used
+            = self.t('used')
 
-      .market-list-item-offer__container
-        .market-list-item-offer__title
-          span.market-list-item-offer__bookmarked-marker.icon.icon-bookmark.icon-space-after(title=self.t('bookmarked'))
-          span.market-list-item-offer__deleted-marker.icon.icon-x.icon-dimmed.icon-space-after(title=self.t('deleted'))
-          a.market-list-item-offer__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
-            = item.title
-          if !item.is_new
-            sub.market-list-item-offer__used
-              = self.t('used')
+      .market-list-item-offer__content
+        .market-list-item-offer__aside
+          if item.files && item.files.length > 0
+            a.market-list-item-offer__image-link(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+              img.market-list-item-offer__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
+          else
+            a.market-list-item-offer__image-link.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
 
         .market-list-item-offer__info
-          .market-list-item-offer__aside-sm
-            if item.files && item.files.length > 0
-              a.market-list-item-offer__image-link(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
-                img.market-list-item-offer__image(src=self.link_to('core.gridfs', { bucket: item.files[0] + '_sm' }))
-            else
-              a.market-list-item-offer__image-link.market-no-foto(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+          .market-list-item-offer__title.d-none.d-sm-block
+            span.market-list-item-offer__bookmarked-marker.icon.icon-bookmark.icon-space-after(title=self.t('bookmarked'))
+            span.market-list-item-offer__deleted-marker.icon.icon-x.icon-dimmed.icon-space-after(title=self.t('deleted'))
+            a.market-list-item-offer__title-text(href=self.link_to('market.item.buy', { section_hid: section.hid, item_hid: item.hid }))
+              = item.title
+            if !item.is_new
+              sub.market-list-item-offer__used
+                = self.t('used')
 
-          .market-list-item-offer__info-contents
-            .market-list-item-offer__price
-              if item.price
+          .market-list-item-offer__price
+            if item.price
+              -
+                function get_symbol(currency) {
+                  var p = '@market.currencies.' + currency + '.sign';
+                  return self.t.exists(p) ? self.t(p) : currency;
+                }
+
+                var user_currency  = self.settings.market_displayed_currency;
+                var rate           = self.currency_rates[item.price.currency] ;
+                var price_original = self.price(item.price.value, get_symbol(item.price.currency));
+                var price_converted;
+
+                if (user_currency && user_currency !== item.price.currency && rate && rate > 0) {
+                  price_converted = self.price(item.price.value * rate, get_symbol(user_currency), true);
+                }
+
+              if price_converted
+                span.market-list-item-offer__price-value(
+                  title= self.t('price_approximate')
+                )= price_converted
+                = ' '
+                span.market-list-item-offer__price-original= '(' + price_original + ')'
+              else
+                span.market-list-item-offer__price-value= price_original
+
+            if item.barter_info
+              span.market-list-item-offer__interchange.icon.icon-interchange(title=self.t('icon_exchange'))
+
+          .market-list-item-offer__details
+            span.market-list-item-offer__details-item
+              - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
+              if self.market_list_show_close_date && isClosed && item.closed_at_ts
+                != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
+              else if self.market_list_show_close_date && !isClosed && item.autoclose_at_ts
                 -
-                  function get_symbol(currency) {
-                    var p = '@market.currencies.' + currency + '.sign';
-                    return self.t.exists(p) ? self.t(p) : currency;
-                  }
+                  // make sure timestamp is set in the future (or at least now)
+                  var date = Math.max(new Date(item.autoclose_at_ts), Date.now());
+                  // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
+                  date = new Date(date - date % (60 * 60 * 1000));
+                != self.t('autoclose_at', { date: self.timetag(date, 'relative') })
+              else
+                != self.timetag(item.ts, 'relative')
 
-                  var user_currency  = self.settings.market_displayed_currency;
-                  var rate           = self.currency_rates[item.price.currency] ;
-                  var price_original = self.price(item.price.value, get_symbol(item.price.currency));
-                  var price_converted;
-
-                  if (user_currency && user_currency !== item.price.currency && rate && rate > 0) {
-                    price_converted = self.price(item.price.value * rate, get_symbol(user_currency), true);
-                  }
-
-                if price_converted
-                  span.market-list-item-offer__price-value(
-                    title= self.t('price_approximate')
-                  )= price_converted
-                  = ' '
-                  span.market-list-item-offer__price-original= '(' + price_original + ')'
-                else
-                  span.market-list-item-offer__price-value= price_original
-
-              if item.barter_info
-                span.market-list-item-offer__interchange.icon.icon-interchange(title=self.t('icon_exchange'))
-
-            .market-list-item-offer__details
+            if !self.market_list_hide_user
               span.market-list-item-offer__details-item
-                - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
-                if self.market_list_show_close_date && isClosed && item.closed_at_ts
-                  != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
-                else if self.market_list_show_close_date && !isClosed && item.autoclose_at_ts
-                  -
-                    // make sure timestamp is set in the future (or at least now)
-                    var date = Math.max(new Date(item.autoclose_at_ts), Date.now());
-                    // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
-                    date = new Date(date - date % (60 * 60 * 1000));
-                  != self.t('autoclose_at', { date: self.timetag(date, 'relative') })
+                - var user = self.users[item.user];
+                if user
+                  a.market-list-item-offer__user-link._ucard-popover(
+                    href=self.link_to('users.member', { user_hid: user.hid })
+                    data-user-id=user._id
+                    data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
+                  )= user.nick
+
+            span.market-list-item-offer__details-item
+              a.market-list-item-offer__section-link(
+                href=self.link_to('market.section.buy', { section_hid: section.hid })
+              )
+                = section.title
+
+          .market-list-item-offer__location
+            if item.location
+              a.market-list-item-offer__location-link(
+                href= '#'
+                data-on-click= 'common.blocks.location_show_dlg'
+                data-latitude= item.location && item.location[1]
+                data-longitude= item.location && item.location[0]
+              )
+                if self.location_names[item.location[0] + ':' + item.location[1]]
+                  = self.location_names[item.location[0] + ':' + item.location[1]]
                 else
-                  != self.timetag(item.ts, 'relative')
+                  span.icon.icon-location
 
-              if !self.market_list_hide_user
-                span.market-list-item-offer__details-item
-                  - var user = self.users[item.user];
-                  if user
-                    a.market-list-item-offer__user-link._ucard-popover(
-                      href=self.link_to('users.member', { user_hid: user.hid })
-                      data-user-id=user._id
-                      data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
-                    )= user.nick
+            if item.delivery
+              span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
 
-              span.market-list-item-offer__details-item
-                a.market-list-item-offer__section-link(
-                  href=self.link_to('market.section.buy', { section_hid: section.hid })
-                )
-                  = section.title
+          .market-list-item-offer__meta-ignored.icon.icon-ignore.icon-space-after
+            = self.t('ignored')
+          .market-list-item-offer__meta-hellbanned
+            = self.t('hellbanned')
 
-            .market-list-item-offer__location
-              if item.location
-                a.market-list-item-offer__location-link(
-                  href= '#'
-                  data-on-click= 'common.blocks.location_show_dlg'
-                  data-latitude= item.location && item.location[1]
-                  data-longitude= item.location && item.location[0]
-                )
-                  if self.location_names[item.location[0] + ':' + item.location[1]]
-                    = self.location_names[item.location[0] + ':' + item.location[1]]
-                  else
-                    span.icon.icon-location
-
-              if item.delivery
-                span.market-list-item-offer__delivery.icon.icon-delivery(title=self.t('icon_delivery'))
-
-        .market-list-item-offer__meta-ignored.icon.icon-ignore.icon-space-after
-          = self.t('ignored')
-        .market-list-item-offer__meta-hellbanned
-          = self.t('hellbanned')
-
-        if item.del_by
-          - var delUser = self.users[item.del_by] || {}
-          .market-list-item-offer__meta-deleted
-            = self.t('del_by')
-            = ' '
-            a.market-list-item-offer__meta-del-by._ucard-popover(
-              href=self.link_to('users.member', { user_hid: delUser.hid })
-              data-user-id=delUser._id
-              data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
-            )= delUser.name
-
-            if item.del_reason
+          if item.del_by
+            - var delUser = self.users[item.del_by] || {}
+            .market-list-item-offer__meta-deleted
+              = self.t('del_by')
               = ' '
-              = self.t('del_reason', { text: item.del_reason })
+              a.market-list-item-offer__meta-del-by._ucard-popover(
+                href=self.link_to('users.member', { user_hid: delUser.hid })
+                data-user-id=delUser._id
+                data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
+              )= delUser.name
 
-      if multiselect_allowed
-        label.form-label.market-list-item-offer__select(title=self.t('multiselect_hint'))
-          input.market-list-item-offer__select-cb(
-            type='checkbox'
-            data-item-id=item._id
-            data-on-change='market.blocks.item_offer_list:item_check'
-          )
+              if item.del_reason
+                = ' '
+                = self.t('del_reason', { text: item.del_reason })
+
+        if multiselect_allowed
+          label.form-label.market-list-item-offer__select(title=self.t('multiselect_hint'))
+            input.market-list-item-offer__select-cb(
+              type='checkbox'
+              data-item-id=item._id
+              data-on-change='market.blocks.item_offer_list:item_check'
+            )
