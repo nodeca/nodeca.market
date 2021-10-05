@@ -124,6 +124,7 @@ article#content.market-item-buy(
         each file in self.item.files
           a.market-attach-link(
             href=self.link_to('core.gridfs', { bucket: file })
+            target='_blank'
             data-bs-toggle='lightbox'
             data-type='image'
             data-gallery='market-gallery'
