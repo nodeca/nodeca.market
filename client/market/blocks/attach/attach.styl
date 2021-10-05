@@ -1,0 +1,60 @@
+@import "nodeca.core/client/common/_variables"
+
+$thumb-image-width  = '$$ N.config.market.uploads.resize.sm.max_width || N.config.market.uploads.resize.sm.width $$'px
+$thumb-image-height = '$$ N.config.market.uploads.resize.sm.max_height || N.config.market.uploads.resize.sm.height $$'px
+$corner-radius = 3px
+
+.market-attach-list
+  display flex
+  flex-wrap wrap
+  gap 10px
+
+.market-attach-link
+  border-radius $corner-radius
+  width $thumb-image-width
+  height $thumb-image-height
+  box-shadow 0 0 1px ($body-bg-secondary - 10%)
+  background-color $body-bg-secondary
+  display flex
+  align-items center
+  justify-content center
+  position relative
+
+.market-attach-image
+  border-radius $corner-radius
+  max-width $thumb-image-width
+  max-height $thumb-image-height
+  width fit-content
+  height fit-content
+
+//
+// Styles for editable list
+//
+.market-attach-link__m-draggable > .market-attach-image
+  cursor grab
+
+.market-attach-image__m-main
+  // increase bottom margin to account for "main photo" label
+  margin-bottom 1.25rem
+
+.market-attach__controls
+  position absolute
+  right .25rem
+  bottom .25rem
+
+.market-attach__control-item > .btn-link
+  color $body-color-secondary + 20%
+  text-shadow 0 0 1px ($body-color-secondary - 60%)
+  &:hover
+    color $body-color-secondary + 40%
+
+.market-attach__control-item > .btn
+  color white
+  background-color rgba(0, 0, 0, 0.3)
+  &:hover
+    background-color rgba(0, 0, 0, 0.4)
+
+.market-attach__main-label
+  color $body-color-secondary
+  position absolute
+  bottom -1.5rem

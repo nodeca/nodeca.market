@@ -120,17 +120,15 @@ article#content.market-item-buy(
       != self.partial('@market.item.buy.blocks.toolbar_controls')
 
     if self.item.files && self.item.files.length > 0
-      ul.market-item-buy__attach-list.thumb-grid.thumb-grid__m-market
+      .market-attach-list
         each file in self.item.files
-          li.market-item-buy__attach-item.thumb-grid__item
-            .thumb-grid__item-inner
-              a.thumb.thumb__m-market(
-                href=self.link_to('core.gridfs', { bucket: file })
-                data-bs-toggle='lightbox'
-                data-type='image'
-                data-gallery='market-gallery'
-              )
-                img.thumb__image(src=self.link_to('core.gridfs', { bucket: file + '_sm' }))
+          a.market-attach-link(
+            href=self.link_to('core.gridfs', { bucket: file })
+            data-bs-toggle='lightbox'
+            data-type='image'
+            data-gallery='market-gallery'
+          )
+            img.market-attach-image(src=self.link_to('core.gridfs', { bucket: file + '_sm' }))
 
     .market-item-buy__description.markup!= self.item.html
 

@@ -222,8 +222,13 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   //
   // Set up file upload
   //
-  $('#market-edit-upload').on('change', function () {
-    uploadFiles($(this).get(0).files);
+  $('#market-upload').on('change', function () {
+    let files = Array.prototype.slice.call($(this).get(0).files); // clone filelist
+
+    // reset input, so uploading the same file again will trigger 'change' event
+    $(this).val('');
+
+    uploadFiles(files);
   });
 });
 

@@ -217,9 +217,13 @@ $corner-radius-similar = 2px
   height $thumb-similar-height
   box-shadow 0 0 1px $body-color-secondary
   background-color $body-bg-secondary
-  display block
+  display flex
+  align-items center
+  justify-content center
 
 .market-item-offer-similar__attach-image
   border-radius $corner-radius-similar
   max-width $thumb-similar-width
   max-height $thumb-similar-height
+  width fit-content
+  height fit-content

@@ -174,12 +174,16 @@ $corner-radius-sm = 2px
   height $thumb-image-height
   box-shadow 0 0 1px ($body-bg-secondary - 10%)
   background-color $body-bg-secondary
-  display block
+  display flex
+  align-items center
+  justify-content center
 
 .market-list-item-offer__image
   border-radius $corner-radius
   max-width $thumb-image-width
   max-height $thumb-image-height
+  width fit-content
+  height fit-content
 
 @media (max-width: $grid-breakpoints.sm - 1)
   .market-list-item-offer__image-link

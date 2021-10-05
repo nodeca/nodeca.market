@@ -80,7 +80,7 @@ article#content.market-new
           .row(data-bind="visible: offer.type() === 'sell'")
             .col.mb-3
               //- Hidden
-              input#market-new-upload(
+              input#market-upload(
                 name='files[]'
                 type='file'
                 style='position: absolute; left: -2000px'
@@ -95,44 +95,40 @@ article#content.market-new
                   else
                     = self.t('field_photos_limit_low', { min: min_images || 0 })
 
-              ul.market-new__attach-list.thumb-grid.thumb-grid__m-tight.thumb-grid__m-market
-                li.market-new__attach-item.thumb-grid__item
-                  .thumb-grid__item-inner
-                    //- Should 'click' file input in context of current action
-                    a.thumb.thumb__m-market(href='#', onClick='document.getElementById("market-new-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
-                      .thumb__content.icon.icon-plus
+              .market-attach-list
+                //- Should 'click' file input in context of current action
+                a.market-attach-link(href='#', onClick='document.getElementById("market-upload").click()', data-bind='event: { dragover: $root.plusDragOver, drop: $root.plusDrop }')
+                  .market-attach-image.icon.icon-plus
 
                 <!-- ko foreach: offer.files -->
-                  li.market-new__attach-item.thumb-grid__item(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }')
-                    .thumb-grid__item-inner
-                      .thumb.thumb__m-market
-                        img.thumb__image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
+                  .market-attach-link.market-attach-link__m-draggable(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }, css: { "market-attach-image__m-main": $index() === 0 }')
+                    img.market-attach-image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
 
-                        .market-new__attach-controls
-                          .market-new__attach-control-item.dropdown.dropup
-                            - var menu_rnd_id = 'rnd' + self.get_label_uid()
+                    .market-attach__controls
+                      .market-attach__control-item.dropdown.dropup
+                        - var menu_rnd_id = 'rnd' + self.get_label_uid()
 
-                            button.btn.btn-link.btn-square.icon.icon-dropdown-local.dropdown-toggle(
-                              type='button'
-                              id=menu_rnd_id
-                              aria-haspopup='true'
-                              aria-expanded='false'
-                              data-bs-toggle='dropdown'
-                            )
+                        button.btn.btn-square.icon.icon-dropdown-local.dropdown-toggle(
+                          type='button'
+                          id=menu_rnd_id
+                          aria-haspopup='true'
+                          aria-expanded='false'
+                          data-bs-toggle='dropdown'
+                        )
 
-                            .dropdown-menu.dropdown-menu-end(aria-labelledby=menu_rnd_id)
-                              button.dropdown-item(
-                                type='button'
-                                data-bind='click: $root.attachSetMain, visible: $index() !== 0'
-                              )= self.t('attach_set_main')
+                        .dropdown-menu.dropdown-menu-end(aria-labelledby=menu_rnd_id)
+                          button.dropdown-item(
+                            type='button'
+                            data-bind='click: $root.attachSetMain, visible: $index() !== 0'
+                          )= self.t('attach_set_main')
 
-                              button.dropdown-item(
-                                type='button'
-                                data-bind='click: $root.attachDelete'
-                              )= self.t('attach_delete')
+                          button.dropdown-item(
+                            type='button'
+                            data-bind='click: $root.attachDelete'
+                          )= self.t('attach_delete')
 
-                        .market-new__attach-main(data-bind='visible: $index() === 0')
-                          small= self.t('attach_main')
+                    .market-attach__main-label(data-bind='visible: $index() === 0')
+                      small= self.t('attach_main')
                 <!-- /ko -->
 
         .row
