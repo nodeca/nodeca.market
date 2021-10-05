@@ -27,14 +27,21 @@
 
 .market-item-buy-edit__attach-controls
   position absolute
-  right 0
-  bottom 0
+  right .25rem
+  bottom .25rem
 
 .market-item-buy-edit__attach-control-item > .btn-link
   color $body-color-secondary + 20%
   text-shadow 0 0 1px ($body-color-secondary - 60%)
   &:hover
     color $body-color-secondary + 40%
+
+.market-item-buy-edit__attach-control-item > .btn
+  color white
+  background-color rgba(0, 0, 0, 0.3)
+  &:hover
+    background-color rgba(0, 0, 0, 0.4)
+
 
 .market-item-buy-edit__attach-main
   color $body-color-secondary
