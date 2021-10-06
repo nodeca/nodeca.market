@@ -5,3 +5,6 @@ en-US:
     err_price_too_low: "Unable to list an item with price lower than #{min}"
     err_too_few_images: "Market offer can't have fewer than #{count} ((image|images))"
     err_too_many_images: "Market offer can't have more than #{count} ((image|images))"
+
+  upload:
+    err_invalid_ext: "#{file_name}: you can't upload files of this type"

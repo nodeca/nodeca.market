@@ -4,10 +4,8 @@
 'use strict';
 
 
-const _            = require('lodash');
 const charcount    = require('charcount');
 const mongoose     = require('mongoose');
-const pipeline     = require('util').promisify(require('stream').pipeline);
 const resizeParse  = require('nodeca.users/server/_lib/resize_parse');
 const format_price = require('nodeca.market/lib/app/price_format');
 
@@ -86,11 +84,6 @@ module.exports = function (N, apiPath) {
   //
   N.wire.before(apiPath, async function fetch_draft(env) {
     env.data.draft = await N.models.market.Draft.findOne({ _id: env.params.draft_id, user: env.user_info.user_id });
-
-    let uploaded = env.data.draft ? _.keyBy(env.data.draft.all_files) : {};
-
-    // restrict files to only files that were uploaded for this draft
-    env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
   });
 
 
@@ -106,7 +99,7 @@ module.exports = function (N, apiPath) {
     }
 
     if (min_images >= 0) {
-      if (env.data.files.length < min_images) {
+      if (env.params.files.length < min_images) {
         throw {
           code: N.io.CLIENT_ERROR,
           message: env.t('err_too_few_images', min_images)
@@ -115,7 +108,7 @@ module.exports = function (N, apiPath) {
     }
 
     if (max_images >= 0) {
-      if (env.data.files.length > max_images) {
+      if (env.params.files.length > max_images) {
         throw {
           code: N.io.CLIENT_ERROR,
           message: env.t('err_too_many_images', max_images)
@@ -188,16 +181,30 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Create offer
+  // Filter files, move them all from gridfs_tmp to gridfs
   //
-  N.wire.on(apiPath, async function create_offer(env) {
-    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
-    let files = [];
+  N.wire.before(apiPath, async function move_files(env) {
+    env.data.files = [];
+    let all_files = Object.fromEntries((env.data.draft ? env.data.draft.all_files : []).map(x => [ x.id, x ]));
 
-    for (let file of env.data.files) {
+    for (let file of env.params.files) {
+      let file_info = all_files[file];
+
+      // user tried to submit item id without uploading a file?
+      if (!file_info) continue;
+
+      // file is already in gridfs
+      if (!file_info.tmp) {
+        env.data.files.push(file_info.id);
+        continue;
+      }
+
+      // move from FileTmp to File
       let new_id = new mongoose.Types.ObjectId();
 
-      files.push(new_id);
+      env.data.files.push(new_id);
+      delete all_files[file];
+      all_files[new_id] = { id: new_id };
 
       for (let size of uploadSizes) {
         let info = await N.models.core.FileTmp.getInfo(file + (size === 'orig' ? '' : '_' + size));
@@ -212,13 +219,30 @@ module.exports = function (N, apiPath) {
           params.filename = new_id + '_' + size;
         }
 
-        await pipeline(
+        await N.models.core.File.put(
           N.models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
-          N.models.core.File.createWriteStream(params)
+          params
         );
       }
     }
 
+    // remove all related files from FileTmp,
+    // this might result in a broken image if user simultaneously edits the same item in two different tabs
+    for (let file of Object.values(all_files)) {
+      if (file.tmp) {
+        await N.models.core.FileTmp.remove(file, true);
+        delete all_files[file.id];
+      }
+    }
+
+    env.data.all_files = Object.values(all_files);
+  });
+
+
+  // Create offer
+  //
+  N.wire.on(apiPath, async function create_offer(env) {
+    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
     let statuses = N.models.market.ItemOffer.statuses;
     let item = new N.models.market.ItemOffer();
 
@@ -237,7 +261,8 @@ module.exports = function (N, apiPath) {
     item.barter_info = env.params.barter_info;
     item.delivery = env.params.delivery;
     item.is_new = env.params.is_new;
-    item.files = item.all_files = files;
+    item.files = env.data.files;
+    item.all_files = env.data.all_files;
 
     if (market_items_expire > 0) {
       item.autoclose_at_ts = new Date(Date.now() + (market_items_expire * 24 * 60 * 60 * 1000));

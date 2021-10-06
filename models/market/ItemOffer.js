@@ -95,7 +95,9 @@ module.exports = function (N, collectionName) {
 
     // All attached photos (including temporary photos during editing
     // and previously removed ones)
-    all_files:    [ Schema.ObjectId ],
+    //  - `tmp: true`  means file is in gridfs_tmp (newly uploaded, but not saved)
+    //  - `tmp: false` means file is in gridfs (previously saved, later removed)
+    all_files:    [ new Schema({ id: Schema.ObjectId, tmp: Boolean }, { _id: false }) ],
 
     // Post params
     params_ref:   Schema.ObjectId,

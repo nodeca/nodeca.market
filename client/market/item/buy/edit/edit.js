@@ -36,7 +36,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     price_currency: ko.observable(item.price.currency || ''),
     section:        ko.observable(item.section || ''),
     description:    ko.observable(item.md || ''),
-    files:          ko.observableArray(item.files),
+    files:          ko.observableArray(item.files.map(id => ({ id }))),
     barter_info:    ko.observable(item.barter_info || ''),
     delivery:       ko.observable(item.delivery || false),
     is_new:         ko.observable(item.is_new || false)
@@ -93,7 +93,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
       return N.wire.emit('users.uploader:add', params)
         .then(() => {
-          params.uploaded.reverse().forEach(m => view.offer.files.push(m.media_id));
+          params.uploaded.reverse().forEach(m => view.offer.files.push({ id: m.media_id, tmp: true }));
         });
     });
 
@@ -201,7 +201,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
       price_currency: view.offer.price_currency(),
       section:        view.offer.section(),
       description:    view.offer.description(),
-      files:          view.offer.files(),
+      files:          view.offer.files().map(x => x.id),
       barter_info:    view.offer.barter_info(),
       delivery:       view.offer.delivery(),
       is_new:         view.offer.is_new(),

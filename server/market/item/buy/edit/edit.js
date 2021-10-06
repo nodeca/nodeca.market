@@ -115,7 +115,6 @@ module.exports = function (N, apiPath) {
 
     // add private fields that aren't exposed by sanitizer
     env.res.item.md = env.data.item.md;
-    env.res.item.all_files = env.data.item.all_files;
   });
 
 

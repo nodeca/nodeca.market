@@ -78,7 +78,12 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
     for (let k of Object.keys(N.runtime.page_data.draft)) {
       if (N.runtime.page_data.draft[k] && view.offer[k]) {
-        view.offer[k](N.runtime.page_data.draft[k]);
+        /* eslint-disable max-depth */
+        if (k === 'files') {
+          view.offer[k](N.runtime.page_data.draft[k].map(id => ({ id, tmp: true })));
+        } else {
+          view.offer[k](N.runtime.page_data.draft[k]);
+        }
       }
     }
   }
@@ -103,6 +108,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     if (!view) return Promise.resolve();
 
     let object = _.pickBy(ko.toJS(view.offer), v => v !== '');
+    object.files = object.files.map(x => x.id);
 
     if (JSON.stringify(savedDraft) === JSON.stringify(object) && !force) return Promise.resolve();
 
@@ -159,7 +165,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
       return N.wire.emit('users.uploader:add', params)
         .then(() => {
-          params.uploaded.reverse().forEach(m => view.offer.files.push(m.media_id));
+          params.uploaded.reverse().forEach(m => view.offer.files.push({ id: m.media_id, tmp: true }));
         });
     });
 
@@ -288,7 +294,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
       price_currency: view.offer.price_currency(),
       section:        view.offer.section(),
       description:    view.offer.description(),
-      files:          view.offer.files(),
+      files:          view.offer.files().map(x => x.id),
       barter_info:    view.offer.barter_info(),
       delivery:       view.offer.delivery(),
       is_new:         view.offer.is_new()

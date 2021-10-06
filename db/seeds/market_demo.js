@@ -7,7 +7,6 @@ const charlatan   = require('charlatan');
 const glob        = require('glob').sync;
 const ObjectId    = require('mongoose').Types.ObjectId;
 const path        = require('path');
-const pipeline    = require('util').promisify(require('stream').pipeline);
 const resize      = require('nodeca.users/models/users/_lib/resize');
 const resizeParse = require('nodeca.users/server/_lib/resize_parse');
 
@@ -91,9 +90,9 @@ async function createRandomPhoto() {
       params.filename = new_id + '_' + size;
     }
 
-    await pipeline(
+    await models.core.File.put(
       models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
-      models.core.File.createWriteStream(params)
+      params
     );
   }
 
@@ -162,7 +161,7 @@ async function createItemOffer(section, user, isClosed = false) {
     user,
 
     files,
-    all_files:   files,
+    all_files:   files.map(id => ({ id })),
 
     /*eslint-disable no-undefined*/
     closed_at_ts: isClosed ? ts : undefined,

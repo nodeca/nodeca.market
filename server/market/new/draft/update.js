@@ -3,8 +3,6 @@
 
 'use strict';
 
-const _ = require('lodash');
-
 
 module.exports = function (N, apiPath) {
 
@@ -57,13 +55,15 @@ module.exports = function (N, apiPath) {
   // Update draft
   //
   N.wire.on(apiPath, async function update_draft(env) {
-    let data = _.omit(env.params, 'draft_id');
-    let uploaded = _.keyBy(env.data.draft.all_files);
+    let draft_data = Object.assign({}, env.params);
+    delete draft_data.draft_id;
+
+    let uploaded = new Set(env.data.draft.all_files.map(x => String(x.id)));
 
     // restrict files to only files that were uploaded for this draft
-    data.files = data.files.filter(id => uploaded.hasOwnProperty(id));
+    draft_data.files = draft_data.files.filter(id => uploaded.has(id));
 
-    env.data.draft.data = data;
+    env.data.draft.data = draft_data;
     env.data.draft.ts = new Date();
 
     await env.data.draft.save();

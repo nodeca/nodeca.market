@@ -92,7 +92,7 @@ article#content.market-item-buy-edit
 
                 <!-- ko foreach: offer.files -->
                   .market-attach-link.market-attach-link__m-draggable(draggable, style='display: none', data-bind='visible: true, event: { dragstart: $root.attachDragStart, dragover: $root.attachDragOver, drop: $root.attachDrop }, css: { "market-attach-image__m-main": $index() === 0 }')
-                    img.market-attach-image(data-bind="attr: { src: $root.router.linkTo('core.gridfs_tmp', { bucket: $data + '_sm' }) }")
+                    img.market-attach-image(data-bind="attr: { src: $root.router.linkTo($data.tmp ? 'core.gridfs_tmp' : 'core.gridfs', { bucket: $data.id + '_sm' }) }")
 
                     .market-attach__controls
                       .market-attach__control-item.dropdown.dropup

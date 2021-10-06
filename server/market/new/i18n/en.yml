@@ -9,3 +9,6 @@ en-US:
   create_wish:
     err_title_too_short: "Title should have at least #{count} ((character|characters))"
     err_desc_too_short: "Description should have at least #{count} ((character|characters))"
+
+  upload:
+    err_invalid_ext: "#{file_name}: you can't upload files of this type"

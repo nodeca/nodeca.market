@@ -162,7 +162,7 @@ module.exports = function (N, apiPath) {
 
     if (!item) throw N.io.NOT_FOUND;
 
-    item.all_files.push(env.res.media.media_id);
+    item.all_files.push({ id: env.res.media.media_id, tmp: true });
     await item.save();
   });
 };

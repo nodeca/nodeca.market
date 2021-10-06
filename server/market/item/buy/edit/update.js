@@ -4,12 +4,16 @@
 'use strict';
 
 
-const _            = require('lodash');
 const charcount    = require('charcount');
+const mongoose     = require('mongoose');
+const resizeParse  = require('nodeca.users/server/_lib/resize_parse');
 const format_price = require('nodeca.market/lib/app/price_format');
 
 
 module.exports = function (N, apiPath) {
+
+  const uploadSizes = Object.keys(resizeParse(N.config.market.uploads).resize);
+
 
   N.validate(apiPath, {
     item_id:        { format: 'mongo', required: true },
@@ -103,16 +107,6 @@ module.exports = function (N, apiPath) {
   });
 
 
-  // Filter files
-  //
-  N.wire.before(apiPath, async function filter_files(env) {
-    let uploaded = _.keyBy(env.data.item.all_files);
-
-    // restrict files to only those uploaded for this item
-    env.data.files = env.params.files.filter(id => uploaded.hasOwnProperty(id));
-  });
-
-
   // Fetch section info
   //
   N.wire.before(apiPath, async function fetch_section_info(env) {
@@ -141,7 +135,7 @@ module.exports = function (N, apiPath) {
     }
 
     if (min_images >= 0) {
-      if (env.data.files.length < min_images) {
+      if (env.params.files.length < min_images) {
         throw {
           code: N.io.CLIENT_ERROR,
           message: env.t('err_too_few_images', min_images)
@@ -150,7 +144,7 @@ module.exports = function (N, apiPath) {
     }
 
     if (max_images >= 0) {
-      if (env.data.files.length > max_images) {
+      if (env.params.files.length > max_images) {
         throw {
           code: N.io.CLIENT_ERROR,
           message: env.t('err_too_many_images', max_images)
@@ -223,6 +217,64 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Filter files, move them all from gridfs_tmp to gridfs
+  //
+  N.wire.before(apiPath, async function move_files(env) {
+    env.data.files = [];
+    let all_files = Object.fromEntries(env.data.item.all_files.map(x => [ x.id, x ]));
+
+    for (let file of env.params.files) {
+      let file_info = all_files[file];
+
+      // user tried to submit item id without uploading a file?
+      if (!file_info) continue;
+
+      // file is already in gridfs
+      if (!file_info.tmp) {
+        env.data.files.push(file_info.id);
+        continue;
+      }
+
+      // move from FileTmp to File
+      let new_id = new mongoose.Types.ObjectId();
+
+      env.data.files.push(new_id);
+      delete all_files[file];
+      all_files[new_id] = { id: new_id };
+
+      for (let size of uploadSizes) {
+        let info = await N.models.core.FileTmp.getInfo(file + (size === 'orig' ? '' : '_' + size));
+
+        if (!info) continue;
+
+        let params = { contentType: info.contentType };
+
+        if (size === 'orig') {
+          params._id = new_id;
+        } else {
+          params.filename = new_id + '_' + size;
+        }
+
+        await N.models.core.File.put(
+          N.models.core.FileTmp.createReadStream(file + (size === 'orig' ? '' : '_' + size)),
+          params
+        );
+      }
+    }
+
+    // remove all related files from FileTmp,
+    // this might result in a broken image if user simultaneously edits the same item in two different tabs
+    for (let file of Object.values(all_files)) {
+      if (file.tmp) {
+        await N.models.core.FileTmp.remove(file, true);
+        delete all_files[file.id];
+      }
+    }
+
+    env.data.all_files = Object.values(all_files);
+  });
+
+
   // Update item
   //
   N.wire.on(apiPath, async function update_item(env) {
@@ -253,6 +305,7 @@ module.exports = function (N, apiPath) {
     item.is_new = env.params.is_new;
     item.files = env.data.files;
     item.section = env.data.section._id;
+    item.all_files = env.data.all_files;
 
     // only update location if user edits his own item,
     // do not update it for moderator actions
