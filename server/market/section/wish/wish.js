@@ -214,6 +214,26 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Fill subscription type
+  //
+  N.wire.after(apiPath, async function fill_subscription(env) {
+    if (!env.user_info.is_member) {
+      env.res.subscription = null;
+      return;
+    }
+
+    let subscription = await N.models.users.Subscription.findOne()
+                                 .where('user').equals(env.user_info.user_id)
+                                 .where('to').equals(env.data.section._id)
+                                 // user subscribes separately to offers and wishes,
+                                 // so for market sections we always have to check subscription type
+                                 .where('to_type').equals(N.shared.content_type.MARKET_SECTION_WISH)
+                                 .lean(true);
+
+    env.res.subscription = subscription?.type;
+  });
+
+
   // Fill breadcrumbs info
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {

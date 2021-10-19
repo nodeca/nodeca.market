@@ -192,9 +192,36 @@ N.wire.on('navigate.done:' + module.apiPath, function search_form_init() {
 });
 
 
+function updateToolbar() {
+  $('.market-section-buy__toolbar-controls')
+    .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
+      section:      N.runtime.page_data.section,
+      settings:     N.runtime.page_data.settings,
+      subscription: N.runtime.page_data.subscription,
+      selected_cnt: pageState.selected_items.length
+    }));
+}
+
+
 // Init handlers
 //
 N.wire.once('navigate.done:' + module.apiPath, function market_section_init_handlers() {
+
+  // Section subscription handler
+  //
+  N.wire.on(module.apiPath + ':subscription', function section_subscription(data) {
+    let hid = data.$this.data('section-hid');
+    let params = { subscription: data.$this.data('section-subscription') };
+
+    return Promise.resolve()
+      .then(() => N.wire.emit('market.section.buy.subscription', params))
+      .then(() => N.io.rpc('market.section.buy.change_subscription', { section_hid: hid, type: params.subscription }))
+      .then(() => {
+        N.runtime.page_data.subscription = params.subscription;
+      })
+      .then(updateToolbar);
+  });
+
 
   // User presses "home" button
   //
@@ -239,16 +266,6 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
 ///////////////////////////////////////////////////////////////////////////////
 // Many items selection
 //
-
-function updateToolbar() {
-  $('.market-section-buy__toolbar-controls')
-    .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
-      section:      N.runtime.page_data.section,
-      settings:     N.runtime.page_data.settings,
-      selected_cnt: pageState.selected_items.length
-    }));
-}
-
 
 let selected_items_key;
 // Flag shift key pressed

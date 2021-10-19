@@ -21,7 +21,13 @@ module.exports = function (N, collectionName) {
     N.shared.content_type[name] = value;
   }
 
+  // content type id for search
   set_content_type('MARKET_SECTION', 12);
+
+  // content type id for subscriptions
+  // (need to track subscriptions to offers and wishes separately)
+  set_content_type('MARKET_SECTION_OFFER', 15);
+  set_content_type('MARKET_SECTION_WISH',  16);
 
   let cache = {
     offer_count: { type: Number, default: 0 },

@@ -33,13 +33,3 @@
           span.icon.icon-track-normal
           =self.t('normal')
         .subscription-dlg__item-text=self.t('normal_desc')
-
-      a.subscription-dlg__item.list-group-item(href='#'
-        data-on-click=self.apiPath + ':select'
-        data-type=types.MUTED
-        class=self.subscription === types.MUTED ? 'active' : ''
-      )
-        .subscription-dlg__item-heading
-          span.icon.icon-track-muted
-          =self.t('muted')
-        .subscription-dlg__item-text=self.t('muted_desc')

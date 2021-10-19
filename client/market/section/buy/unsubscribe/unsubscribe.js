@@ -1,21 +1,12 @@
 'use strict';
 
 
-N.wire.once('navigate.done:' + module.apiPath, function page_once() {
+N.wire.on('navigate.done:' + module.apiPath, function unsubscribe() {
+  let selector = '.market-section-buy-unsubscribe';
+  let type = $(selector).data('type');
+  let section_hid = $(selector).data('section-hid');
 
-  // Edit subscription button handler
-  //
-  N.wire.on(module.apiPath + ':edit', function edit_subscription(data) {
-    let hid = data.$this.data('hid');
-    let params = { subscription: data.$this.data('subscription') };
-
-    return Promise.resolve()
-      .then(() => N.wire.emit('market.section.buy.subscription', params))
-      .then(() => N.io.rpc('market.section.buy.subscribe', { section_hid: hid, type: params.subscription }))
-      .then(() => {
-        data.$this.replaceWith(
-          N.runtime.render(module.apiPath + '.button', { section: { hid }, subscription: params.subscription })
-        );
-      });
-  });
+  return Promise.resolve()
+           .then(() => N.io.rpc('market.section.buy.change_subscription', { section_hid, type }))
+           .then(() => $(selector).addClass('page-loading__m-done'));
 });

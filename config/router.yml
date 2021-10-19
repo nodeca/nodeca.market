@@ -22,8 +22,20 @@ router:
           match: /\d+/
           type: integer
 
+    market.section.buy.unsubscribe:
+      "/market/cat{section_hid}/unsubscribe":
+        section_hid:
+          match: /\d+/
+          type: integer
+
     market.section.wish:
       "/market/wish/cat{section_hid}":
+        section_hid:
+          match: /\d+/
+          type: integer
+
+    market.section.wish.unsubscribe:
+      "/market/wish/cat{section_hid}/unsubscribe":
         section_hid:
           match: /\d+/
           type: integer

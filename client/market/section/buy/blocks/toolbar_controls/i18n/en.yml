@@ -1,6 +1,10 @@
 en-US:
   item_add: Add item
   currency: Currency
+  subscription: Subscription
+  subs_normal: No subscription. You will not receive notifications about new items.
+  subs_tracking: Normal. You will see new items in tracker.
+  subs_watching: Urgent. You will see new items in tracker and receive email notifications.
   many_header: "With #{count} ((item|items)):"
   many_unselect: Clear selection
   many_delete: Delete
