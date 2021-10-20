@@ -1,0 +1,3 @@
+en-US:
+  subject: '#{project_name}: new item in "Wish: #{section_title}" (market)'
+  view: View

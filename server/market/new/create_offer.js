@@ -333,6 +333,16 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Add new item notification for subscribers
+  //
+  N.wire.after(apiPath, async function add_new_item_notification(env) {
+    await N.wire.emit('internal:users.notify', {
+      src: env.data.new_item._id,
+      type: 'MARKET_NEW_OFFER'
+    });
+  });
+
+
   // Mark user as active
   //
   N.wire.after(apiPath, async function set_active_flag(env) {

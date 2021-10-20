@@ -1,0 +1,3 @@
+ru-RU:
+  subject: '#{project_name}: новое объявление в "#{section_title}" (барахолка)'
+  view: Посмотреть
