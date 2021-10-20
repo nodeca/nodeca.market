@@ -1,0 +1,27 @@
+each item in self.items
+  - var is_wish = item.to_type === '$$ JSON.stringify(N.shared.content_type.MARKET_SECTION_WISH) $$';
+  - var section = self.market_sections[item.to];
+  - var href = self.link_to(is_wish ? 'market.section.wish' : 'market.section.buy', { section_hid: section.hid });
+
+  .user-subscriptions-item.user-subscriptions-item__m-market-section.user-subscriptions-item__m-no-markers
+    .user-subscriptions-item__content
+      h2.user-subscriptions-item__title
+        a.user-subscriptions-item__title-link(href=href)= (is_wish ? self.t('prefix_wish') : '') + section.title
+
+      //- cover all space with link for small screens
+      a.user-subscriptions-item__overlay.d-md-none(href=href)
+
+    .user-subscriptions-item__controls
+      button.user-subscriptions-item__btn-edit.btn.btn-outline-secondary.btn-sm.btn-square.icon.d-none.d-sm-inline-block(
+        title=self.t('edit_subscription')
+        data-on-click='users.subscriptions:update'
+        data-subscription=item
+        data-block-name=self.block_name
+        class=self.icon(item.type)
+      )
+      button.user-subscriptions-item__btn-delete.btn.btn-outline-secondary.btn-sm.btn-square.icon.icon-x(
+        title=self.t('delete_subscription')
+        data-on-click='users.subscriptions:delete'
+        data-subscription=item
+        data-block-name=self.block_name
+      )
