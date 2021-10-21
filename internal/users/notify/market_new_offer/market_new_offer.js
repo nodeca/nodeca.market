@@ -12,7 +12,8 @@ module.exports = function (N) {
   // Notification will not be sent if target user:
   //
   // 1. creates this item himself
-  // 2. ignores sender of this message
+  // 2. no longer has access to this item
+  // 3. ignores sender of this message
   //
   N.wire.on('internal:users.notify.deliver', async function notify_deliver_market_item(local_env) {
     if (local_env.type !== 'MARKET_NEW_OFFER') return;
@@ -53,10 +54,20 @@ module.exports = function (N) {
     //
     user_ids.delete(from_user_id);
 
-    // filter users by access
-    // no need to do this, because market sections are always visible to everyone
+    // 2. filter users by access
+    //
+    for (let user_id of user_ids) {
+      let access_env = { params: {
+        items: item,
+        user_info: users_info[user_id]
+      } };
 
-    // 2. filter out ignored users
+      await N.wire.emit('internal:market.access.item_offer', access_env);
+
+      if (!access_env.data.access_read) user_ids.delete(user_id);
+    }
+
+    // 3. filter out ignored users
     //
     let ignore_data = await N.models.users.Ignore.find()
                                 .where('from').in(Array.from(user_ids))

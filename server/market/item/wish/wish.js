@@ -234,6 +234,32 @@ module.exports = function (N, apiPath) {
   });
 
 
+  // Mark item as read
+  //
+  N.wire.after(apiPath, function mark_item_read(env) {
+    if (!env.user_info.is_member) return;
+
+    // Don't need wait for callback, just log error if needed
+    N.models.users.Marker.mark(
+      env.user_info.user_id,
+      env.data.item._id,
+      // add "_offers" or "_wishes" suffix to distinguish between subscription types,
+      // it is needed to make "mark all" button only mark offers or wishes instead of both
+      env.data.section._id + '_wishes',
+      'market_item_wish'
+    ).then(() =>
+      N.models.users.Marker.setPos(
+        env.user_info.user_id,
+        env.data.item._id,
+        1,
+        1,
+        env.data.section._id + '_wishes',
+        'market_item_wish'
+      )
+    ).catch(err => N.logger.error(`Marker cannot mark item as read: ${err}`));
+  });
+
+
   // Add "responses" block for author
   //
   N.wire.after(apiPath, async function fill_item_responses(env) {

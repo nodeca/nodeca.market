@@ -1,5 +1,9 @@
 i18n:
   ru-RU:
     users:
+      tracker:
+        menu:
+          market_item: Барахолка
+
       subscriptions:
         market_section: Барахолка

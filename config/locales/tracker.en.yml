@@ -1,5 +1,9 @@
 i18n:
   en-US:
     users:
+      tracker:
+        menu:
+          market_item: Market
+
       subscriptions:
         market_section: Market

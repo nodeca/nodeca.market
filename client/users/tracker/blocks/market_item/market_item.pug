@@ -1,0 +1,41 @@
+each item in self.items
+  - var is_wish = item.type === 'market_item_wish';
+  - var market_item = is_wish ? self.market_item_wishes[item.id] : self.market_item_offers[item.id];
+  - var section = self.market_sections[market_item.section];
+  - var user = self.users[market_item.user] || {};
+  -debugger
+  - var mark = self.read_marks[market_item._id];
+  - var href = self.link_to(is_wish ? 'market.item.wish' : 'market.item.buy', { section_hid: section.hid, item_hid: market_item.hid });
+
+  .user-tracker-item(
+    class=is_wish ? '.user-tracker-item__m-market-item-wish' : '.user-tracker-item__m-market-item-offer'
+    class=mark.isNew ? 'user-tracker-item__m-new' : ''
+    class=mark.next !== -1 ? 'user-tracker-item__m-unread' : ''
+    data-last-ts=new Date(item.last_ts).valueOf()
+  )
+    .user-tracker-item__content
+      h2.user-tracker-item__title
+        a.user-tracker-item__title-link(href=href)= market_item.title
+
+        .user-tracker-item__new-marker= self.t('new')
+
+      .user-tracker-item__microstat
+        a.user-tracker-item__microstat-category(href=self.link_to(is_wish ? 'market.section.wish' : 'market.section.buy', { section_hid: section.hid }))
+          = (is_wish ? self.t('prefix_wish') : '') + section.title
+        a.user-tracker-item__microstat-time(
+          href=href
+        )
+          != self.timetag(market_item.ts, 'relative')
+        if user.hid
+          a.user-tracker-item__microstat-author._ucard-popover(
+            href=self.link_to('users.member', { user_hid: user.hid })
+            data-user-id=user._id
+          )= user.name
+
+      //- cover all space with link for small screens
+      a.user-tracker-item__overlay.d-md-none(href=href)
+
+    .user-tracker-item__stat-time
+      a.user-tracker-item__stat-link(
+        href=href
+      )!= self.timetag(market_item.ts, 'relative')

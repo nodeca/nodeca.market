@@ -1,4 +1,9 @@
 users:
+  tracker:
+    menu:
+      market_item:
+        priority: 50
+
   subscriptions:
     market_section:
       to_type: [ MARKET_SECTION_OFFER, MARKET_SECTION_WISH ]
