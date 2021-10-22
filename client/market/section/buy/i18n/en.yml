@@ -5,6 +5,7 @@ en-US:
   prev_page: Newer
 
   msg_multiselect: Multiselect on
+  all_marked_read: All items in this section are now marked as read
   many_items_deleted: Selected items have been deleted
   many_close_confirm: Are you sure you wish to close selected items?
   many_items_closed: Selected items have been closed

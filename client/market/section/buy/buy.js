@@ -223,6 +223,14 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
   });
 
 
+  // Click mark all read
+  //
+  N.wire.on(module.apiPath + ':mark_read', function mark_read(data) {
+    return N.io.rpc('market.section.buy.mark_read', { hid: data.$this.data('section-hid') })
+               .then(() => N.wire.emit('notify.info', t('all_marked_read')));
+  });
+
+
   // User presses "home" button
   //
   N.wire.on(module.apiPath + ':nav_to_start', function navigate_to_start() {

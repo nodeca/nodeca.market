@@ -8,7 +8,8 @@ if self.settings.market_can_create_items
 
 - items.push('currency')
 
-if self.runtime.is_member
+if self.runtime.is_member && !self.section.is_category
+  - items.push('mark_read')
   - items.push('subscription')
 
 - var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
@@ -36,6 +37,14 @@ if items.length > 0 && items[items.length - 1] === 'header'
       href=self.link_to('market.new', { $query: { section: (self.section || {})._id } })
       class=show_menu ? 'd-none d-sm-inline-block' : ''
       title=self.t('item_add')
+    )
+
+  if self.runtime.is_member && !self.section.is_category
+    button.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-check(
+      type='button'
+      data-on-click='market.section.buy:mark_read'
+      data-section-hid=self.section.hid
+      title=self.t('mark_read')
     )
 
   - var subscriptionIcon = 'icon-track-normal'
@@ -84,6 +93,13 @@ if items.length > 0 && items[items.length - 1] === 'header'
                 data-on-click='market.blocks.currency_select_dlg'
                 data-currency=self.settings.market_displayed_currency
               )= self.t('currency')
+
+            when 'mark_read'
+              button.dropdown-item.d-sm-none(
+                type='button'
+                data-on-click='market.section.buy:mark_read'
+                data-section-hid=self.section.hid
+              )= self.t('mark_read')
 
             when 'subscription'
               button.dropdown-item(

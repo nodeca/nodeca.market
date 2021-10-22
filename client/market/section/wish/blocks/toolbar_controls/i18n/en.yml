@@ -1,5 +1,6 @@
 en-US:
   item_add: Add item
+  mark_read: Mark all read
   currency: Currency
   subscription: Subscription
   subs_normal: No subscription. You will not receive notifications about new items.

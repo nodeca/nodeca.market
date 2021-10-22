@@ -5,6 +5,7 @@ ru-RU:
   prev_page: Позже
 
   msg_multiselect: Множественный выбор
+  all_marked_read: Все объявления в разделе помечены как прочитанные
   many_items_deleted: Выбранные объявления удалены
   many_close_confirm: Вы уверены, что хотите закрыть выбранные объявления?
   many_items_closed: Выбранные объявления закрыты
