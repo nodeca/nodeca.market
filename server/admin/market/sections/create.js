@@ -5,11 +5,12 @@
 
 module.exports = function (N, apiPath) {
   N.validate(apiPath, {
-    parent:         { type: [ 'null', 'string' ], required: true },
-    title:          { type: 'string',           required: true, minLength: 1 },
-    is_category:    { type: 'boolean',          required: true },
-    allow_offers:   { type: 'boolean',          required: true },
-    allow_wishes:   { type: 'boolean',          required: true }
+    parent:        { type: [ 'null', 'string' ], required: true },
+    title:         { type: 'string',           required: true, minLength: 1 },
+    is_category:   { type: 'boolean',          required: true },
+    allow_offers:  { type: 'boolean',          required: true },
+    allow_wishes:  { type: 'boolean',          required: true },
+    no_price:      { type: 'boolean',          required: true }
   });
 
   N.wire.on(apiPath, async function section_create(env) {

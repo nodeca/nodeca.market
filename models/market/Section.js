@@ -54,6 +54,9 @@ module.exports = function (N, collectionName) {
     allow_offers:     { type: Boolean, default: true },
     allow_wishes:     { type: Boolean, default: true },
 
+    // Control ability to set selling price in a "gift" section
+    no_price:         { type: Boolean, default: false },
+
     // Cache
     cache,
     cache_hb:         cache

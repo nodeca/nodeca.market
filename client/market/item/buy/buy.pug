@@ -73,10 +73,10 @@ article#content.market-item-buy(
                 return self.t.exists(p) ? self.t(p) : currency;
               }
 
-              var user_currency  = self.settings.market_displayed_currency;
-              var rate           = self.currency_rates[self.item.price.currency] ;
-              var price_original = self.price(self.item.price.value, get_symbol(self.item.price.currency));
-              var price_converted;
+              var user_currency   = self.settings.market_displayed_currency;
+              var rate            = self.currency_rates[self.item.price.currency] ;
+              var price_original  = self.price(self.item.price.value, get_symbol(self.item.price.currency));
+              var price_converted = null;
 
               if (user_currency && user_currency !== self.item.price.currency && rate && rate > 0) {
                 price_converted = self.price(self.item.price.value * rate, get_symbol(user_currency), true);

@@ -33,9 +33,9 @@ module.exports = function (N, apiPath) {
     barter:             { type: 'boolean' },
     delivery:           { type: 'boolean' },
     search_all:         { type: 'boolean' },
-    price_min_value:    { type: 'integer' },
+    price_min_value:    { type: 'number' },
     price_min_currency: { type: 'string' },
-    price_max_value:    { type: 'integer' },
+    price_max_value:    { type: 'number' },
     price_max_currency: { type: 'string' },
     range:              { type: 'integer' },
     sort:               { type: 'string' },
@@ -192,7 +192,7 @@ module.exports = function (N, apiPath) {
       let rate = await N.models.market.CurrencyRate.get(env.data.search.price_max_currency);
 
       if (rate) {
-        query += ' AND price>0 AND price<=?';
+        query += ' AND price<=?';
         price_max = env.data.search.price_max_value * rate;
         params.push(price_max);
       } else {

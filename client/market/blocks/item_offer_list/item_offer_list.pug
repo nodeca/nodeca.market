@@ -60,10 +60,10 @@ each item, idx in self.items
                   return self.t.exists(p) ? self.t(p) : currency;
                 }
 
-                var user_currency  = self.settings.market_displayed_currency;
-                var rate           = self.currency_rates[item.price.currency] ;
-                var price_original = self.price(item.price.value, get_symbol(item.price.currency));
-                var price_converted;
+                var user_currency   = self.settings.market_displayed_currency;
+                var rate            = self.currency_rates[item.price.currency] ;
+                var price_original  = self.price(item.price.value, get_symbol(item.price.currency));
+                var price_converted = null;
 
                 if (user_currency && user_currency !== item.price.currency && rate && rate > 0) {
                   price_converted = self.price(item.price.value * rate, get_symbol(user_currency), true);

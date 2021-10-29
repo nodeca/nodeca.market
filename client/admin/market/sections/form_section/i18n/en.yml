@@ -15,3 +15,5 @@ en-US:
   field_is_category: Category
   field_allow_offers: Allow offers
   field_allow_wishes: Allow wishes
+  field_no_price: Forbid setting price
+  field_no_price__help: run search rebuild after changing this setting

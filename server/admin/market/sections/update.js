@@ -8,12 +8,13 @@
 
 module.exports = function (N, apiPath) {
   N.validate(apiPath, {
-    _id:            { format: 'mongo', required: true },
-    parent:         { type: [ 'null', 'string' ], required: true },
-    title:          { type: 'string',           required: true },
-    is_category:    { type: 'boolean',          required: true },
-    allow_offers:   { type: 'boolean',          required: true },
-    allow_wishes:   { type: 'boolean',          required: true }
+    _id:           { format: 'mongo', required: true },
+    parent:        { type: [ 'null', 'string' ], required: true },
+    title:         { type: 'string',           required: true },
+    is_category:   { type: 'boolean',          required: true },
+    allow_offers:  { type: 'boolean',          required: true },
+    allow_wishes:  { type: 'boolean',          required: true },
+    no_price:      { type: 'boolean',          required: true }
   });
 
   N.wire.on(apiPath, async function section_update(env) {

@@ -22,10 +22,13 @@ form.form-horizontal(data-bind="submit: isNewSection ? create : update")
           .switch
             input(id='section_' + name, type="checkbox", data-bind='checked: currentSection.' + name)
             label.form-label(for='section_' + name, data-yes=self.t('value_yes'), data-no=self.t('value_no')): i
+        if self.t.exists('field_' + name + '__help')
+          .form-text= self.t('field_' + name + '__help')
 
     +option_field('is_category')
     +option_field('allow_offers')
     +option_field('allow_wishes')
+    +option_field('no_price')
 
   .row.mb-3
     .col-9.ml-auto

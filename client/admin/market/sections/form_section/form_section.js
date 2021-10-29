@@ -6,11 +6,12 @@ const ko = require('knockout');
 
 
 const SECTION_FIELD_DEFAULTS = {
-  title:          '',
-  parent:         null,
-  is_category:    false,
-  allow_offers:   true,
-  allow_wishes:   true
+  title:         '',
+  parent:        null,
+  is_category:   false,
+  allow_offers:  true,
+  allow_wishes:  true,
+  no_price:      false
 };
 
 
