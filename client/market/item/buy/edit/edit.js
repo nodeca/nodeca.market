@@ -32,8 +32,8 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
 
   view.offer = {
     title:          ko.observable(item.title || ''),
-    price_value:    ko.observable(item.price.value || ''),
-    price_currency: ko.observable(item.price.currency || ''),
+    price_value:    ko.observable(item.price?.value || ''),
+    price_currency: ko.observable(item.price?.currency || ''),
     section:        ko.observable(item.section || ''),
     description:    ko.observable(item.md || ''),
     files:          ko.observableArray(item.files.map(id => ({ id }))),
@@ -41,6 +41,10 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     delivery:       ko.observable(item.delivery || false),
     is_new:         ko.observable(item.is_new || false)
   };
+
+  view.requirePrice = ko.computed(() =>
+    !N.runtime.page_data.no_price_sections.has(view.offer.section())
+  );
 
   // force price to be numeric (better to do with extenders, but subscription is easier to do)
   view.offer.price_value.subscribe(v => {

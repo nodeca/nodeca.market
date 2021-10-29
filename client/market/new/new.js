@@ -71,6 +71,11 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
     view.offer.type('buy');
   }
 
+  view.requirePrice = ko.computed(() =>
+    view.offer.type() === 'sell' &&
+    !N.runtime.page_data.no_price_sections.has(view.offer.section())
+  );
+
   let savedDraft = _.pickBy(ko.toJS(view.offer), v => v !== '');
 
   if (N.runtime.page_data.draft) {

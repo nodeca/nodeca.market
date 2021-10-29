@@ -3,6 +3,7 @@
 - self.add_raw_data('defaults', self.defaults)
 - self.add_raw_data('parse_options', self.parse_options)
 - self.add_raw_data('currency_types', self.currency_types)
+- self.add_raw_data('no_price_sections', new Set(self.no_price_sections))
 
 article#content.market-new
   != self.partial('@common.blocks.navbar.logo_apps')
@@ -28,12 +29,12 @@ article#content.market-new
             label.form-label.market-new__label(for='market-new-title')= self.t('field_title')
             input.form-control#market-new-title(type='text', data-bind="textInput: offer.title", required)
 
-        .row(data-bind="visible: offer.type() === 'sell'")
+        .row(data-bind="visible: requirePrice")
           .col-lg-3.col-md-4.col-sm-6.mb-3
             label.form-label.market-new__label(for='market-new-price')= self.t('field_price')
             .input-group
-              input.form-control#market-new-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value, attr: { required: offer.type() === 'sell' }")
-              select.form-control.market-new__currency.form-select(data-bind="value: offer.price_currency, optionsCaption: '', options: currencyTypes, optionsText: 'title', optionsValue: 'value', attr: { required: offer.type() === 'sell' }")
+              input.form-control#market-new-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value, attr: { required: requirePrice }")
+              select.form-control.market-new__currency.form-select(data-bind="value: offer.price_currency, optionsCaption: '', options: currencyTypes, optionsText: 'title', optionsValue: 'value', attr: { required: requirePrice }")
 
         mixin sections_tree(sections, deepness)
           each section in sections

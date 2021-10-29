@@ -82,6 +82,10 @@ module.exports = function (N, apiPath) {
   N.wire.on(apiPath, async function fill_sections_tree(env) {
     env.data.section_item_type = 'offers';
     await N.wire.emit('internal:market.sections_tree', env);
+
+    env.res.no_price_sections =
+      (await N.models.market.Section.find({ no_price: true }).select('_id').lean(true))
+        .map(s => String(s._id));
   });
 
 

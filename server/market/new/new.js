@@ -77,6 +77,10 @@ module.exports = function (N, apiPath) {
     await N.wire.emit('internal:market.sections_tree', env);
     env.res.sections_buy = env.res.sections;
     env.res.sections = null;
+
+    env.res.no_price_sections =
+      (await N.models.market.Section.find({ no_price: true }).select('_id').lean(true))
+        .map(s => String(s._id));
   });
 
 

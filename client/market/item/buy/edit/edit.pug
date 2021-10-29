@@ -2,6 +2,7 @@
 - self.add_raw_data('settings', self.settings)
 - self.add_raw_data('parse_options', self.parse_options)
 - self.add_raw_data('currency_types', self.currency_types)
+- self.add_raw_data('no_price_sections', new Set(self.no_price_sections))
 
 article#content.market-item-buy-edit
   != self.partial('@common.blocks.navbar.logo_apps')
@@ -23,12 +24,12 @@ article#content.market-item-buy-edit
             label.form-label.market-item-buy-edit__label(for='market-edit-title')= self.t('field_title')
             input.form-control#market-edit-title(type='text', data-bind="textInput: offer.title", required)
 
-        .row
+        .row(data-bind="visible: requirePrice")
           .col-lg-3.col-md-4.col-sm-6.mb-3
             label.form-label.market-item-buy-edit__label(for='market-edit-price')= self.t('field_price')
             .input-group
-              input.form-control#market-edit-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value", required)
-              select.form-control.market-item-buy-edit__currency.form-select(data-bind="value: offer.price_currency, options: currencyTypes, optionsText: 'title', optionsValue: 'value'", required)
+              input.form-control#market-edit-price(type='number', step=0.01, min=0, data-bind="value: offer.price_value, attr: { required: requirePrice }")
+              select.form-control.market-item-buy-edit__currency.form-select(data-bind="value: offer.price_currency, optionsCaption: '', options: currencyTypes, optionsText: 'title', optionsValue: 'value', attr: { required: requirePrice }")
 
         mixin sections_tree(sections, deepness)
           each section in sections

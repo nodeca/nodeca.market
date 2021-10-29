@@ -18,8 +18,8 @@ module.exports = function (N, apiPath) {
   N.validate(apiPath, {
     item_id:        { format: 'mongo', required: true },
     title:          { type: 'string',  required: true },
-    price_value:    { type: 'number',  required: true },
-    price_currency: { type: 'string',  required: true },
+    price_value:    { anyOf: [ { type: 'number' }, { const: '' } ], required: true },
+    price_currency: { type: 'string',  required: false },
     section:        { format: 'mongo', required: true },
     description:    { type: 'string',  required: true },
     files:          {
@@ -157,6 +157,8 @@ module.exports = function (N, apiPath) {
   // Check and convert currency
   //
   N.wire.before(apiPath, async function convert_currency(env) {
+    if (env.data.section.no_price) return;
+
     if (!N.config.market.currencies.hasOwnProperty(env.params.price_currency)) {
       throw N.io.BAD_REQUEST;
     }
@@ -295,11 +297,15 @@ module.exports = function (N, apiPath) {
     item.html = env.data.parse_result.html;
     item.md = env.params.description;
     item.params = env.data.parse_options;
-    item.price = {
-      value:    env.params.price_value,
-      currency: env.params.price_currency
-    };
-    item.base_currency_price = env.data.base_currency_price;
+
+    if (!env.data.section.no_price) {
+      item.price = {
+        value:    env.params.price_value,
+        currency: env.params.price_currency
+      };
+      item.base_currency_price = env.data.base_currency_price;
+    }
+
     item.barter_info = env.params.barter_info;
     item.delivery = env.params.delivery;
     item.is_new = env.params.is_new;
