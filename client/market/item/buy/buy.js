@@ -1,6 +1,9 @@
 'use strict';
 
 
+const glightbox = require('glightbox');
+
+
 N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 
   // Click report button
@@ -200,5 +203,35 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     if (title && href) {
       params.text = `Re: [${title}](${href})\n\n`;
     }
+  });
+});
+
+
+N.wire.on('navigate.done:' + module.apiPath, function init_lightbox() {
+
+  $(document).on('click', '.market-attach-link', function () {
+    let $container = $(this).closest('.market-item-buy');
+    let nodes;
+
+    if ($container.length) {
+      nodes = $container.find('.market-attach-link').toArray();
+    } else {
+      nodes = [ this ];
+    }
+
+    let elements = [];
+
+    nodes.forEach(node => {
+      elements.push({
+        href: $(node).attr('href'),
+        type: 'image'
+      });
+    });
+
+    let index = nodes.indexOf(this);
+
+    glightbox({ elements }).openAt(index);
+
+    return false;
   });
 });
