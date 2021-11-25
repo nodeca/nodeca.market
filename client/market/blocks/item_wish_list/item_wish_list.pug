@@ -7,100 +7,93 @@
 - var multiselect_allowed = self.settings.market_mod_can_delete_items || self.settings.market_mod_can_move_items;
 
 each item, idx in self.items
-  if (self.ignored_users[item.user] && !self.settings.market_show_ignored && !self.market_list_show_ignores)
-    //- skip entries created by ignored users
+  - var section = self.sections_by_id[item.section] || {};
 
-  else
-    - var section = self.sections_by_id[item.section] || {};
+  li.market-list-item-wish(
+    id='item' + item.hid
+    class=(item.st === itemStatuses.HB) ? 'market-list-item-wish__m-hellbanned' : ''
+    class=([ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1) ? 'market-list-item-wish__m-closed' : ''
+    class=(item.st === itemStatuses.DELETED) ? 'market-list-item-wish__m-deleted' : ''
+    class=(item.st === itemStatuses.DELETED_HARD) ? 'market-list-item-wish__m-deleted-hard' : ''
+    class=(self.own_bookmarks.indexOf(item._id) !== -1) ? 'market-list-item-wish__m-bookmarked' : ''
+    data-item-id=item._id
+    data-item-hid=item.hid
+    data-item-index=(self.index_offset || 0) + idx
+  )
+    .market-list-item-wish__info
+      .market-list-item-wish__title
+        span.market-list-item-wish__bookmarked-marker.icon.icon-bookmark.icon-space-after(title=self.t('bookmarked'))
+        span.market-list-item-wish__deleted-marker.icon.icon-x.icon-dimmed.icon-space-after(title=self.t('deleted'))
+        a.market-list-item-wish__title-text(href=self.link_to('market.item.wish', { section_hid: section.hid, item_hid: item.hid }))
+          = item.title
 
-    li.market-list-item-wish(
-      id='item' + item.hid
-      class=(item.st === itemStatuses.HB) ? 'market-list-item-wish__m-hellbanned' : ''
-      class=([ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1) ? 'market-list-item-wish__m-closed' : ''
-      class=(item.st === itemStatuses.DELETED) ? 'market-list-item-wish__m-deleted' : ''
-      class=(item.st === itemStatuses.DELETED_HARD) ? 'market-list-item-wish__m-deleted-hard' : ''
-      class=(self.own_bookmarks.indexOf(item._id) !== -1) ? 'market-list-item-wish__m-bookmarked' : ''
-      class=self.ignored_users[item.user] ? 'market-list-item-wish__m-ignored' : ''
-      data-item-id=item._id
-      data-item-hid=item.hid
-      data-item-index=(self.index_offset || 0) + idx
-    )
       .market-list-item-wish__info
-        .market-list-item-wish__title
-          span.market-list-item-wish__bookmarked-marker.icon.icon-bookmark.icon-space-after(title=self.t('bookmarked'))
-          span.market-list-item-wish__deleted-marker.icon.icon-x.icon-dimmed.icon-space-after(title=self.t('deleted'))
-          a.market-list-item-wish__title-text(href=self.link_to('market.item.wish', { section_hid: section.hid, item_hid: item.hid }))
-            = item.title
+        .market-list-item-wish__details
+          span.market-list-item-wish__details-item
+            - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
+            if self.market_list_show_close_date && isClosed && item.closed_at_ts
+              != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
+            else if self.market_list_show_close_date && !isClosed && item.autoclose_at_ts
+              -
+                // make sure timestamp is set in the future (or at least now)
+                var date = Math.max(new Date(item.autoclose_at_ts), Date.now());
+                // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
+                date = new Date(date - date % (60 * 60 * 1000));
+              != self.t('autoclose_at', { date: self.timetag(date, 'relative') })
+            else
+              != self.timetag(item.ts, 'relative')
 
-        .market-list-item-wish__info
-          .market-list-item-wish__details
+          if !self.market_list_hide_user
             span.market-list-item-wish__details-item
-              - var isClosed = [ item.st, item.ste ].indexOf(itemStatuses.CLOSED) !== -1
-              if self.market_list_show_close_date && isClosed && item.closed_at_ts
-                != self.t('closed_at', { date: self.timetag(item.closed_at_ts, 'relative') })
-              else if self.market_list_show_close_date && !isClosed && item.autoclose_at_ts
-                -
-                  // make sure timestamp is set in the future (or at least now)
-                  var date = Math.max(new Date(item.autoclose_at_ts), Date.now());
-                  // round timestamp down to nearest hour (exact time is meaningless if task is delayed)
-                  date = new Date(date - date % (60 * 60 * 1000));
-                != self.t('autoclose_at', { date: self.timetag(date, 'relative') })
+              - var user = self.users[item.user];
+              if user
+                a.market-list-item-wish__user-link._ucard-popover(
+                  href=self.link_to('users.member', { user_hid: user.hid })
+                  data-user-id=user._id
+                  data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
+                )= user.nick
+
+          span.market-list-item-wish__details-item
+            a.market-list-item-wish__section-link(
+              href=self.link_to('market.section.wish', { section_hid: section.hid })
+            )
+              = section.title
+
+        .market-list-item-wish__location
+          if item.location
+            a.market-list-item-wish__location-link(
+              href= '#'
+              data-on-click= 'common.blocks.location_show_dlg'
+              data-latitude= item.location && item.location[1]
+              data-longitude= item.location && item.location[0]
+            )
+              if self.location_names[item.location[0] + ':' + item.location[1]]
+                = self.location_names[item.location[0] + ':' + item.location[1]]
               else
-                != self.timetag(item.ts, 'relative')
+                span.icon.icon-location
 
-            if !self.market_list_hide_user
-              span.market-list-item-wish__details-item
-                - var user = self.users[item.user];
-                if user
-                  a.market-list-item-wish__user-link._ucard-popover(
-                    href=self.link_to('users.member', { user_hid: user.hid })
-                    data-user-id=user._id
-                    data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
-                  )= user.nick
+      .market-list-item-wish__meta-hellbanned
+        = self.t('hellbanned')
 
-            span.market-list-item-wish__details-item
-              a.market-list-item-wish__section-link(
-                href=self.link_to('market.section.wish', { section_hid: section.hid })
-              )
-                = section.title
+      if item.del_by
+        - var delUser = self.users[item.del_by] || {}
+        .market-list-item-wish__meta-deleted
+          = self.t('del_by')
+          = ' '
+          a.market-list-item-wish__meta-del-by._ucard-popover(
+            href=self.link_to('users.member', { user_hid: delUser.hid })
+            data-user-id=delUser._id
+            data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
+          )= delUser.nick
 
-          .market-list-item-wish__location
-            if item.location
-              a.market-list-item-wish__location-link(
-                href= '#'
-                data-on-click= 'common.blocks.location_show_dlg'
-                data-latitude= item.location && item.location[1]
-                data-longitude= item.location && item.location[0]
-              )
-                if self.location_names[item.location[0] + ':' + item.location[1]]
-                  = self.location_names[item.location[0] + ':' + item.location[1]]
-                else
-                  span.icon.icon-location
-
-        .market-list-item-wish__meta-ignored.icon.icon-ignore.icon-space-after
-          = self.t('ignored')
-        .market-list-item-wish__meta-hellbanned
-          = self.t('hellbanned')
-
-        if item.del_by
-          - var delUser = self.users[item.del_by] || {}
-          .market-list-item-wish__meta-deleted
-            = self.t('del_by')
+          if item.del_reason
             = ' '
-            a.market-list-item-wish__meta-del-by._ucard-popover(
-              href=self.link_to('users.member', { user_hid: delUser.hid })
-              data-user-id=delUser._id
-              data-user-ref='market_list_item_wish:'+section.hid+':'+item.hid
-            )= delUser.nick
+            = self.t('del_reason', { text: item.del_reason })
 
-            if item.del_reason
-              = ' '
-              = self.t('del_reason', { text: item.del_reason })
-
-      if multiselect_allowed
-        label.form-label.market-list-item-wish__select(title=self.t('multiselect_hint'))
-          input.market-list-item-wish__select-cb(
-            type='checkbox'
-            data-item-id=item._id
-            data-on-change='market.blocks.item_wish_list:item_check'
-          )
+    if multiselect_allowed
+      label.form-label.market-list-item-wish__select(title=self.t('multiselect_hint'))
+        input.market-list-item-wish__select-cb(
+          type='checkbox'
+          data-item-id=item._id
+          data-on-change='market.blocks.item_wish_list:item_check'
+        )

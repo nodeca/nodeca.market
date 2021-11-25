@@ -76,12 +76,10 @@
 
 .market-list-item-offer__meta-deleted
 .market-list-item-offer__meta-hellbanned
-.market-list-item-offer__meta-ignored
   color $body-color-secondary
   shortable()
 
 .market-list-item-offer__meta-hellbanned
-.market-list-item-offer__meta-ignored
   display none
 
 .market-list-item-offer__bookmarked-marker
@@ -95,14 +93,10 @@
   .market-list-item-offer__bookmarked-marker
     display inline-block
 
-// only hide ignored and hb items on section and search pages,
+// only hide hb items on section and search pages,
 // show them items on user pages as regular
 .market-section-buy__item-list
 .market-search-buy__item-list
-  .market-list-item-offer__m-ignored
-    .market-list-item-offer__meta-ignored
-      display block
-
   .market-list-item-offer__m-hellbanned
     .market-list-item-offer__meta-hellbanned
       display block
@@ -112,11 +106,10 @@
   .market-list-item-offer__deleted-marker
     display inline-block
 
-// only hide ignored and hb items on section and search pages,
+// only hide hb items on section and search pages,
 // show them items on user pages as regular
 .market-section-buy__item-list
 .market-search-buy__item-list
-  .market-list-item-offer__m-ignored
   .market-list-item-offer__m-hellbanned
     background-color $deleted-bg
     opacity 0.7

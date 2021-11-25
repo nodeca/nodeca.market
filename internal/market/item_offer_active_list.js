@@ -28,8 +28,7 @@ let setting_names = [
   'market_items_per_page',
   'market_mod_can_delete_items',
   'market_mod_can_hard_delete_items',
-  'market_mod_can_move_items',
-  'market_show_ignored'
+  'market_mod_can_move_items'
 ];
 
 
@@ -127,26 +126,6 @@ module.exports = function (N, apiPath) {
     env.data.items.forEach(function (item) {
       if (item.user)   env.data.users.push(item.user);
       if (item.del_by) env.data.users.push(item.del_by);
-    });
-  });
-
-
-  // Check if any users are ignored
-  //
-  N.wire.after(apiPath, async function check_ignores(env) {
-    let users = env.data.items.map(item => item.user).filter(Boolean);
-
-    // don't fetch `_id` to load all data from composite index
-    let ignored = await N.models.users.Ignore.find()
-                            .where('from').equals(env.user_info.user_id)
-                            .where('to').in(users)
-                            .select('from to -_id')
-                            .lean(true);
-
-    env.res.ignored_users = env.res.ignored_users || {};
-
-    ignored.forEach(row => {
-      env.res.ignored_users[row.to] = true;
     });
   });
 

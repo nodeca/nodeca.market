@@ -8,7 +8,6 @@ i18n:
 
         setting_names:
           market_can_create_items: Create market items
-          market_show_ignored: Show lots from ignored users
           market_mod_can_add_infractions: Can give infractions in market
           market_mod_can_edit_items: Edit market items
           market_mod_can_move_items: Open, close or move market items

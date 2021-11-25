@@ -7,12 +7,6 @@ setting_schemas:
       type: boolean
       default: false
 
-    market_show_ignored:
-      priority: 220
-      category_key: market
-      type: boolean
-      default: false
-
     market_mod_can_edit_items:
       priority: 1010
       category_key: perm_market_moderate
