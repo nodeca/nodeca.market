@@ -40,7 +40,8 @@ module.exports = function (N, apiPath) {
     if (offer_subs.length !== 0) {
       let cuts = await N.models.users.Marker.cuts(
         locals.params.user_info.user_id,
-        offer_subs.map(s => s.to + '_offers'));
+        offer_subs.map(s => s.to + '_offers'),
+        'market_item_offer');
 
       let queryParts = [];
 
@@ -55,7 +56,8 @@ module.exports = function (N, apiPath) {
     if (wish_subs.length !== 0) {
       let cuts = await N.models.users.Marker.cuts(
         locals.params.user_info.user_id,
-        offer_subs.map(s => s.to + '_wishes'));
+        offer_subs.map(s => s.to + '_wishes'),
+        'market_item_wish');
 
       let queryParts = [];
 
@@ -78,7 +80,8 @@ module.exports = function (N, apiPath) {
       lastPostTs: item.ts
     }));
 
-    let read_marks_offers = await N.models.users.Marker.info(locals.params.user_info.user_id, data);
+    let read_marks_offers = await N.models.users.Marker.info(
+      locals.params.user_info.user_id, data, 'marker_item_offer');
 
     data = item_wishes.map(item => ({
       categoryId: item.section + '_wishes',
@@ -87,7 +90,8 @@ module.exports = function (N, apiPath) {
       lastPostTs: item.ts
     }));
 
-    let read_marks_wishes = await N.models.users.Marker.info(locals.params.user_info.user_id, data);
+    let read_marks_wishes = await N.models.users.Marker.info(
+      locals.params.user_info.user_id, data, 'marker_item_wish');
 
 
     // Filter new and unread items

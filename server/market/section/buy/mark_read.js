@@ -34,6 +34,6 @@ module.exports = function (N, apiPath) {
   // Mark topics as read
   //
   N.wire.on(apiPath, async function mark_topics_read(env) {
-    await N.models.users.Marker.markAll(env.user_info.user_id, env.data.section._id + '_offers');
+    await N.models.users.Marker.markByCategory(env.user_info.user_id, env.data.section._id + '_offers');
   });
 };
