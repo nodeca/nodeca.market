@@ -2,11 +2,9 @@ users:
   tracker:
     menu:
       market_item:
-        marker_type: [ market_item_offer, market_item_wish ]
         priority: 50
 
   subscriptions:
     market_section:
       to_type: [ MARKET_SECTION_OFFER, MARKET_SECTION_WISH ]
-      marker_type: [ market_item_offer, market_item_wish ]
       priority: 70

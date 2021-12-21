@@ -22,6 +22,8 @@ module.exports = function (N, collectionName) {
 
   set_content_type('MARKET_ITEM_OFFER', 13);
 
+  N.shared.marker_types = (N.shared.marker_types || []).concat([ 'market_item_offer' ]);
+
   let statuses = {
     OPEN:         1, // only in active model
     CLOSED:       2, // only in archive
