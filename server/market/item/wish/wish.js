@@ -247,15 +247,6 @@ module.exports = function (N, apiPath) {
       // it is needed to make "mark all" button only mark offers or wishes instead of both
       env.data.section._id + '_wishes',
       'market_item_wish'
-    ).then(() =>
-      N.models.users.Marker.setPos(
-        env.user_info.user_id,
-        env.data.item._id,
-        1,
-        1,
-        env.data.section._id + '_wishes',
-        'market_item_wish'
-      )
     ).catch(err => N.logger.error(`Marker cannot mark item as read: ${err}`));
   });
 
