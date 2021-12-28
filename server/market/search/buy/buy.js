@@ -23,11 +23,11 @@ module.exports = function (N, apiPath) {
         barter:             { type: 'string' },
         delivery:           { type: 'string' },
         search_all:         { type: 'string' },
-        price_min_value:    { type: 'string' },
+        price_min_value:    { anyOf: [ { format: 'pos_int_str' }, { const: '' } ] },
         price_min_currency: { type: 'string' },
-        price_max_value:    { type: 'string' },
+        price_max_value:    { anyOf: [ { format: 'pos_int_str' }, { const: '' } ] },
         price_max_currency: { type: 'string' },
-        range:              { type: 'string' },
+        range:              { anyOf: [ { format: 'pos_int_str' }, { const: '' } ] },
         sort:               { type: 'string' }
       },
       additionalProperties: true

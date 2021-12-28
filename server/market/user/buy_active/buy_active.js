@@ -14,7 +14,7 @@ module.exports = function (N, apiPath) {
     $query:   { // from is used on client-side to highlight level-up
       type: 'object',
       properties: {
-        from: { type: 'string' }
+        from: { format: 'pos_int_str' }
       },
       additionalProperties: false
     }

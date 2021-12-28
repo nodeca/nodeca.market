@@ -20,7 +20,7 @@ module.exports = function (N, apiPath) {
         query:              { type: 'string' },
         section:            { format: 'mongo' },
         search_all:         { type: 'string' },
-        range:              { type: 'string' },
+        range:              { anyOf: [ { format: 'pos_int_str' }, { const: '' } ] },
         sort:               { type: 'string' }
       },
       additionalProperties: true

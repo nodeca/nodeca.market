@@ -11,7 +11,7 @@ module.exports = function (N, apiPath) {
     $query:   {
       type: 'object',
       properties: {
-        from: { type: 'string' },
+        from: { format: 'pos_int_str' },
         prev: { const: '' },
         next: { const: '' }
       },
