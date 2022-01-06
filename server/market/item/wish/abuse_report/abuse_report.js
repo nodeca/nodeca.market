@@ -6,8 +6,18 @@
 module.exports = function (N, apiPath) {
 
   N.validate(apiPath, {
-    item_id: { format: 'mongo', required: true },
-    message: { type: 'string', required: true }
+    properties: {
+      item_id: { format: 'mongo', required: true },
+      message: { type: 'string' },
+      move_to: { type: 'integer', minimum: 1 }
+    },
+
+    additionalProperties: false,
+
+    oneOf: [
+      { required: [ 'message' ] },
+      { required: [ 'move_to' ] }
+    ]
   });
 
 
@@ -24,6 +34,22 @@ module.exports = function (N, apiPath) {
     let can_report_abuse = await env.extras.settings.fetch('can_report_abuse');
 
     if (!can_report_abuse) throw N.io.FORBIDDEN;
+  });
+
+
+  // Fetch destination section, check that it's not a category
+  //
+  N.wire.before(apiPath, async function fetch_section(env) {
+    if (!env.params.move_to) return;
+
+    env.data.move_to_section = await N.models.market.Section.findOne({ hid: env.params.move_to }).lean(true);
+    if (!env.data.move_to_section) throw N.io.NOT_FOUND;
+
+    let type_allowed = await N.models.market.Section.checkIfAllowed(env.data.move_to_section._id, 'wishes');
+    if (!type_allowed) throw N.io.NOT_FOUND;
+
+    // Cannot move to a category. Should never happen - restricted on client
+    if (env.data.move_to_section.is_category) throw N.io.BAD_REQUEST;
   });
 
 
@@ -69,13 +95,25 @@ module.exports = function (N, apiPath) {
     params.link  = true;
     params.quote = true;
 
-    let report = new N.models.core.AbuseReport({
-      src: env.data.item._id,
-      type: N.shared.content_type.MARKET_ITEM_WISH,
-      text: env.params.message,
-      from: env.user_info.user_id,
-      params_ref: await N.models.core.MessageParams.setParams(params)
-    });
+    let report;
+
+    if (env.data.move_to_section) {
+      report = new N.models.core.AbuseReport({
+        src: env.data.item._id,
+        type: N.shared.content_type.MARKET_ITEM_WISH,
+        data: { move_to: env.data.move_to_section._id },
+        from: env.user_info.user_id,
+        params_ref: await N.models.core.MessageParams.setParams(params)
+      });
+    } else {
+      report = new N.models.core.AbuseReport({
+        src: env.data.item._id,
+        type: N.shared.content_type.MARKET_ITEM_WISH,
+        text: env.params.message,
+        from: env.user_info.user_id,
+        params_ref: await N.models.core.MessageParams.setParams(params)
+      });
+    }
 
     await N.wire.emit('internal:common.abuse_report', { report });
   });

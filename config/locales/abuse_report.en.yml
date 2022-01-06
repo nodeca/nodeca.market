@@ -2,13 +2,34 @@ i18n:
   en-US:
     market:
       abuse_report:
+        item_offer:
+          messages:
 
-        messages:
+            - |
+              It's inappropriate
+              This post contains content that a reasonable person would consider offensive, abusive, or a violation of our rules.
 
-          - |
-            It's inappropriate
-            This post contains content that a reasonable person would consider offensive, abusive, or a violation of our rules.
+            - |
+              It's advertisement/spam
+              I think this is an advertisement or spam. Please, check it out.
 
-          - |
-            It's advertisement/spam
-            I think this is an advertisement or spam. Please, check it out.
+            - |
+              Please, move this item
+              @market.item.buy.blocks.abuse_report_dlg.section_select
+              Select a section you suggest to move this item into:
+
+        item_wish:
+          messages:
+
+            - |
+              It's inappropriate
+              This post contains content that a reasonable person would consider offensive, abusive, or a violation of our rules.
+
+            - |
+              It's advertisement/spam
+              I think this is an advertisement or spam. Please, check it out.
+
+            - |
+              Please, move this item
+              @market.item.wish.blocks.abuse_report_dlg.section_select
+              Select a section you suggest to move this item into:

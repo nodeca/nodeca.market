@@ -4,4 +4,10 @@ ru-RU:
 
   header: "Жалоба от [#{nick}](#{url}):"
   src_description: "На [объявление](#{url}) о продаже:"
+  move_from_to:
+    Пользователь предлагает перенести объявление
+     "[#{src_title}](#{src_url})"
+     из "[#{move_from_title}](#{move_from_link})"
+     в "[#{move_to_title}](#{move_to_link})".
+  move_link_text: "Нажмите эту ссылку, если вы считаете это правильным:"
   report_topic: Тема с жалобой.

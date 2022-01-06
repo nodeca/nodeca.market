@@ -4,4 +4,10 @@ en-US:
 
   header: "Report from [#{nick}](#{url}):"
   src_description: "About [item offer](#{url}):"
+  move_from_to:
+    User suggests to move item
+     "[#{src_title}](#{src_url})"
+     from "[#{move_from_title}](#{move_from_link})"
+     into "[#{move_to_title}](#{move_to_link})".
+  move_link_text: "Click this link if you think it is correct:"
   report_topic: Topic with report.

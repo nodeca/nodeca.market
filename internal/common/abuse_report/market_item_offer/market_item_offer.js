@@ -112,22 +112,51 @@ module.exports = function (N, apiPath) {
 
     locals.project_name = await N.settings.get('general_project_name');
     locals.report_text = params.report.text;
-    locals.src_url = N.router.linkTo('market.item.buy', {
-      section_hid: params.data.section.hid,
-      item_hid:    params.data.item.hid
-    });
-    locals.src_text = escape_md(params.data.item.title) + '\n\n' + params.data.item.md;
 
-    // calculate minimum backtick length for ````quote, so it would encapsulate
-    // original content (longest backtick sequence plus 1, but at least 3)
-    let backtick_seq_len = Math.max.apply(
-      null,
-      ('`` ' + locals.report_text + ' ' + locals.src_text)
-        .match(/`+/g) //`
-        .map(s => s.length)
-      ) + 1;
+    if (params.report.data?.move_to) {
+      let move_to_section = await N.models.market.Section
+                                      .findById(params.report.data.move_to)
+                                      .lean(true);
 
-    locals.backticks = '`'.repeat(backtick_seq_len);
+      locals.move_from_link = N.router.linkTo('market.section.buy', {
+        section_hid: params.data.section.hid
+      });
+
+      locals.move_to_link = N.router.linkTo('market.section.buy', {
+        section_hid: move_to_section.hid
+      });
+
+      locals.move_from_title = params.data.section.title;
+      locals.move_to_title = move_to_section.title;
+
+      locals.src_title = params.data.item.title;
+      locals.src_url = N.router.linkTo('market.item.buy', {
+        section_hid: params.data.section.hid,
+        item_hid:    params.data.item.hid
+      });
+      locals.move_link = N.router.linkTo('market.item.buy', {
+        section_hid: params.data.section.hid,
+        item_hid:    params.data.item.hid,
+        $anchor: `move_to_${move_to_section.hid}`
+      });
+    } else {
+      locals.src_url = N.router.linkTo('market.item.buy', {
+        section_hid: params.data.section.hid,
+        item_hid:    params.data.item.hid
+      });
+      locals.src_text = escape_md(params.data.item.title) + '\n\n' + params.data.item.md;
+
+      // calculate minimum backtick length for ````quote, so it would encapsulate
+      // original content (longest backtick sequence plus 1, but at least 3)
+      let backtick_seq_len = Math.max.apply(
+        null,
+        ('`` ' + locals.report_text + ' ' + locals.src_text)
+          .match(/`+/g) //`
+          .map(s => s.length)
+        ) + 1;
+
+      locals.backticks = '`'.repeat(backtick_seq_len);
+    }
 
     if (author) {
       locals.author = author;

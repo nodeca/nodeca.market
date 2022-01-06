@@ -1,5 +1,14 @@
 {{{t 'header' nick=author.user_nick url=author_link}}}
 
+{{#if move_link}}
+{{{t 'move_from_to' move_from_link=move_from_link move_from_title=move_from_title
+               move_to_link=move_to_link move_to_title=move_to_title
+               src_title=src_title src_url=src_url}}}
+
+{{{t 'move_link_text'}}}
+
+[{{{move_link}}}]({{{move_link}}})
+{{else}}
 {{{ backticks }}}quote
 {{{ report_text }}}
 {{{ backticks }}}
@@ -9,6 +18,7 @@
 {{{ backticks }}}quote
 {{{ src_text }}}
 {{{ backticks }}}
+{{/if}}
 
 {{#if report_topic_url}}
 [{{{t 'report_topic'}}}]({{{report_topic_url}}})

@@ -6,12 +6,25 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   // Click report button
   //
   N.wire.on(module.apiPath + ':report', function item_report(data) {
-    let params = { messages: t('@market.abuse_report.messages') };
+    let params = {
+      messages: t('@market.abuse_report.item_wish.messages'),
+      current_section: N.runtime.page_data.section_hid
+    };
     let id = data.$this.data('item-id');
 
     return Promise.resolve()
       .then(() => N.wire.emit('common.blocks.abuse_report_dlg', params))
-      .then(() => N.io.rpc('market.item.wish.abuse_report', { item_id: id, message: params.message }))
+      .then(() => {
+        let rpc_args = { item_id: id };
+
+        if (params.move_to) {
+          rpc_args.move_to = params.move_to;
+        } else {
+          rpc_args.message = params.message;
+        }
+
+        return N.io.rpc('market.item.wish.abuse_report', rpc_args);
+      })
       .then(() => N.wire.emit('notify.info', t('abuse_reported')));
   });
 
@@ -201,4 +214,33 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
       params.text = `Re: [${title}](${href})\n\n`;
     }
   });
+});
+
+
+// Open move item dialog when user goes to #move_to_XX anchor
+//
+N.wire.on('navigate.done:' + module.apiPath, function page_setup_move(data) {
+  let anchor = data.anchor || '';
+  let m;
+  if (!(m = anchor.match(/^#move_to_(\d+)$/))) return;
+
+  let params = { section_hid_from: N.runtime.page_data.section_hid, section_hid_default: +m[1] };
+
+  Promise.resolve()
+    .then(() => N.wire.emit('market.item.wish.item_move_dlg', params))
+    .then(() => {
+      let request = {
+        section_hid_to: params.section_hid_to,
+        item_id: N.runtime.page_data.item_id
+      };
+
+      return N.io.rpc('market.item.wish.move', request);
+    })
+    .then(() => N.wire.emit('notify.info', t('move_item_done')))
+    .then(() => {
+      let section_hid = params.section_hid_to;
+      let item_hid = N.runtime.page_data.item_hid;
+      return N.wire.emit('navigate.to', N.router.linkTo('market.item.wish', { section_hid, item_hid }));
+    })
+    .catch(err => N.wire.emit('error', err));
 });

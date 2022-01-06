@@ -7,7 +7,7 @@ mixin sections_tree(sections, deepness)
       class=self.section_hid_from === section.hid ? 'market-item-buy-move-section__m-current' : ''
       disabled=section.is_category
       value=section.is_category ? null : section.hid
-      selected=(self.section_hid_from === section.hid)
+      selected=(self.section_hid_default === section.hid)
     )=prefix + section.title
 
     if section.children && section.children.length

@@ -4,6 +4,7 @@
 //
 // - section_hid_from
 // - section_hid_to
+// - section_hid_default
 //
 'use strict';
 
@@ -43,7 +44,11 @@ N.wire.once(module.apiPath, function init_handlers() {
 // Init dialog
 //
 N.wire.on(module.apiPath, function show_item_move_dlg(options) {
+  // protection against dialog being created twice
+  if ($dialog) return Promise.reject('CANCELED');
+
   params = options;
+  params.section_hid_default = params.section_hid_default || params.section_hid_from;
 
   return N.io.rpc('market.item.wish.move.sections').then(res => {
     $dialog = $(N.runtime.render(module.apiPath, Object.assign({ apiPath: module.apiPath }, params, res)));
