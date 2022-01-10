@@ -1,3 +1,5 @@
 ru-RU:
+  topic: Объявление
   subject: '#{project_name}: новое объявление в "Куплю: #{section_title}" (барахолка)'
-  view: Посмотреть
+  visit: Перейти
+  unsubscribe: Отписаться
