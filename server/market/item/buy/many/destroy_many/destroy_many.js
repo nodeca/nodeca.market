@@ -108,7 +108,11 @@ module.exports = function (N, apiPath) {
     let bulk_archived = N.models.market.ItemOfferArchived.collection.initializeUnorderedBulkOp();
 
     for (let item of env.data.items) {
-      if (item.st === statuses.DELETED || item.st === statuses.DELETED_HARD) {
+      if (item.st === statuses.DELETED && env.params.method !== 'hard') {
+        continue;
+      }
+
+      if (item.st === statuses.DELETED_HARD) {
         continue;
       }
 
