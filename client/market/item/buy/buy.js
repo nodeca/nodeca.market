@@ -220,7 +220,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 });
 
 
-N.wire.on('navigate.done:' + module.apiPath, function init_lightbox() {
+N.wire.once('navigate.done:' + module.apiPath, function init_lightbox() {
 
   $(document).on('click', '.market-attach-link', function () {
     let $container = $(this).closest('.market-item-buy');
