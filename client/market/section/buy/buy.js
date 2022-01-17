@@ -193,13 +193,20 @@ N.wire.on('navigate.done:' + module.apiPath, function search_form_init() {
 
 
 function updateToolbar() {
-  $('.market-section-buy__toolbar-controls')
-    .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
-      section:      N.runtime.page_data.section,
-      settings:     N.runtime.page_data.settings,
-      subscription: N.runtime.page_data.subscription,
-      selected_cnt: pageState.selected_items.length
-    }));
+  let templateParams = {
+    section:      N.runtime.page_data.section,
+    settings:     N.runtime.page_data.settings,
+    subscription: N.runtime.page_data.subscription,
+    selected_cnt: pageState.selected_items.length
+  };
+
+  // render dropdown in menu
+  $('.page-actions__dropdown').replaceWith(
+    N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+
+  // render buttons+dropdown in page head
+  $('.page-actions').replaceWith(
+    N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
 }
 
 

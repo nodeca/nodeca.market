@@ -1,0 +1,88 @@
+- var menu_rnd_id = 'rnd' + self.get_label_uid()
+
+- var items = []
+
+if self.settings.market_can_create_items
+  - items.push('new_item')
+
+- items.push('currency')
+
+- var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
+
+
+if self.selected_cnt
+  if items.length > 0
+    - items.push('divider')
+  - items.push('many_header')
+  - items.push('many_unselect')
+  if self.settings.market_mod_can_delete_items
+    - items.push('many_delete')
+  if self.settings.market_mod_can_move_items
+    - items.push('many_close')
+    - items.push('many_move')
+
+//- If last item is header - remove it
+if items.length > 0 && items[items.length - 1] === 'header'
+  - items.pop()
+
+.page-actions__dropdown
+  if show_menu
+    button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
+      type='button'
+      id=menu_rnd_id
+      aria-haspopup='true'
+      aria-expanded='false'
+      data-bs-toggle='dropdown'
+    )
+
+    .dropdown-menu.dropdown-menu-end(aria-labelledby=menu_rnd_id)
+
+      each item in items
+        case item
+
+          when 'new_item'
+            //- this menu element should be shown in navbar OR on small screen
+            a.dropdown-item.hidden-page-head(
+              href=self.link_to('market.new', { $query: { wish: '', section: (self.section || {})._id } })
+            )= self.t('item_add')
+
+            a.dropdown-item.d-sm-none.hidden-nav-alt(
+              href=self.link_to('market.new', { $query: { wish: '', section: (self.section || {})._id } })
+            )= self.t('item_add')
+
+          when 'currency'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.blocks.currency_select_dlg'
+              data-currency=self.settings.market_displayed_currency
+            )= self.t('currency')
+
+          when 'divider'
+            .dropdown-divider
+
+          when 'many_header'
+            .dropdown-header=self.t('many_header', { count: self.selected_cnt })
+
+          when 'many_unselect'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.search.wish:items_unselect'
+            )=self.t('many_unselect')
+
+          when 'many_delete'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.search.wish:delete_many'
+            )= self.t('many_delete')
+
+          when 'many_close'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.search.wish:close_many'
+            )= self.t('many_close')
+
+          when 'many_move'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.search.wish:move_many'
+            )= self.t('many_move')

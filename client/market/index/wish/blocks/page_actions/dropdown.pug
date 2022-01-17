@@ -1,0 +1,50 @@
+- var menu_rnd_id = 'rnd' + self.get_label_uid()
+
+- var items = []
+
+if self.settings.market_can_create_items
+  - items.push('new_item')
+
+if self.runtime.is_member
+  - items.push('my_items')
+
+- items.push('currency')
+
+- var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
+
+.page-actions__dropdown
+  if show_menu
+    button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
+      type='button'
+      id=menu_rnd_id
+      aria-haspopup='true'
+      aria-expanded='false'
+      data-bs-toggle='dropdown'
+    )
+
+    .dropdown-menu.dropdown-menu-end(aria-labelledby=menu_rnd_id)
+
+      each item in items
+        case item
+
+          when 'new_item'
+            //- this menu element should be shown in navbar OR on small screen
+            a.dropdown-item.hidden-page-head(
+              href=self.link_to('market.new', { $query: { wish: '' } })
+            )= self.t('item_add')
+
+            a.dropdown-item.d-sm-none.hidden-nav-alt(
+              href=self.link_to('market.new', { $query: { wish: '' } })
+            )= self.t('item_add')
+
+          when 'my_items'
+            a.dropdown-item(
+              href=self.link_to('market.user.wish_active', { user_hid: N.runtime.user_hid })
+            )= self.t('my_items')
+
+          when 'currency'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.blocks.currency_select_dlg'
+              data-currency=self.settings.market_displayed_currency
+            )= self.t('currency')

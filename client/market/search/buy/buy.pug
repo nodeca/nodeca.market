@@ -7,7 +7,7 @@ article#content.market-search-buy
     var navbar_args = {
       title:    self.t('title'),
       level_up: self.link_to('market.index.buy'),
-      toolbar:  'market.search.buy.blocks.toolbar_controls',
+      toolbar:  'market.search.buy.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.search.buy', { $query: self.search }),
         link_bottom: '',
@@ -30,7 +30,7 @@ article#content.market-search-buy
     header.page-head.market-search-buy__head
       h1.market-search-buy__title.page-head__title(itemprop='name')= self.t('title')
 
-      != self.partial('@market.search.buy.blocks.toolbar_controls')
+      != self.partial('@market.search.buy.blocks.page_actions')
 
     != self.partial('@market.blocks.search_form_buy')
 

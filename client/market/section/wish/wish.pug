@@ -16,7 +16,7 @@ article#content.market-section-wish(
       level_up: self.parent_hid ?
                 self.link_to('market.section.wish', { section_hid: self.parent_hid }) :
                 self.link_to('market.index.wish'),
-      toolbar:  'market.section.wish.blocks.toolbar_controls',
+      toolbar:  'market.section.wish.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.section.wish', { section_hid: self.section.hid }),
         link_bottom: self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.last_item_hid } }),
@@ -39,7 +39,7 @@ article#content.market-section-wish(
     header.page-head.market-section-wish__head
       h1.market-section-wish__title.page-head__title(itemprop='name')= self.section.title
 
-      != self.partial('@market.section.wish.blocks.toolbar_controls')
+      != self.partial('@market.section.wish.blocks.page_actions')
 
     != self.partial('@market.blocks.search_form_wish')
     

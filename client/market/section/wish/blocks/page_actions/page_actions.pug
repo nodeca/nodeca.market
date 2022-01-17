@@ -1,0 +1,38 @@
+- var subscriptionTypes = '$$ JSON.stringify(N.models.users.Subscription.types) $$'
+
+.page-actions
+  if self.settings.market_can_create_items
+    a.btn.btn-secondary.btn-square.icon.icon-plus.d-none.d-sm-inline-block(
+      href=self.link_to('market.new', { $query: { wish: '', section: (self.section || {})._id } })
+      title=self.t('item_add')
+    )
+
+  if self.runtime.is_member && !self.section.is_category
+    button.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon.icon-check(
+      type='button'
+      data-on-click='market.section.wish:mark_read'
+      data-section-hid=self.section.hid
+      title=self.t('mark_read')
+    )
+
+  - var subscriptionIcon = 'icon-track-normal'
+  - var subscriptionTitle = self.t('subs_normal')
+
+  if (self.subscription === subscriptionTypes.TRACKING)
+    - subscriptionIcon = 'icon-track-tracking'
+    - subscriptionTitle = self.t('subs_tracking')
+  else if (self.subscription === subscriptionTypes.WATCHING)
+    - subscriptionIcon = 'icon-track-watching'
+    - subscriptionTitle = self.t('subs_watching')
+
+  if (self.subscription && self.subscription !== subscriptionTypes.NORMAL)
+    button.btn.btn-secondary.btn-square.d-none.d-sm-inline-block.icon(
+      type='button'
+      title=subscriptionTitle
+      class=subscriptionIcon
+      data-on-click='market.section.wish:subscription'
+      data-section-hid=self.section.hid
+      data-section-subscription=self.subscription
+    )
+
+  != self.partial('dropdown')

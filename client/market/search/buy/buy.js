@@ -155,12 +155,19 @@ N.wire.before('market.blocks.search_form_buy:search', function inject_sort(data)
 //
 
 function updateToolbar() {
-  $('.market-search-buy__toolbar-controls')
-    .replaceWith(N.runtime.render(module.apiPath + '.blocks.toolbar_controls', {
-      section:      N.runtime.page_data.section,
-      settings:     N.runtime.page_data.settings,
-      selected_cnt: pageState.selected_items.length
-    }));
+  let templateParams = {
+    section:      N.runtime.page_data.section,
+    settings:     N.runtime.page_data.settings,
+    selected_cnt: pageState.selected_items.length
+  };
+
+  // render dropdown in menu
+  $('.page-actions__dropdown').replaceWith(
+    N.runtime.render(module.apiPath + '.blocks.page_actions.dropdown', templateParams));
+
+  // render buttons+dropdown in page head
+  $('.page-actions').replaceWith(
+    N.runtime.render(module.apiPath + '.blocks.page_actions', templateParams));
 }
 
 

@@ -1,0 +1,10 @@
+ru-RU:
+  item_add: Добавить объявление
+  dropdown:
+    item_add: Добавить объявление
+    currency: Валюта
+    many_header: "С #{count} ((объявлением|объявлениями|объявлениями)):"
+    many_unselect: Снять выделение
+    many_delete: Удалить
+    many_close: Закрыть
+    many_move: Переместить

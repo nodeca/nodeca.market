@@ -94,7 +94,7 @@ article#content.market-item-wish(
                 = ' '
                 = self.t('del_reason', { text: self.item.del_reason })
 
-      != self.partial('@market.item.wish.blocks.toolbar_controls')
+      != self.partial('@market.item.wish.blocks.page_actions')
 
     .market-item-wish__description.markup!= self.item.html
 

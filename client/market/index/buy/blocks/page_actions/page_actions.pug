@@ -1,0 +1,8 @@
+.page-actions
+  if self.settings.market_can_create_items
+    a.btn.btn-secondary.btn-square.icon.icon-plus.d-none.d-sm-inline-block(
+      href=self.link_to('market.new')
+      title=self.t('item_add')
+    )
+
+  != self.partial('dropdown')

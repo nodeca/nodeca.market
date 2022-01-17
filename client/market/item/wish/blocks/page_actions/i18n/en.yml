@@ -1,0 +1,12 @@
+en-US:
+  dropdown:
+    user_items: All items from this user
+    currency: Currency
+    mod_actions: Moderation
+    close: Close
+    open: Open
+    move: Move
+    delete: Delete
+    undelete: Restore
+    ip_info: IP info
+    add_infraction: Add infraction

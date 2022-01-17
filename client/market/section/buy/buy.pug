@@ -16,7 +16,7 @@ article#content.market-section-buy(
       level_up: self.parent_hid ?
                 self.link_to('market.section.buy', { section_hid: self.parent_hid }) :
                 self.link_to('market.index.buy'),
-      toolbar:  'market.section.buy.blocks.toolbar_controls',
+      toolbar:  'market.section.buy.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.section.buy', { section_hid: self.section.hid }),
         link_bottom: self.link_to('market.section.buy', { section_hid: self.section.hid, $query: { from: self.last_item_hid } }),
@@ -39,7 +39,7 @@ article#content.market-section-buy(
     header.page-head.market-section-buy__head
       h1.market-section-buy__title.page-head__title(itemprop='name')= self.section.title
 
-      != self.partial('@market.section.buy.blocks.toolbar_controls')
+      != self.partial('@market.section.buy.blocks.page_actions')
 
     != self.partial('@market.blocks.search_form_buy')
     

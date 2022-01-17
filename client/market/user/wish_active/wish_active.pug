@@ -14,7 +14,7 @@ article#content.market-user.market-user__m-wish-active(
     var navbar_args = {
       title:    self.t('title_with_user', { user: user.nick }),
       level_up: self.link_to('market.index.buy'),
-      toolbar:  'market.user.wish_active.blocks.toolbar_controls',
+      toolbar:  'market.user.wish_active.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.user.wish_active', { user_hid: user.hid }),
         link_bottom: self.link_to('market.user.wish_active', { user_hid: user.hid, $query: { from: self.last_item_hid } }),
@@ -46,7 +46,7 @@ article#content.market-user.market-user__m-wish-active(
             img.market-user__avatar(alt=user.name)&attributes(self.avatar(user, 'sm'))
             = user.name
 
-      != self.partial('@market.user.wish_active.blocks.toolbar_controls')
+      != self.partial('@market.user.wish_active.blocks.page_actions')
 
     != self.partial('@market.user.tabs', { active_tab: 'wish_active' })
 

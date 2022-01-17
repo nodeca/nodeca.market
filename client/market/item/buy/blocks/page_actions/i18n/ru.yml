@@ -1,0 +1,12 @@
+ru-RU:
+  dropdown:
+    user_items: Все объявления этого пользователя
+    currency: Валюта
+    mod_actions: Модерация
+    close: Закрыть
+    open: Открыть
+    move: Переместить
+    delete: Удалить
+    undelete: Восстановить
+    ip_info: Информация об IP
+    add_infraction: Выдать нарушение

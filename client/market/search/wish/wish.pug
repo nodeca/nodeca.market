@@ -7,7 +7,7 @@ article#content.market-search-wish
     var navbar_args = {
       title:    self.t('title'),
       level_up: self.link_to('market.index.wish'),
-      toolbar:  'market.search.wish.blocks.toolbar_controls',
+      toolbar:  'market.search.wish.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.search.wish', { $query: self.search }),
         link_bottom: '',
@@ -30,7 +30,7 @@ article#content.market-search-wish
     header.page-head.market-search-wish__head
       h1.market-search-wish__title.page-head__title(itemprop='name')= self.t('title')
 
-      != self.partial('@market.search.wish.blocks.toolbar_controls')
+      != self.partial('@market.search.wish.blocks.page_actions')
 
     != self.partial('@market.blocks.search_form_wish')
 

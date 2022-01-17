@@ -1,0 +1,11 @@
+ru-RU:
+  dropdown:
+    currency: Валюта
+    renew_all: Продлить всё
+    many_header: "С #{count} ((объявлением|объявлениями|объявлениями)):"
+    many_unselect: Снять выделение
+    many_delete: Удалить
+    many_undelete: Восстановить
+    many_close: Закрыть
+    many_open: Открыть
+    many_move: Переместить

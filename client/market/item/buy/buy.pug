@@ -120,7 +120,7 @@ article#content.market-item-buy(
                 = ' '
                 = self.t('del_reason', { text: self.item.del_reason })
 
-      != self.partial('@market.item.buy.blocks.toolbar_controls')
+      != self.partial('@market.item.buy.blocks.page_actions')
 
     if self.item.files && self.item.files.length > 0
       .market-attach-list

@@ -1,0 +1,146 @@
+- var itemStatuses = '$$ JSON.stringify(N.models.market.ItemWish.statuses) $$'
+- var menu_rnd_id = 'rnd' + self.get_label_uid()
+- var user = self.users[self.item.user] || {}
+
+- var items = []
+
+- items.push('user_items')
+- items.push('currency')
+
+if self.item.user === self.runtime.user_id && self.settings.market_can_create_items
+  if self.item.st === itemStatuses.OPEN || self.item.ste === itemStatuses.OPEN
+    - items.push('close')
+  if self.item.st === itemStatuses.CLOSED || self.item.ste === itemStatuses.CLOSED
+    if !(self.settings.market_items_expire > 0 && self.item.closed_at_ts && new Date(self.item.closed_at_ts) < Date.now() - self.settings.market_items_expire * 24 * 60 * 60 * 1000)
+      - items.push('open')
+
+if items.length > 0
+  - items.push('divider')
+
+- items.push('header')
+
+if self.settings.market_mod_can_add_infractions
+  - items.push('mod_add_infraction')
+
+if self.settings.can_see_ip
+  - items.push('mod_ip_info')
+
+if self.settings.market_mod_can_delete_items
+  if self.item.st === itemStatuses.DELETED || self.item.st === itemStatuses.DELETED_HARD
+    - items.push('mod_undelete')
+  else
+    - items.push('mod_delete')
+
+if self.settings.market_mod_can_move_items
+  if self.item.st === itemStatuses.OPEN || self.item.ste === itemStatuses.OPEN
+    - items.push('mod_close')
+  if self.item.st === itemStatuses.CLOSED || self.item.ste === itemStatuses.CLOSED
+    - items.push('mod_open')
+
+  - items.push('mod_move')
+
+//- If last item is header - remove it
+if items.length > 0 && items[items.length - 1] === 'header'
+  - items.pop()
+
+//- If last item is divider - remove it
+if items.length > 0 && items[items.length - 1] === 'divider'
+  - items.pop()
+
+.page-actions__dropdown
+  if items.length > 0
+    button.btn.btn-secondary.btn-square.icon.icon-dropdown.dropdown-toggle(
+      type='button'
+      id=menu_rnd_id
+      aria-haspopup='true'
+      aria-expanded='false'
+      data-bs-toggle='dropdown'
+    )
+
+    .dropdown-menu.dropdown-menu-end(aria-labelledby=menu_rnd_id)
+
+      each item in items
+        case item
+
+          when 'user_items'
+            a.dropdown-item(
+              href=self.link_to('market.user.wish_active', { user_hid: user.hid })
+            )= self.t('user_items')
+
+          when 'currency'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.blocks.currency_select_dlg'
+              data-currency=self.settings.market_displayed_currency
+            )= self.t('currency')
+
+          when 'close'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:close'
+              data-item-id=self.item._id
+            )= self.t('close')
+
+          when 'open'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:open'
+              data-item-id=self.item._id
+            )= self.t('open')
+
+          when 'divider'
+            .dropdown-divider
+
+          when 'header'
+            .dropdown-header= self.t('mod_actions')
+
+          when 'mod_add_infraction'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:add_infraction'
+              data-item-id=self.item._id
+            )= self.t('add_infraction')
+
+          when 'mod_ip_info'
+            button.dropdown-item(
+          type='button'
+              data-on-click='market.item.wish:show_ip'
+              data-item-id=self.item._id
+            )= self.t('ip_info')
+
+          when 'mod_delete'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:delete'
+              data-item-id=self.item._id
+            )= self.t('delete')
+
+          when 'mod_undelete'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:undelete'
+              data-item-id=self.item._id
+            )= self.t('undelete')
+
+          when 'mod_close'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:close'
+              data-item-id=self.item._id
+              data-as-moderator='true'
+            )= self.t('close')
+
+          when 'mod_open'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:open'
+              data-item-id=self.item._id
+              data-as-moderator='true'
+            )= self.t('open')
+
+          when 'mod_move'
+            button.dropdown-item(
+              type='button'
+              data-on-click='market.item.wish:move'
+              data-item-id=self.item._id
+            )= self.t('move')
