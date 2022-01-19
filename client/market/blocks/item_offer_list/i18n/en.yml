@@ -10,5 +10,5 @@ en-US:
   bookmarked: You bookmarked this item
   multiselect_hint: Click with shift to start range selection
   autoclose_at: 'until #{date}'
-  closed_at: 'until #{date}'
+  closed_at: 'closed #{date}'
   price_approximate: Approximate
