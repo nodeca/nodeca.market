@@ -40,12 +40,18 @@
   clear both
 
 .market-user__active
-.market-user__closed
   margin-top 2rem
 
 .market-user__closed-title
-  font-size $font-size-base
-  line-height 1.25em
-  color $body-color-secondary - 10%
-  border-bottom 1px solid $decorator-color
-  padding-bottom .375rem
+  align-items baseline
+  font-size $font-size-xs
+  color $body-color-secondary + 20%
+  display flex
+  gap .75rem
+  margin 1rem 0
+
+  &::before, &::after
+    border-top 1px solid $decorator-color
+    padding-bottom .25em
+    flex 1 1 auto
+    content ''
