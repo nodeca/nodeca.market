@@ -26,7 +26,7 @@ article#content.market-section-buy(
     };
 
   != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
-  != self.partial('@common.blocks.navbar.alt_levelup_progress_title_toolbar', navbar_args)
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title', navbar_args)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
@@ -42,7 +42,7 @@ article#content.market-section-buy(
       != self.partial('@market.section.buy.blocks.page_actions')
 
     != self.partial('@market.blocks.search_form_buy')
-    
+
     .market-section-buy__subsections
       each section in self.subsections || []
         .market-section-buy__subsection(
