@@ -11,12 +11,10 @@ article#content.market-section-wish(
   data-last-item-hid= self.last_item_hid
 )
   -
-    var navbar_args = {
-      title:    self.section.title,
+    const navbar_base = {
       level_up: self.parent_hid ?
                 self.link_to('market.section.wish', { section_hid: self.parent_hid }) :
                 self.link_to('market.index.wish'),
-      extra_buttons: 'market.section.wish.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.section.wish', { section_hid: self.section.hid }),
         link_bottom: self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.last_item_hid } }),
@@ -25,8 +23,15 @@ article#content.market-section-wish(
       }
     };
 
-  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
-  != self.partial('@common.blocks.navbar.alt_levelup_progress_title', navbar_args)
+    const navbar_primary = {};
+
+    const navbar_alt = {
+      title:    self.section.title,
+      extra_buttons: 'market.section.wish.blocks.page_actions.dropdown'
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', { ...navbar_base, ...navbar_primary })
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title', { ...navbar_base, ...navbar_alt })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

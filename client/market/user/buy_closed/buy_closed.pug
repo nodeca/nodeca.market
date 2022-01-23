@@ -12,10 +12,8 @@ article#content.market-user.market-user__m-buy-closed(
   data-last-item-hid= self.last_item_hid
 )
   -
-    var navbar_args = {
-      title:    self.t('title_with_user', { user: user.nick }),
+    const navbar_base = {
       level_up: self.link_to('market.index.buy'),
-      extra_buttons: 'market.user.buy_closed.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.user.buy_closed', { user_hid: user.hid }),
         link_bottom: self.link_to('market.user.buy_closed', { user_hid: user.hid, $query: { from: self.last_item_hid } }),
@@ -24,8 +22,15 @@ article#content.market-user.market-user__m-buy-closed(
       }
     };
 
-  != self.partial('@common.blocks.navbar.levelup_progress_apps', navbar_args)
-  != self.partial('@common.blocks.navbar.alt_levelup_progress_title', navbar_args)
+    const navbar_primary = {};
+
+    const navbar_alt = {
+      title: self.t('title_with_user', { user: user.nick }),
+      extra_buttons: 'market.user.buy_closed.blocks.page_actions.dropdown'
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', { ...navbar_base, ...navbar_primary })
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title', { ...navbar_base, ...navbar_alt })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

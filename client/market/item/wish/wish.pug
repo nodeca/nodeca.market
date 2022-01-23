@@ -21,15 +21,15 @@ article#content.market-item-wish(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-wish__m-bookmarked' : ''
 )
   -
-    var navbar_args = {};
+    const navbar_base = {};
 
     if (isOpen) {
-      navbar_args.level_up = self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.item.hid } });
+      navbar_base.level_up = self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.item.hid } });
     } else {
-      navbar_args.level_up = self.link_to('market.user.wish_closed', { user_hid: user.hid, $query: { from: self.item.hid } });
+      navbar_base.level_up = self.link_to('market.user.wish_closed', { user_hid: user.hid, $query: { from: self.item.hid } });
     }
 
-  != self.partial('@common.blocks.navbar.levelup_apps', navbar_args)
+  != self.partial('@common.blocks.navbar.levelup_apps', navbar_base)
 
   nav.breadcrumbs-container
     .layout__container.container-fluid
