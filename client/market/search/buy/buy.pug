@@ -7,7 +7,7 @@ article#content.market-search-buy
     var navbar_args = {
       title:    self.t('title'),
       level_up: self.link_to('market.index.buy'),
-      toolbar:  'market.search.buy.blocks.page_actions.dropdown',
+      extra_buttons: 'market.search.buy.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.search.buy', { $query: self.search }),
         link_bottom: '',

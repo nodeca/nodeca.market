@@ -14,7 +14,7 @@ article#content.market-user.market-user__m-buy-active(
     var navbar_args = {
       title:    self.t('title_with_user', { user: user.nick }),
       level_up: self.link_to('market.index.buy'),
-      toolbar:  'market.user.buy_active.blocks.page_actions.dropdown',
+      extra_buttons: 'market.user.buy_active.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.user.buy_active', { user_hid: user.hid }),
         link_bottom: self.link_to('market.user.buy_active', { user_hid: user.hid, $query: { from: self.last_item_hid } }),

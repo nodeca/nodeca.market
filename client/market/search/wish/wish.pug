@@ -7,7 +7,7 @@ article#content.market-search-wish
     var navbar_args = {
       title:    self.t('title'),
       level_up: self.link_to('market.index.wish'),
-      toolbar:  'market.search.wish.blocks.page_actions.dropdown',
+      extra_buttons: 'market.search.wish.blocks.page_actions.dropdown',
       progress: {
         link_top:    self.link_to('market.search.wish', { $query: self.search }),
         link_bottom: '',
