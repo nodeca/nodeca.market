@@ -21,7 +21,9 @@ article#content.market-item-wish(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-wish__m-bookmarked' : ''
 )
   -
-    const navbar_base = {};
+    const navbar_base = {
+      search_method: 'market.search.wish'
+    };
 
     if (isOpen) {
       navbar_base.level_up = self.link_to('market.section.wish', { section_hid: self.section.hid, $query: { from: self.item.hid } });

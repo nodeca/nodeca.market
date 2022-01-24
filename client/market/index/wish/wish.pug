@@ -1,5 +1,5 @@
 article#content.market-index-wish
-  != self.partial('@common.blocks.navbar.logo_apps')
+  != self.partial('@common.blocks.navbar.logo_apps', { search_method: 'market.search.wish' })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

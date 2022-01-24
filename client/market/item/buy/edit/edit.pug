@@ -5,7 +5,7 @@
 - self.add_raw_data('no_price_sections', new Set(self.no_price_sections))
 
 article#content.market-item-buy-edit
-  != self.partial('@common.blocks.navbar.logo_apps')
+  != self.partial('@common.blocks.navbar.logo_apps', { search_method: 'market.search.buy' })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

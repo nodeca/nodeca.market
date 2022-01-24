@@ -3,7 +3,7 @@
 - self.add_raw_data('parse_options', self.parse_options)
 
 article#content.market-item-wish-edit
-  != self.partial('@common.blocks.navbar.logo_apps')
+  != self.partial('@common.blocks.navbar.logo_apps', { search_method: 'market.search.wish' })
 
   nav.breadcrumbs-container
     .layout__container.container-fluid

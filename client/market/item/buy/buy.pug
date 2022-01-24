@@ -21,7 +21,9 @@ article#content.market-item-buy(
   class=(self.own_bookmarks.indexOf(self.item._id) !== -1) ? 'market-item-buy__m-bookmarked' : ''
 )
   -
-    const navbar_base = {};
+    const navbar_base = {
+      search_method: 'market.search.buy'
+    };
 
     if (isOpen) {
       navbar_base.level_up = self.link_to('market.section.buy', { section_hid: self.section.hid, $query: { from: self.item.hid } });

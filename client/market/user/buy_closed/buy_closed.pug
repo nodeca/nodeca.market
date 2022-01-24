@@ -22,7 +22,9 @@ article#content.market-user.market-user__m-buy-closed(
       }
     };
 
-    const navbar_primary = {};
+    const navbar_primary = {
+      search_method: 'market.search.buy'
+    };
 
     const navbar_alt = {
       title: self.t('title_with_user', { user: user.nick }),
