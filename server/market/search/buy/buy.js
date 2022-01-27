@@ -164,9 +164,13 @@ module.exports = function (N, apiPath) {
       'market_displayed_currency'
     ]));
 
-    if (env.session.currency) {
+    if (!env.user_info.is_member) {
       // patch for guests who don't have user store
-      env.res.settings.market_displayed_currency = env.session.currency;
+      let currency = env.extras.getCookie('currency');
+
+      if (currency && N.config.market.currencies.hasOwnProperty(currency)) {
+        env.res.settings.market_displayed_currency = currency;
+      }
     }
   });
 };

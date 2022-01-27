@@ -41,9 +41,13 @@ module.exports = function (N, apiPath) {
     env.data.settings = env.data.settings || {};
     Object.assign(env.data.settings, await env.extras.settings.fetch(setting_names));
 
-    if (env.session.currency) {
+    if (!env.user_info.is_member) {
       // patch for guests who don't have user store
-      env.data.settings.market_displayed_currency = env.session.currency;
+      let currency = env.extras.getCookie('currency');
+
+      if (currency && N.config.market.currencies.hasOwnProperty(currency)) {
+        env.data.settings.market_displayed_currency = currency;
+      }
     }
 
     env.res.settings = env.data.settings;

@@ -19,8 +19,9 @@ module.exports = function (N, apiPath) {
         { market_displayed_currency: { value: env.params.currency } },
         { user_id: env.user_info.user_id }
       );
-    } else {
-      env.session.currency = env.params.currency;
     }
+
+    // cookie is a backup storage for guests only
+    env.extras.setCookie('currency', env.params.currency);
   });
 };
