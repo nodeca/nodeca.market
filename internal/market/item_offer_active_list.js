@@ -37,19 +37,18 @@ module.exports = function (N, apiPath) {
   // Fetch and fill permissions
   //
   N.wire.before(apiPath, async function fetch_and_fill_permissions(env) {
-    env.data.settings = env.data.settings || {};
-    Object.assign(env.data.settings, await env.extras.settings.fetch(setting_names));
+    let settings = await env.extras.settings.fetch(setting_names);
 
     if (!env.user_info.is_member) {
       // patch for guests who don't have user store
       let currency = env.extras.getCookie('currency');
 
       if (currency && N.config.market.currencies.hasOwnProperty(currency)) {
-        env.data.settings.market_displayed_currency = currency;
+        settings.market_displayed_currency = currency;
       }
     }
 
-    env.res.settings = env.data.settings;
+    env.res.settings = env.data.settings = { ...env.data.settings, ...settings };
   });
 
 

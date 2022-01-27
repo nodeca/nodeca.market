@@ -133,18 +133,20 @@ module.exports = function (N, apiPath) {
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
-    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+    let settings = await env.extras.settings.fetch([
       'market_can_create_items',
       'market_displayed_currency'
-    ]));
+    ]);
 
     if (!env.user_info.is_member) {
       // patch for guests who don't have user store
       let currency = env.extras.getCookie('currency');
 
       if (currency && N.config.market.currencies.hasOwnProperty(currency)) {
-        env.res.settings.market_displayed_currency = currency;
+        settings.market_displayed_currency = currency;
       }
     }
+
+    env.res.settings = { ...env.res.settings, ...settings };
   });
 };

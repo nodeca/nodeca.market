@@ -214,7 +214,7 @@ module.exports = function (N, apiPath) {
   // Fetch settings needed on the client-side
   //
   N.wire.after(apiPath, async function fetch_settings(env) {
-    env.res.settings = Object.assign({}, env.res.settings, await env.extras.settings.fetch([
+    let settings = await env.extras.settings.fetch([
       'can_report_abuse',
       'can_see_ip',
       'market_can_create_items',
@@ -225,16 +225,18 @@ module.exports = function (N, apiPath) {
       'market_mod_can_hard_delete_items',
       'market_mod_can_edit_items',
       'market_mod_can_move_items'
-    ]));
+    ]);
 
     if (!env.user_info.is_member) {
       // patch for guests who don't have user store
       let currency = env.extras.getCookie('currency');
 
       if (currency && N.config.market.currencies.hasOwnProperty(currency)) {
-        env.res.settings.market_displayed_currency = currency;
+        settings.market_displayed_currency = currency;
       }
     }
+
+    env.res.settings = env.data.settings = { ...env.data.settings, ...settings };
   });
 
 
