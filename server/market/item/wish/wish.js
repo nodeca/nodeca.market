@@ -147,13 +147,13 @@ module.exports = function (N, apiPath) {
   //
   N.wire.after(apiPath, function update_view_counter(env) {
     // First-time visitor or a bot, don't count those
-    if (!env.session_id) return;
+    if (env.session_just_created) return;
 
     N.redis.time(function (err, time) {
       if (err) return;
 
       let score = Math.floor(time[0] * 1000 + time[1] / 1000);
-      let key   = env.data.item._id + '-' + env.session_id;
+      let key   = `${env.data.item._id}-${env.session_id}`;
 
       N.redis.zscore('views:market_item_wish:track_last', key, function (err, old_score) {
         if (err) return;
