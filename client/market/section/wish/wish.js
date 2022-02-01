@@ -2,7 +2,7 @@
 
 
 const _   = require('lodash');
-const bag = require('bagjs')({ prefix: 'nodeca' });
+const bkv = require('bkv').shared();
 const ScrollableList = require('nodeca.core/lib/app/scrollable_list');
 
 
@@ -313,9 +313,9 @@ function key_down(event) {
 function save_selected_items_immediate() {
   if (pageState.selected_items.length) {
     // Expire after 1 day
-    bag.set(selected_items_key, pageState.selected_items, 60 * 60 * 24).catch(() => {});
+    bkv.set(selected_items_key, pageState.selected_items, 60 * 60 * 24);
   } else {
-    bag.remove(selected_items_key).catch(() => {});
+    bkv.remove(selected_items_key);
   }
 }
 const save_selected_items = _.debounce(save_selected_items_immediate, 500);
@@ -347,15 +347,13 @@ N.wire.on('navigate.done:' + module.apiPath, function market_load_previously_sel
     .on('keydown', key_down);
 
   // Don't need wait here
-  bag.get(selected_items_key)
+  bkv.get(selected_items_key, [])
     .then(ids => {
-      ids = ids || [];
       pageState.selected_items = ids;
       update_selection_state($(document));
 
       return ids.length ? updateToolbar() : null;
-    })
-    .catch(() => {}); // Suppress storage errors
+    });
 });
 
 

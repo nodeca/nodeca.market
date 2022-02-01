@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const bag = require('bagjs')({ prefix: 'nodeca' });
+const bkv = require('bkv').shared();
 
 
 // Knockout bindings root object.
@@ -19,12 +19,8 @@ N.wire.on('navigate.preload:' + module.apiPath, function load_deps(preload) {
 
 // Get last currency user selected previously
 //
-N.wire.before('navigate.done:' + module.apiPath, function load_settings() {
-  return bag.get('market_new_item_currency')
-    .then(currency => {
-      last_used_currency = currency || '';
-    })
-    .catch(() => {}); // Suppress storage errors
+N.wire.before('navigate.done:' + module.apiPath, async function load_settings() {
+  last_used_currency = await bkv.get('market_new_item_currency', '');
 });
 
 
@@ -94,8 +90,7 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   }
 
   view.offer.price_currency.subscribe(function (v) {
-    bag.set('market_new_item_currency', v)
-      .catch(() => {}); // suppress storage errors
+    bkv.set('market_new_item_currency', v);
   });
 
   // force price to be numeric (better to do with extenders, but subscription is easier to do)

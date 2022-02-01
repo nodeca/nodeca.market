@@ -2,7 +2,7 @@
 'use strict';
 
 
-const bag = require('bagjs')({ prefix: 'nodeca' });
+const bkv = require('bkv').shared();
 
 
 const OPTIONS_STORE_KEY = 'market_search_form_expanded';
@@ -10,18 +10,16 @@ const OPTIONS_STORE_KEY = 'market_search_form_expanded';
 
 // Expand search form on page load
 //
-N.wire.on(module.apiPath + ':init', function search_init() {
-  return bag.get(OPTIONS_STORE_KEY).then(({ expanded }) => {
-    if (expanded) $('#market_search_options').addClass('show');
-  }).catch(() => {}); // suppress storage errors
+N.wire.on(module.apiPath + ':init', async function search_init() {
+  let { expanded } = await bkv.get(OPTIONS_STORE_KEY, {});
+  if (expanded) $('#market_search_options').addClass('show');
 });
 
 
 function save_search_bar_options() {
   let expanded = $('#market_search_options').hasClass('show');
 
-  return bag.set(OPTIONS_STORE_KEY, { expanded })
-            .catch(() => {}); // suppress storage errors
+  return bkv.set(OPTIONS_STORE_KEY, { expanded });
 }
 
 
