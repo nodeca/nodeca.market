@@ -28,6 +28,16 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
   const RpcCache = require('nodeca.core/client/mdedit/_lib/rpc_cache')(N);
   const ko = require('knockout');
 
+  // https://stackoverflow.com/a/42298478/1031804
+  function resizeToFitContent(el) {
+    el.style.height = '1px'; el.style.height = el.scrollHeight + 'px';
+  }
+  ko.bindingHandlers.autoResize = ko.bindingHandlers.autoResize || {
+    init(element, valueAccessor) {
+      ko.computed(function () { ko.unwrap(valueAccessor()); resizeToFitContent(element); });
+    }
+  };
+
   let draft_id;
 
   let rpc_cache = new RpcCache();

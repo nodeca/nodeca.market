@@ -130,7 +130,10 @@ article#content.market-item-buy-edit
                 data-bind='click: togglePreview, css: { "btn-outline-success": showPreview(), "btn-link": !showPreview() }'
               )=self.t('mode_preview')
 
-            textarea.form-control#market-edit-description(rows=5, data-bind='textInput: offer.description, visible: !showPreview()', required)
+            textarea.form-control.market-item-buy-edit__textarea#market-edit-description(
+              rows=5,
+              data-bind='textInput: offer.description, autoResize: offer.description, visible: !showPreview()', required
+            )
             .market-item-buy__preview.markup(data-bind='html: previewHtml, visible: showPreview()')
             .form-text!= self.t('field_description_help', { link: self.link_to('common.faq_markup') })
 
