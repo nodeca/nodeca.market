@@ -1,14 +1,15 @@
 .market-search-buy__sections-order-block
   - var active_section = !self.search.search_all && self.search.section;
   .market-search-buy__sections
-    .market-search-buy__section(
-      class='market-search-buy__section-level-0'
-      class=!active_section ? 'market-search-buy__section-active' : ''
-    )
-      - var query = Object.assign({}, self.search, { search_all: true });
-      a.market-search-buy__section-title(
-        href=self.link_to('market.search.buy', { $query: query })
-      )= self.t('search_all')
+    if (self.search_stats || []).length
+      .market-search-buy__section(
+        class='market-search-buy__section-level-0'
+        class=!active_section ? 'market-search-buy__section-active' : ''
+      )
+        - var query = Object.assign({}, self.search, { search_all: true });
+        a.market-search-buy__section-title(
+          href=self.link_to('market.search.buy', { $query: query })
+        )= self.t('search_all')
 
     each section in self.search_stats || []
       .market-search-buy__section(
