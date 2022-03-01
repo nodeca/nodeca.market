@@ -62,7 +62,7 @@ module.exports = function (N, apiPath) {
 
     if (params.search_all) env.data.search.search_all = true;
 
-    if (Number(params.range) > 0 && env.data.user.location) {
+    if (Number(params.range) > 0 && env.data.user?.location) {
       // get nearest available range
       env.data.search.range = Number(params.range) >= 150 ? 200 : 100;
     }

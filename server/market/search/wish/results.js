@@ -81,7 +81,7 @@ module.exports = function (N, apiPath) {
 
     if (params.search_all) env.data.search.search_all = true;
 
-    if (Number(params.range) > 0 && env.data.user.location) {
+    if (Number(params.range) > 0 && env.data.user?.location) {
       // get nearest available range
       env.data.search.range = Number(params.range) >= 150 ? 200 : 100;
     }
@@ -143,7 +143,7 @@ module.exports = function (N, apiPath) {
       }
     }
 
-    if (env.data.search.range && env.data.user.location) {
+    if (env.data.search.range && env.data.user?.location) {
       query += ' AND has_location=1 AND calc_dist<=?';
       params.push(env.data.search.range);
       need_dist = true;

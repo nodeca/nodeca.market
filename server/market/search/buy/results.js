@@ -107,7 +107,7 @@ module.exports = function (N, apiPath) {
       env.data.search.price_max_currency = params.price_max_currency;
     }
 
-    if (Number(params.range) > 0 && env.data.user.location) {
+    if (Number(params.range) > 0 && env.data.user?.location) {
       // get nearest available range
       env.data.search.range = Number(params.range) >= 150 ? 200 : 100;
     }
@@ -207,7 +207,7 @@ module.exports = function (N, apiPath) {
       env.res.search_error = env.res.search_error || env.t('err_invalid_price_range');
     }
 
-    if (env.data.search.range && env.data.user.location) {
+    if (env.data.search.range && env.data.user?.location) {
       query += ' AND has_location=1 AND calc_dist<=?';
       params.push(env.data.search.range);
       need_dist = true;
