@@ -173,7 +173,9 @@ N.wire.on('navigate.done:' + module.apiPath, function page_setup() {
         uploaded: null
       };
 
-      return N.wire.emit('users.uploader:add', params)
+      return Promise.resolve()
+        .then(() => N.loader.loadAssets('users'))
+        .then(() => N.wire.emit('users.uploader:add', params))
         .then(() => {
           params.uploaded.reverse().forEach(m => view.offer.files.push({ id: m.media_id, tmp: true }));
         });

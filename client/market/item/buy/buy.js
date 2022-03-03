@@ -191,14 +191,16 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
   // (this is the same API that usercard is using, so users.dialog.create:begin hook below works)
   //
   N.wire.on(module.apiPath + ':contact', function create_dialog(data) {
-    return N.wire.emit('users.dialog.create:begin', {
-      nick: data.$this.data('to-nick'),
-      hid: data.$this.data('to-hid'),
-      ref: data.$this.data('ref'),
+    return Promise.resolve()
+      .then(() => N.loader.loadAssets('users'))
+      .then(() => N.wire.emit('users.dialog.create:begin', {
+        nick: data.$this.data('to-nick'),
+        hid: data.$this.data('to-hid'),
+        ref: data.$this.data('ref'),
 
-      // add tag if user clicks on "contact" button (but not from usercard)
-      meta: { market_item_ref: data.$this.data('item-id') }
-    });
+        // add tag if user clicks on "contact" button (but not from usercard)
+        meta: { market_item_ref: data.$this.data('item-id') }
+      }));
   });
 
 
