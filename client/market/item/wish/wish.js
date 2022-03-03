@@ -43,7 +43,7 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
     let params = { item_id };
 
     return Promise.resolve()
-      .then(() => N.wire.emit('users.blocks.add_infraction_dlg', params))
+      .then(() => N.wire.emit('common.blocks.add_infraction_dlg', params))
       .then(() => N.io.rpc('market.item.wish.add_infraction', params))
       .then(() => N.wire.emit('navigate.reload'))
       .then(() => N.wire.emit('notify.info', t('infraction_added')));
