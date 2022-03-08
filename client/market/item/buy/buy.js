@@ -222,33 +222,40 @@ N.wire.once('navigate.done:' + module.apiPath, function page_once() {
 });
 
 
-N.wire.once('navigate.done:' + module.apiPath, function init_lightbox() {
+function show_lightbox() {
+  let $container = $(this).closest('.market-item-buy');
+  let nodes;
 
-  $(document).on('click', '.market-attach-link', function () {
-    let $container = $(this).closest('.market-item-buy');
-    let nodes;
+  if ($container.length) {
+    nodes = $container.find('.market-attach-link').toArray();
+  } else {
+    nodes = [ this ];
+  }
 
-    if ($container.length) {
-      nodes = $container.find('.market-attach-link').toArray();
-    } else {
-      nodes = [ this ];
-    }
+  let elements = [];
 
-    let elements = [];
-
-    nodes.forEach(node => {
-      elements.push({
-        href: $(node).attr('href'),
-        type: 'image'
-      });
+  nodes.forEach(node => {
+    elements.push({
+      href: $(node).attr('href'),
+      type: 'image'
     });
-
-    let index = nodes.indexOf(this);
-
-    glightbox({ elements }).openAt(index);
-
-    return false;
   });
+
+  let index = nodes.indexOf(this);
+
+  glightbox({ elements }).openAt(index);
+
+  return false;
+}
+
+
+N.wire.on('navigate.done:' + module.apiPath, function lightbox_init() {
+  $(document).on('click', '.market-attach-link', show_lightbox);
+});
+
+
+N.wire.on('navigate.exit:' + module.apiPath, function lightbox_done() {
+  $(document).off('click', '.market-attach-link', show_lightbox);
 });
 
 
