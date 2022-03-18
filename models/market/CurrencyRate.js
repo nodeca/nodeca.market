@@ -66,7 +66,7 @@ module.exports = function (N, collectionName) {
   let rootUrl = (N.config.bind?.default?.mount || 'http://localhost') + '/';
   let userAgent = `needle/${needle.version} (Nodeca; +${rootUrl})`;
 
-  CurrencyRate.statics.fetch = async function fetch() {
+  /*CurrencyRate.statics.fetch = async function fetch() {
     let response = await needle('get', 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', {
       headers: { 'User-Agent': userAgent },
       open_timeout: 10000,
@@ -90,6 +90,43 @@ module.exports = function (N, collectionName) {
       if (c === BASE_CURRENCY) continue;
 
       rates[c] = Number(tree.find(`Cube[currency="${c}"]`).attr('rate'));
+
+      if (!Number.isFinite(rates[c])) throw new Error('Unable to parse currency rates');
+    }
+
+    await N.models.market.CurrencyRate.updateOne({}, { ts: new Date(), date, rates }, { upsert: true });
+  };*/
+
+
+  CurrencyRate.statics.fetch = async function fetch() {
+    let response = await needle('get', 'https://www.cbr.ru/scripts/XML_daily.asp', {
+      headers: { 'User-Agent': userAgent },
+      open_timeout: 10000,
+      response_timeout: 30000,
+      read_timeout: 30000,
+      parse_response: false
+    });
+
+    if (response.statusCode !== 200) {
+      throw new Error(`Wrong HTTP response code: ${response.statusCode}`);
+    }
+
+    let tree = cheerio(response.body, { xmlMode: true });
+
+    let date = new Date(tree.filter('ValCurs').attr('date').split('.').reverse().join('-'));
+    let res_rates = { RUB: 1 };
+
+    if (!Number.isFinite(+date)) throw new Error('Unable to parse currency rates');
+
+    tree.find('Valute').each((i, node) => {
+      let curr  = cheerio(node).find('CharCode').text();
+      let value = cheerio(node).find('Value').text();
+      res_rates[curr] = Number(value.replace(',', '.'));
+    });
+
+    let rates = {};
+    for (let c of Object.keys(N.config.market.currencies)) {
+      rates[c] = res_rates[BASE_CURRENCY] / res_rates[c];
 
       if (!Number.isFinite(rates[c])) throw new Error('Unable to parse currency rates');
     }
