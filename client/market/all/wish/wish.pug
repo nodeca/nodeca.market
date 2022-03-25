@@ -1,0 +1,72 @@
+- self.add_raw_data('settings',     self.settings)
+- self.add_raw_data('subscription', self.subscription)
+- self.add_raw_data('pagination',   self.pagination)
+
+article#content.market-all-wish(
+  data-keymap= {
+    'home': 'market.all.wish:nav_to_start',
+    'end':  'market.all.wish:nav_to_end'
+  }
+  data-last-item-hid= self.last_item_hid
+)
+  -
+    var navbar_base = {
+      level_up: self.link_to('market.index.wish'),
+      progress: {
+        link_top:    self.link_to('market.all.wish'),
+        link_bottom: self.link_to('market.all.wish', { $query: { from: self.last_item_hid } }),
+        current:     self.pagination.chunk_offset,
+        total:       self.pagination.total
+      }
+    };
+
+    const navbar_primary = {
+      search_method: 'market.search.wish'
+    };
+
+    const navbar_alt = {
+      title: self.t('title'),
+      extra_buttons: 'market.all.wish.blocks.page_actions.dropdown',
+    };
+
+  != self.partial('@common.blocks.navbar.levelup_progress_apps', { ...navbar_base, ...navbar_primary })
+  != self.partial('@common.blocks.navbar.alt_levelup_progress_title', { ...navbar_base, ...navbar_alt })
+
+  nav.breadcrumbs-container
+    .layout__container.container-fluid
+      != self.partial('@common.blocks.breadcrumbs')
+
+  .layout__container.container-fluid
+    != self.partial('@common.blocks.announces')
+    != self.partial('@market.blocks.drafts')
+
+    header.page-head.market-all-wish__head
+      h1.market-all-wish__title.page-head__title(itemprop='name')= self.t('title')
+
+      != self.partial('@market.all.wish.blocks.page_actions')
+
+    != self.partial('@market.blocks.search_form_wish')
+
+    if self.items && self.items.length
+      .market-all-wish__loading-prev.nojs-hide(
+        class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
+      )
+        span.icon.icon-loading-placeholder
+
+      ul.market-all-wish__item-list
+        != self.partial('@market.blocks.item_wish_list')
+
+      .market-all-wish__loading-next.nojs-hide(
+        class=(self.items && self.items.length > 0 && self.items[self.items.length - 1].hid === self.last_item_hid ? 'd-none' : '')
+      )
+        span.icon.icon-loading-placeholder
+
+      nav.pager.js-hide
+        if self.head.prev
+          a.btn.btn-secondary(href=self.head.prev)= self.t('prev_page')
+
+        if self.head.next
+          a.btn.btn-secondary(href=self.head.next)= self.t('next_page')
+    else
+      p.market-all-wish__no-items
+        != self.t('no_items')

@@ -6,6 +6,12 @@ router:
     market.index.wish:
       "/market/wish": ~
 
+    market.all.buy:
+      "/market/all": ~
+
+    market.all.wish:
+      "/market/wish/all": ~
+
     market.search.buy:
       "/market/search": ~
 

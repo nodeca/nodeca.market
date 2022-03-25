@@ -1,0 +1,8 @@
+en-US:
+  title: Delete selected items
+  confirmation_text: Are you sure you wish to delete items?
+  reason_input_help: Deletion reason
+  ok: OK
+  cancel: Cancel
+  delete_soft: Soft delete
+  delete_hard: Hard delete

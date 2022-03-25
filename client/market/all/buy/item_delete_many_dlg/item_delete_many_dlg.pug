@@ -1,0 +1,24 @@
+.modal.fade(tabindex='-1' role='dialog' aria-hidden='true')
+  .modal-dialog(role='document')
+    .modal-content
+      form(data-on-submit=self.apiPath + ':submit')
+        .modal-header
+          h4.modal-title=self.t('title')
+          button.btn-close(type='button' tabindex='-1' data-bs-dismiss='modal')
+        .modal-body
+          p.text-danger=self.t('confirmation_text')
+          .mb-3
+            input.form-control(type='text' name='reason' tabindex='1' placeholder=self.t('reason_input_help'))
+          if self.canDeleteHard
+            .mb-3
+              .form-check
+                label.form-check-label
+                  input.form-check-input(type='radio' name='method' tabindex='2' value='soft' checked=true)
+                  = ' ' + self.t('delete_soft')
+              .form-check
+                label.form-check-label
+                  input.form-check-input(type='radio' name='method' tabindex='3' value='hard')
+                  = ' ' + self.t('delete_hard')
+        .modal-footer
+          button.btn.btn-secondary(type='button' tabindex='4' data-bs-dismiss='modal')=self.t('cancel')
+          button.btn.btn-danger(type='submit' tabindex='5')=self.t('ok')
