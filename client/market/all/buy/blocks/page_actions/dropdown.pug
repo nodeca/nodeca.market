@@ -2,12 +2,9 @@
 
 - var items = []
 
-if self.settings.market_can_create_items
-  - items.push('new_item')
-
 - items.push('currency')
 
-- var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
+- var show_menu = items.length > 0;
 
 if self.selected_cnt
   if items.length > 0
@@ -38,17 +35,6 @@ if items.length > 0 && items[items.length - 1] === 'header'
 
       each item in items
         case item
-
-          when 'new_item'
-            //- this menu element should be shown in navbar OR on small screen
-            a.dropdown-item.hidden-page-head(
-              href=self.link_to('market.new')
-            )= self.t('item_add')
-
-            a.dropdown-item.d-sm-none.hidden-nav-alt(
-              href=self.link_to('market.new')
-            )= self.t('item_add')
-
           when 'currency'
             button.dropdown-item(
               type='button'

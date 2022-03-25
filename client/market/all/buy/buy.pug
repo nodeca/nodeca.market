@@ -45,8 +45,6 @@ article#content.market-all-buy(
 
       != self.partial('@market.all.buy.blocks.page_actions')
 
-    != self.partial('@market.blocks.search_form_buy')
-
     if self.items && self.items.length
       .market-all-buy__loading-prev.nojs-hide(
         class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')

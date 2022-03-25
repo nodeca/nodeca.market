@@ -179,13 +179,6 @@ N.wire.on('navigate.exit:' + module.apiPath, function page_teardown() {
 });
 
 
-// Init search form
-//
-N.wire.on('navigate.done:' + module.apiPath, function search_form_init() {
-  return N.wire.emit('market.blocks.search_form_buy:init');
-});
-
-
 function updateToolbar() {
   let templateParams = {
     settings:     N.runtime.page_data.settings,

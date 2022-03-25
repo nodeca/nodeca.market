@@ -45,8 +45,6 @@ article#content.market-all-wish(
 
       != self.partial('@market.all.wish.blocks.page_actions')
 
-    != self.partial('@market.blocks.search_form_wish')
-
     if self.items && self.items.length
       .market-all-wish__loading-prev.nojs-hide(
         class=(self.pagination.chunk_offset === 0 ? 'd-none' : '')
