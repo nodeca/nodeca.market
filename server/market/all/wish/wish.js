@@ -135,7 +135,7 @@ module.exports = function (N, apiPath) {
   // Fill breadcrumbs info
   //
   N.wire.after(apiPath, async function fill_breadcrumbs(env) {
-    await N.wire.emit('internal:market.breadcrumbs_fill', { env });
+    await N.wire.emit('internal:market.breadcrumbs_fill', { env, wish: true });
   });
 
 
