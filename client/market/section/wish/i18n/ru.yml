@@ -10,3 +10,5 @@ ru-RU:
   many_close_confirm: Вы уверены, что хотите закрыть выбранные объявления?
   many_items_closed: Выбранные объявления закрыты
   many_items_moved: Выбранные объявления перемещены
+  category_subscription_confirm: Вы хотите изменить подписку для всех разделов в этой категории?
+  category_subscription_done: 'Подписка изменена для #{count} ((раздела|разделов|разделов))'

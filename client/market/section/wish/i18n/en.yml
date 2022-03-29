@@ -10,3 +10,5 @@ en-US:
   many_close_confirm: Are you sure you wish to close selected items?
   many_items_closed: Selected items have been closed
   many_items_moved: Selected items have been moved
+  category_subscription_confirm: Do you wish to change subscription for all sections in this category?
+  category_subscription_done: 'Subscription changed for #{count} ((section|sections))'

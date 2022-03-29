@@ -49,16 +49,48 @@ module.exports = function (N, apiPath) {
   // Add/remove subscription
   //
   N.wire.on(apiPath, async function subscription_add_remove(env) {
+    // get hids of specified section and all its non-linked subsections
+    let children = await N.models.market.Section.getChildren({
+      section: env.data.section._id,
+      wishes: true
+    });
+
+    children = children.filter(s => !s.is_linked);
+
+    let sections = [ env.data.section ];
+
+    if (children.length > 0) {
+      let s = await N.models.market.Section.find()
+                        .where('_id').in(children.map(x => x._id))
+                        .lean(true)
+                        .exec();
+
+      sections = sections.concat(s);
+    }
+
+    // still allow to unsubscribe from category, but can't subscribe to it
+    if (env.params.type !== N.models.users.Subscription.types.NORMAL) {
+      sections = sections.filter(s => !s.is_category);
+    }
+
     // Use `update` with `upsert` to avoid duplicates in case of multi click
-    await N.models.users.Subscription.updateOne(
-      {
-        user: env.user_info.user_id,
-        to: env.data.section._id,
-        // user subscribes separately to offers and wishes,
-        // so for market sections we always have to check subscription type
-        to_type: N.shared.content_type.MARKET_SECTION_WISH
-      },
-      { type: env.params.type },
-      { upsert: true });
+    let affected_count = 0;
+
+    for (let section of sections) {
+      let res = await N.models.users.Subscription.updateOne(
+        {
+          user: env.user_info.user_id,
+          to: section._id,
+          // user subscribes separately to offers and wishes,
+          // so for market sections we always have to check subscription type
+          to_type: N.shared.content_type.MARKET_SECTION_WISH
+        },
+        { type: env.params.type },
+        { upsert: true });
+
+      affected_count += res.nModified + (res.upserted?.length ? 1 : 0);
+    }
+
+    env.res.affected_section_count = affected_count;
   });
 };

@@ -222,8 +222,19 @@ N.wire.once('navigate.done:' + module.apiPath, function market_section_init_hand
 
     return Promise.resolve()
       .then(() => N.wire.emit('market.section.buy.subscription', params))
+      .then(() => (N.runtime.page_data.section.is_category ?
+                  N.wire.emit('common.blocks.confirm', t('category_subscription_confirm')) :
+                  Promise.resolve()))
       .then(() => N.io.rpc('market.section.buy.change_subscription', { section_hid: hid, type: params.subscription }))
-      .then(() => {
+      .then(res => {
+        if (!res.affected_section_count) return; // no changes
+
+        if (N.runtime.page_data.section.is_category) {
+          // category
+          return N.wire.emit('notify.info', t('category_subscription_done', res.affected_section_count));
+        }
+
+        // regular section
         N.runtime.page_data.subscription = params.subscription;
       })
       .then(updateToolbar);

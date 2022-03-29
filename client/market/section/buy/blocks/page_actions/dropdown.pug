@@ -10,6 +10,8 @@ if self.settings.market_can_create_items
 
 if self.runtime.is_member && !self.section.is_category
   - items.push('mark_read')
+
+if self.runtime.is_member
   - items.push('subscription')
 
 - var show_menu = items.filter(function (item) { return item !== 'new_item'; }).length > 0;
