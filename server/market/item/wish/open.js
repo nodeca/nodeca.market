@@ -91,12 +91,15 @@ module.exports = function (N, apiPath) {
   // Check permissions
   //
   N.wire.before(apiPath, async function check_permissions(env) {
-    let market_items_expire = await env.extras.settings.fetch('market_items_expire');
+    let market_items_reopen_max_age = await env.extras.settings.fetch('market_items_reopen_max_age');
 
     // users cannot open old items, restricted on the client also
-    if (!env.params.as_moderator && market_items_expire > 0 && env.data.item.closed_at_ts &&
-         env.data.item.closed_at_ts < Date.now() - market_items_expire * 24 * 60 * 60 * 1000) {
-      throw N.io.FORBIDDEN;
+    if (!env.params.as_moderator && market_items_reopen_max_age > 0 && env.data.item.closed_at_ts &&
+         env.data.item.closed_at_ts < Date.now() - market_items_reopen_max_age * 24 * 60 * 60 * 1000) {
+      throw {
+        code: N.io.CLIENT_ERROR,
+        message: env.t('err_item_too_old')
+      };
     }
 
     //

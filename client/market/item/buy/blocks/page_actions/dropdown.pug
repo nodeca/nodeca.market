@@ -11,8 +11,7 @@ if self.item.user === self.runtime.user_id && self.settings.market_can_create_it
   if self.item.st === itemStatuses.OPEN || self.item.ste === itemStatuses.OPEN
     - items.push('close')
   if self.item.st === itemStatuses.CLOSED || self.item.ste === itemStatuses.CLOSED
-    if !(self.settings.market_items_expire > 0 && self.item.closed_at_ts && new Date(self.item.closed_at_ts) < Date.now() - self.settings.market_items_expire * 24 * 60 * 60 * 1000)
-      - items.push('open')
+    - items.push('open')
 
 if items.length > 0
   - items.push('divider')

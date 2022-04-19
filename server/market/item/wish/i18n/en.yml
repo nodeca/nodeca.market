@@ -5,3 +5,6 @@ en-US:
   add_infraction:
     err_perm_receive: You can't add infractions to this user
     err_infraction_exists: Can't give infraction twice
+
+  open:
+    err_item_too_old: You can't open this item because it is too old

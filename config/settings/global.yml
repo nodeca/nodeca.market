@@ -16,6 +16,13 @@ setting_schemas:
       type: number
       default: 31 # 1 month
 
+    market_items_reopen_max_age:
+      priority: 15
+      group_key: market_general
+      category_key: market_common
+      type: number
+      default: 183 # 6 months
+
     market_drafts_expire:
       priority: 20
       group_key: market_general

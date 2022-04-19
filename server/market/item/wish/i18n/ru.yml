@@ -5,3 +5,6 @@ ru-RU:
   add_infraction:
     err_perm_receive: Вы не можете выдать нарушение этому пользователю
     err_infraction_exists: Нельзя выдать нарушение дважды
+
+  open:
+    err_item_too_old: Нельзя открыть объявление потому, что оно слишком старое
