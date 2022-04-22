@@ -59,7 +59,7 @@ module.exports = function (N, apiPath) {
           .select('section hid')
           .sort('hid')
           .lean(true)
-          .stream(),
+          .cursor(),
 
       item_offers_stream,
       () => {}
@@ -85,7 +85,7 @@ module.exports = function (N, apiPath) {
           .select('section hid')
           .sort('hid')
           .lean(true)
-          .stream(),
+          .cursor(),
 
       item_wishes_stream,
       () => {}
