@@ -88,7 +88,7 @@ module.exports = function (N, apiPath) {
         { type: env.params.type },
         { upsert: true });
 
-      affected_count += res.nModified + (res.upserted?.length ? 1 : 0);
+      affected_count += res.modifiedCount + res.upsertedCount;
     }
 
     env.res.affected_section_count = affected_count;
