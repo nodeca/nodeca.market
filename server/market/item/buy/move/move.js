@@ -69,8 +69,6 @@ module.exports = function (N, apiPath) {
   // Move topic
   //
   N.wire.on(apiPath, async function move_topic(env) {
-    if (String(env.data.item.section) === String(env.data.section_to._id)) return;
-
     if (env.data.item_is_archived) {
       await N.models.market.ItemOfferArchived.updateOne(
         { _id: env.data.item._id },
@@ -107,8 +105,6 @@ module.exports = function (N, apiPath) {
   // Schedule search index update
   //
   N.wire.after(apiPath, async function add_search_index(env) {
-    if (String(env.data.item.section) === String(env.data.section_to._id)) return;
-
     await N.queue.market_item_offers_search_update_by_ids([ env.data.item._id ]).postpone();
   });
 
@@ -116,8 +112,6 @@ module.exports = function (N, apiPath) {
   // Update sections counters
   //
   N.wire.after(apiPath, async function update_sections(env) {
-    if (String(env.data.item.section) === String(env.data.section_to._id)) return;
-
     await N.models.market.Section.updateCache(env.data.item.section);
     await N.models.market.Section.updateCache(env.data.section_to._id);
   });
