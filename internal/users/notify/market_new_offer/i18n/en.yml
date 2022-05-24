@@ -2,4 +2,5 @@ en-US:
   topic: Item
   subject: '#{project_name}: new item in "#{section_title}" (market)'
   visit: Visit
+  reply_notice: This message is generated automatically. Please, don't reply to it.
   unsubscribe: Unsubscribe
