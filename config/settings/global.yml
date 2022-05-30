@@ -36,6 +36,12 @@ setting_schemas:
       category_key: market_item
       default: 10
 
+    market_title_max_length:
+      type: number
+      group_key: market_editor
+      category_key: market_item
+      default: 100
+
     market_desc_min_length:
       type: number
       group_key: market_editor

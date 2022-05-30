@@ -18,6 +18,7 @@ i18n:
           market_drafts_expire: Max time to store drafts (days)
           market_items_reopen_max_age: Users can open their own closed items no older than this (days)
           market_title_min_length: Min title length
+          market_title_max_length: Max title length
           market_desc_min_length: Min description length
           market_items_min_images: Min number of images in a lot
           market_items_max_images: Max number of images in a lot
