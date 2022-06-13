@@ -3,7 +3,6 @@ each item in self.items
   - var market_item = is_wish ? self.market_item_wishes[item.id] : self.market_item_offers[item.id];
   - var section = self.market_sections[market_item.section];
   - var user = self.users[market_item.user] || {};
-  -debugger
   - var mark = self.read_marks[market_item._id];
   - var href = self.link_to(is_wish ? 'market.item.wish' : 'market.item.buy', { section_hid: section.hid, item_hid: market_item.hid });
 
