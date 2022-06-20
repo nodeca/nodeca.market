@@ -30,7 +30,11 @@ module.exports = function (N, apiPath) {
     }
 
     // Fail if this section contains user posts.
-    let anyPost = await N.models.market.Item.findOne({ section: section._id });
+    let anyPost =
+      await N.models.market.ItemOffer.findOne({ section: section._id }) ||
+      await N.models.market.ItemOfferArchived.findOne({ section: section._id }) ||
+      await N.models.market.ItemWish.findOne({ section: section._id }) ||
+      await N.models.market.ItemWishArchived.findOne({ section: section._id });
 
     if (anyPost) {
       throw { code: N.io.CLIENT_ERROR, message: env.t('error_section_contains_posts') };

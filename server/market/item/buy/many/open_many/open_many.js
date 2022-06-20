@@ -125,7 +125,7 @@ module.exports = function (N, apiPath) {
       if (!env.data.item_is_archived) {
         bulk_active.find({ _id: item._id }).updateOne(update);
       } else {
-        bulk_archived.find({ _id: item._id }).removeOne();
+        bulk_archived.find({ _id: item._id }).deleteOne();
         bulk_active.insert(new_item);
         env.data.sections_to_update.add(String(item.section));
       }
