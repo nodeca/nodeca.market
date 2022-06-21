@@ -95,10 +95,8 @@ each item, idx in self.items
             span.market-list-item-offer__details-item
               - var user = self.users[item.user];
               if user
-                a.market-list-item-offer__user-link._ucard-popover(
-                  href=self.link_to('users.member', { user_hid: user.hid })
-                  data-user-id=user._id
-                  data-user-ref='market_list_item_offer:'+section.hid+':'+item.hid
+                a.market-list-item-offer__user-link(
+                  href=self.link_to('market.user.buy_active', { user_hid: user.hid })
                 )= user.nick
 
           span.market-list-item-offer__details-item
